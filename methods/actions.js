@@ -14,18 +14,21 @@ client.on("error", (err) => console.log("Redis Client Error", err));
 
 client.connect();
 
+const logoUrl =
+  "https://www.tinqlab.com/_next/image?url=%2Ftinqlab_logo.svg&w=32&q=75g";
+
 var functions = {
-  //logout route
+  // ** LOGOUT ROUTE **//
   logout: function (req, res) {
     if (req.session || req.user) {
       req.session.destroy(async (err) => {
         if (err) {
-          res.status(400).send("Unable to log out");
+          res.status(400).send({ success: false, message: "Unable to logout" });
         } else {
           await client.del(req.user.email);
           res.status(200).json({
             success: true,
-            msg: "Successfully logged you out.",
+            msg: "User Successfully logged out.",
           });
         }
       });
@@ -34,12 +37,12 @@ var functions = {
     }
   },
 
-  //***CREATE A NEW USER ACCOUNT***
+  //***CREATE A NEW USER ACCOUNT***//
   signup: async function (req, res) {
     function generateOTP() {
       var digits = "0123456789";
       let OTP = "";
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 4; i++) {
         OTP += digits[Math.floor(Math.random() * 10)];
       }
       return OTP;
@@ -51,7 +54,7 @@ var functions = {
     //check if the email exists
     let userEmail = await User.findOne({ email: lowerCaseEmail });
     if (!lowerCaseEmail) {
-      res.json({ success: false, msg: "No Email Provided" });
+      res.status(400).send({ success: false, msg: "No Email Provided" });
     } else if (userEmail) {
       return res.status(400).send({
         success: false,
@@ -70,6 +73,7 @@ var functions = {
           //CREATING THE NEW USER
           var newUser = User({
             fullname: "",
+            nickname: "",
             phone: 00000000000,
             occupation: "",
             street: "",
@@ -83,25 +87,24 @@ var functions = {
           });
           newUser.save(function (err, newUser) {
             if (err) {
-              res.json({
+              res.status(500).send({
                 success: false,
                 msg: "Failed to create user account",
                 err,
               });
             } else {
-              const logoUrl = "https://i.imgur.com/uNnD4YG.png";
               let htmlWelcomeTemplate = `
              <!DOCTYPE html>
         <html>
         <body>
-         <img src=${logoUrl} alt="ComiBlock Logo" style="display:block;width:150px;height:100px;margin-left:auto; margin-right:auto">
+         <img src=${logoUrl} alt="Tinqlab Logo" style="display:block;width:150px;height:100px;margin-left:auto; margin-right:auto">
         <h3 style="margin:0.4em; margin-bottom:2em; text-align:center; color:black">Please confirm your email</h3>
         
         <p style="line-spacing:4px; text-align:left;color:black">Hello ,</p>
         <p style="line-spacing:4px; text-align:left;color:black">Please use this verification code to verify your email address.</p>
         <p style="font-weight:bold; text-align:left;color:black;font-size:1.5em;margin-bottom:2em">${generatedOTP}</p>
-        <p style="font-size:3px;line-spacing:4px; text-allign:left;color:black;margin-bottom:3em"><span style="font-weight:bold">Note:</span> If you did not take this action, please contact us immediately at <span><a href="mailto:hello@comiblock.com">hello@comiblock.com</a></span>.</p>
-        <p style="font-size:2px;line-spacing:4px; text-allign:left; margin-top:2em;color:black">Powerful investment strategies that help you invest in crypto confidently, grow and manage your capital expertly, available on <span><a href="https://play.google.com/store/apps/details?id=com.sendVillageHQ.comi_block">Andriod</a></span>, and coming soon on IOS</p>
+        <p style="font-size:3px;line-spacing:4px; text-allign:left;color:black;margin-bottom:3em"><span style="font-weight:bold">Note:</span> If you did not take this action, please contact us immediately at <span><a href="mailto:hello@comiblock.com">hello@tinqlab.com</a></span>.</p>
+        <p style="font-size:2px;line-spacing:4px; text-allign:left; margin-top:2em;color:black">Powerful investment strategies that help you invest in crypto confidently, grow and manage your capital expertly, available on <span><a href="">Andriod</a></span>, and coming soon on IOS</p>
         </body>
         </html>
              `;
@@ -120,7 +123,7 @@ var functions = {
 
               //step 2
               let mailOptions = {
-                from: "support@comiblock.com",
+                from: process.env.NODEMAILER_EMAIL,
                 to: lowerCaseEmail,
                 subject: "Please verify your email address",
                 html: htmlWelcomeTemplate,
@@ -155,7 +158,9 @@ var functions = {
     let user = await User.findOne({ email: lowerCaseEmail });
     const theEmail = lowerCaseEmail;
     if (!lowerCaseEmail) {
-      res.json({ success: false, msg: "Please Enter an Email address" });
+      res
+        .status(400)
+        .send({ success: false, msg: "Please Enter an Email address" });
     } else if (!user) {
       return res.status(400).send({
         success: false,
@@ -191,14 +196,13 @@ var functions = {
     }
   },
 
-  //****COMPLETE THE USER REGISTRATION***/
+  //3****COMPLETE THE USER REGISTRATION***/
   completeSignup: async function (req, res) {
     const userEmailAddress = req.body.email;
     const lowerCaseEmail = userEmailAddress.toLowerCase();
-    let fullname = req.body.fullname;
+    let nickname = req.body.nickname;
     let password = req.body.password;
-    let occupation = req.body.occupation;
-    let dateOfBirth = req.body.dateOfBirth;
+    let confirmPassword = req.body.confirmPassword;
     //CHECKING IF USER HAS AN ACCOUNT WITH US AND EMAIL VERIFIED
     User.findOne(
       {
@@ -219,10 +223,9 @@ var functions = {
           });
         } else if (
           !user ||
-          !req.body.fullname ||
           !req.body.password ||
-          !req.body.dateOfBirth ||
-          !req.body.occupation
+          !req.body.confirmPassword ||
+          !req.body.nickname
         ) {
           res.status(403).send({
             success: false,
@@ -232,6 +235,11 @@ var functions = {
           return res.status(401).send({
             success: false,
             msg: "Password must be 6 or more character long",
+          });
+        } else if (password !== confirmPassword) {
+          return res.status(401).send({
+            success: false,
+            msg: "Password did not match",
           });
         } else {
           //hashing the password
@@ -249,28 +257,36 @@ var functions = {
                     { email: lowerCaseEmail },
                     {
                       $set: {
-                        fullname,
+                        nickname,
                         password: hash,
-                        occupation,
-                        dateOfBirth,
+                        accountSetup: true,
                       },
                     }
-                  ).then((user) => {
-                    //CREATING A NEW USER Money
-                    try {
-                      const newMoney = {
-                        _id: lowerCaseEmail,
-                        userEmail: lowerCaseEmail,
-                        userFullname: req.body.fullname,
-                        occupation: req.body.occupation,
-                        walletBalance: 0,
-                        emergeBalance: 0,
-                        originBalance: 0,
-                        referralBonusBalance: 0,
-                      };
-                      new Money(newMoney).save();
-                    } catch (err) {
-                      console.log(err);
+                  ).then(async (user) => {
+                    //CREATING A NEW USER MONEY DATABASE
+                    const userMoney = await Money.findOne({
+                      userEmail: lowerCaseEmail,
+                    });
+                    if (!userMoney) {
+                      try {
+                        const newMoney = {
+                          _id: lowerCaseEmail,
+                          userEmail: lowerCaseEmail,
+                          userFullname: "",
+                          occupation: "",
+                          walletBalance: 0,
+                          emergeBalance: 0,
+                          originBalance: 0,
+                          referralBonusBalance: 0,
+                        };
+                        new Money(newMoney).save();
+
+                        //CREATE TATUM ACCOUNT_SETUP AND RECIEVE ADDRESSES HERE
+                      } catch (err) {
+                        console.log(err);
+                      }
+                    } else {
+                      console.log("User already exists in money db");
                     }
                   });
                 } catch (err) {
@@ -279,17 +295,16 @@ var functions = {
               });
             });
 
-            const logoUrl = "https://i.imgur.com/uNnD4YG.png";
             let htmlWelcomeTemplate = `
               <!DOCTYPE html>
               <html>
               <body>
-              <img src=${logoUrl} alt="ComiBlock Logo" style="display:block;width:150px;height:100px;margin-left:auto; margin-right:auto">
-              <h3 style="margin:0.4em; text-align:center; color:black">Welcome to ComiBlock</h3>
+              <img src=${logoUrl} alt="TinqFi Logo" style="display:block;width:150px;height:100px;margin-left:auto; margin-right:auto">
+              <h3 style="margin:0.4em; text-align:center; color:black">Welcome to TinqFi</h3>
               
-              <p style="line-spacing:4px; text-align:left;color:black">Hello ${fullname},</p>
+              <p style="line-spacing:4px; text-align:left;color:black">Hello ${nickname},</p>
               <p style="line-spacing:4px; text-align:left;color:black">Thank you for completing your registration today.</p>
-              <p style="font-size:2px;line-spacing:4px; text-align:left; margin-top:2em;color:black">Powerful investment strategies that help you invest in crypto confidently, grow and manage your capital expertly, available on <span><a href="https://play.google.com/store/apps/details?id=com.sendVillageHQ.comi_block">Andriod</a></span>, and coming soon on IOS.</p>
+              <p style="font-size:2px;line-spacing:4px; text-align:left; margin-top:2em;color:black">Powerful investment strategies that help you invest in crypto confidently, grow and manage your capital expertly, available on <span><a href="">Andriod</a></span>, and coming soon on IOS.</p>
               </body>
               </html>
              `;
@@ -308,9 +323,9 @@ var functions = {
 
             //step 2
             let mailOptions = {
-              from: "support@comiblock.com",
+              from: process.env.NODEMAILER_EMAIL,
               to: lowerCaseEmail,
-              subject: "Thank you for joining ComiBlock",
+              subject: "Thank you for joining TinqFi",
               html: htmlWelcomeTemplate,
             };
 
@@ -325,7 +340,7 @@ var functions = {
 
             res.json({
               success: true,
-              Message: "User Account successfully created",
+              Message: "User Account successfully created, Please Login ",
             });
           } catch (err) {
             res.json({ message: err });
@@ -349,7 +364,7 @@ var functions = {
         if (!user) {
           res.status(401).send({
             success: false,
-            msg: "Authentication Failed, user email or password not correct",
+            msg: "Authentication Failed, no user with such email address",
           });
         } else if (user.emailVerified === false) {
           res.status(403).send({
@@ -432,20 +447,20 @@ var functions = {
     } else if (!userEmail) {
       return res.status(400).send({
         success: false,
-        msg: "There is no user with this email address!",
+        msg: "There is no user with this email address, Please signup!",
       });
     } else {
       function generateOTP() {
         var digits = "0123456789";
         let OTP = "";
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 4; i++) {
           OTP += digits[Math.floor(Math.random() * 10)];
         }
         return OTP;
       }
       const generatedOTP = generateOTP();
       //NOW I HAVE THE OTP, SEND IT TO THE DATABASE
-      const logoUrl = "https://i.imgur.com/uNnD4YG.png";
+      // const logoUrl = "https://i.imgur.com/uNnD4YG.png";
       let htmlRecoverTemplate = `
             <!DOCTYPE html>
             <html>

@@ -28,6 +28,12 @@ var userSchema = new mongoose.Schema({
     min: 2,
     max: 255,
   },
+  nickname: {
+    type: String,
+    // require: true,
+    min: 2,
+    max: 255,
+  },
   phone: {
     type: Number,
     // require: true,
@@ -66,6 +72,10 @@ var userSchema = new mongoose.Schema({
     require: true,
   },
   emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  accountSetup: {
     type: Boolean,
     default: false,
   },

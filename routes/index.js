@@ -21,9 +21,11 @@ router.get("/api", function (req, res) {
   } else {
     req.session.viewCount = 1;
   }
-  res.send(
-    `Hello Bro, Welcome to our Api Home, you visited ${req.session.viewCount}`
-  );
+  res
+    .status(200)
+    .send(
+      `Hello Tovia, Welcome to our Api Home screen. if you are seeing this, be rest assured that the server is up and running, you visited ${req.session.viewCount}`
+    );
   console.log(req.session);
 });
 
@@ -32,19 +34,19 @@ router.get("/", function (req, res) {
 });
 
 //LOGOUT A USER
-router.delete("/logout", verify, actions.logout);
+router.delete("/api/v1/logout", verify, actions.logout);
 
 //** @desc ADD A NEW USER **
-router.post("/api/signup", actions.signup);
+router.post("/api/v1/signup", actions.signup);
 
 //** @desc confirm a new/old user email**
-router.post("/api/verify_email", actions.verifyEmail);
+router.post("/api/v1/verify_email", actions.verifyEmail);
 
 //@desc completes a user registration **
-router.post("/api/complete_signup", actions.completeSignup);
+router.post("/api/v1/complete_signup", actions.completeSignup);
 
-//authenticate a user **
-router.post("/api/login", actions.authenticate);
+//authenticate a user ** here
+router.post("/api/v1/login", actions.authenticate);
 
 //@desc recover user account **
 router.post("/api/recover_account", actions.recoverAccount);
