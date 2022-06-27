@@ -30,7 +30,7 @@ router.get("/api", function (req, res) {
 });
 
 router.get("/", function (req, res) {
-  res.redirect("https://jerrycifeanyi.gitbook.io/comiblock-api-v2-docs/");
+  res.redirect("https://jerrycifeanyi.gitbook.io/tinqfi-api/");
 });
 
 //LOGOUT A USER
