@@ -45,10 +45,10 @@ router.post("/api/v1/verify_email", actions.verifyEmail);
 //@desc completes a user registration **
 router.post("/api/v1/complete_signup", actions.completeSignup);
 
-//authenticate a user ** here
+//authenticate a user **
 router.post("/api/v1/login", actions.authenticate);
 
-//@desc recover user account **
+//@desc recover user account **  HERE
 router.post("/api/recover_account", actions.recoverAccount);
 
 //@desc change a user password **
@@ -60,7 +60,13 @@ router.post("/api/change_password_auth", verify, actions.updatePasswordAuth);
 // update legal aggreement**
 router.post("/api/legal_agreement", verify, actions.updateLegal);
 
-//docs from here
+//DOCS FROM HERE
+
+// //@desc completes a user registration **
+// router.post("/api/v1/test_final", actions.finalTest);
+
+// //@desc completes a user registration **
+// router.post("/api/v1/createAddress", actions.addressTest);
 
 //@desc update a user pin **
 router.post("/api/change_pin", verify, actions.updatePin);

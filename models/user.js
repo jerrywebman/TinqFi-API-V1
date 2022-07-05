@@ -59,6 +59,10 @@ var userSchema = new mongoose.Schema({
     type: String,
     // require: true,
   },
+  ourCustomerTatumId: {
+    type: String,
+    unique: true,
+  },
   dateOfBirth: {
     type: String,
     require: true,

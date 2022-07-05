@@ -12,17 +12,17 @@ var moneySchema = new mongoose.Schema({
     match: /.+\@.+\..+/,
     unique: true,
   },
-  userFullname: {
+  nickname: {
     type: String,
     require: true,
   },
-  walletBalance: {
+  investmentBalance: {
     type: Number,
   },
-  originBalance: {
+  loanBalance: {
     type: Number,
   },
-  emergeBalance: {
+  savingsBalance: {
     type: Number,
   },
   referralBonusBalance: {

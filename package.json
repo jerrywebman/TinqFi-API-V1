@@ -1,6 +1,6 @@
 {
-  "name": "comicblock",
-  "version": "1.0.3",
+  "name": "tinqfi",
+  "version": "1.0.1",
   "description": "",
   "main": "server.js",
   "scripts": {
@@ -13,6 +13,7 @@
   "dependencies": {
     "@hapi/iron": "^7.0.0",
     "@magic-sdk/admin": "^1.4.1",
+    "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "connect-mongo": "^4.6.0",
@@ -34,6 +35,7 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-magic": "^1.0.0",
+    "qs": "^6.11.0",
     "redis": "^4.1.0"
   }
 }

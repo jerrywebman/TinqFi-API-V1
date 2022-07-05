@@ -1,23 +1,64 @@
 var User = require("../models/user");
 var Money = require("../models/money");
+var Address = require("../models/address");
 var jwt = require("jsonwebtoken");
 var config = require("../config/dbconfig");
 const { token } = require("morgan");
 var bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { createClient } = require("redis");
+const createWalletActions = require("./specialMethods/createWalletActions");
+var AddressStore = require("../models/address");
 
 //for redis
 const client = createClient();
 
-client.on("error", (err) => console.log("Redis Client Error", err));
+// client.on("error", (err) => console.log("Redis Client Error", err));
 
-client.connect();
+// client.connect();
 
 const logoUrl =
   "https://www.tinqlab.com/_next/image?url=%2Ftinqlab_logo.svg&w=32&q=75g";
 
 var functions = {
+  addressTest: function (req, res) {
+    //store the addresses in the database
+    try {
+      const addAddress = AddressStore.updateOne(
+        { userEmail: "jerrycifeanyi@gmail.com" },
+        {
+          $push: {
+            onRegistration: {
+              derivationKey: "serverResponse.data.derivationKey1",
+              currency: "serverResponse.data.currency1",
+              address: "serverResponse.data.address1",
+            },
+          },
+        }
+      ).then(() => {
+        console.log("done");
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  //testing the account functions
+  finalTest: function () {
+    const clientEmail = "jerrycifeanyi@gmail.com";
+    var everythingBTC = createWalletActions.createBtcWallet(clientEmail);
+    var everythingETH = createWalletActions.createETHWallet(clientEmail);
+    var everythingBSC = createWalletActions.createBSCWallet(clientEmail);
+    var everythingDOGE = createWalletActions.createDOGEWallet(clientEmail);
+
+    Promise.all([
+      everythingBTC,
+      everythingETH,
+      everythingBSC,
+      everythingDOGE,
+    ]).then((results) => console.log(results));
+    console.log("end test");
+  },
   // ** LOGOUT ROUTE **//
   logout: function (req, res) {
     if (req.session || req.user) {
@@ -80,6 +121,7 @@ var functions = {
             city: "",
             country: "",
             dateOfBirth: "",
+            ourCustomerTatumId: lowerCaseEmail,
             pin: "",
             verifyCode: hash,
             email: lowerCaseEmail,
@@ -196,6 +238,14 @@ var functions = {
     }
   },
 
+  // thisTest: function () {
+  //   return console.log("Testing this test 1");
+  // },
+
+  // thisTestTwo: function () {
+  //   return console.log("Testing this test 2");
+  // },
+
   //3****COMPLETE THE USER REGISTRATION***/
   completeSignup: async function (req, res) {
     const userEmailAddress = req.body.email;
@@ -272,16 +322,42 @@ var functions = {
                         const newMoney = {
                           _id: lowerCaseEmail,
                           userEmail: lowerCaseEmail,
-                          userFullname: "",
-                          occupation: "",
-                          walletBalance: 0,
-                          emergeBalance: 0,
-                          originBalance: 0,
+                          nickname,
+                          investmentBalance: 0,
+                          loanBalance: 0,
+                          savingsBalance: 0,
                           referralBonusBalance: 0,
                         };
                         new Money(newMoney).save();
+                        //creating the address db
+                        const newAddress = {
+                          userEmail: lowerCaseEmail,
+                          nickname,
+                          ourCustomerTatumId: lowerCaseEmail,
+                          onRegistration: [],
+                          onP2P: [],
+                          lastUpdated: Date.now(),
+                        };
+                        new AddressStore(newAddress).save();
 
                         //CREATE TATUM ACCOUNT_SETUP AND RECIEVE ADDRESSES HERE
+                        const clientEmail = lowerCaseEmail;
+                        var everythingBTC =
+                          createWalletActions.createBtcWallet(clientEmail);
+                        var everythingETH =
+                          createWalletActions.createETHWallet(clientEmail);
+                        var everythingBSC =
+                          createWalletActions.createBSCWallet(clientEmail);
+                        var everythingDOGE =
+                          createWalletActions.createDOGEWallet(clientEmail);
+
+                        //create all the wallet addresses
+                        Promise.all([
+                          everythingBTC,
+                          everythingETH,
+                          everythingBSC,
+                          everythingDOGE,
+                        ]).then(() => console.log("end test"));
                       } catch (err) {
                         console.log(err);
                       }
