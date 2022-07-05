@@ -12,7 +12,7 @@ module.exports = async function (req, res, next) {
       url: process.env.REDIS_URL,
       socket: {
         tsl: true,
-        rejectUnauthorized: true,
+        rejectUnauthorized: false,
       },
     });
 

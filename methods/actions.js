@@ -13,7 +13,7 @@ const client = createClient({
   url: process.env.REDIS_URL,
   socket: {
     tsl: true,
-    rejectUnauthorized: true,
+    rejectUnauthorized: false,
   },
 });
 
