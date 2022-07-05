@@ -1,13 +1,13 @@
 const express = require("express");
 require("dotenv").config();
 const actions = require("../methods/actions");
-const transactionactions = require("../methods/transactionsActions");
-const moneyactions = require("../methods/userMoneyActions");
-const assessment = require("../methods/questionnaireResponseAction");
-const portfolio = require("../methods/portfolioActions");
-const strategy = require("../methods/strategyActions");
+const transactionactions = require("../methods/oldmethods/transactionsActions");
+const moneyactions = require("../methods/oldmethods/userMoneyActions");
+const assessment = require("../methods/oldmethods/questionnaireResponseAction");
+const portfolio = require("../methods/oldmethods/portfolioActions");
+const strategy = require("../methods/oldmethods/strategyActions");
 
-const verify = require("../verifyToken");
+const verify = require("../middleware/verifyToken");
 
 const router = express.Router();
 
@@ -66,7 +66,7 @@ router.post("/api/legal_agreement", verify, actions.updateLegal);
 // router.post("/api/v1/test_final", actions.finalTest);
 
 // //@desc completes a user registration **
-// router.post("/api/v1/createAddress", actions.addressTest);
+router.post("/api/v1/createAddress", actions.addressTest);
 
 //@desc update a user pin **
 router.post("/api/change_pin", verify, actions.updatePin);

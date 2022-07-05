@@ -1,5 +1,5 @@
-var Questionnaire = require("../models/Questionnaire");
-var User = require("../models/user");
+var Questionnaire = require("../../models/Questionnaire");
+var User = require("../../models/user");
 
 var functions = {
   //CREATE A NEW Questionnaire

@@ -1,4 +1,4 @@
-var Portfolio = require("../models/Portfolio");
+var Portfolio = require("../../models/Portfolio");
 
 var functions = {
   //CREATE A NEW Portfolio

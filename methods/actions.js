@@ -1,21 +1,19 @@
 var User = require("../models/user");
 var Money = require("../models/money");
-var Address = require("../models/address");
 var jwt = require("jsonwebtoken");
-var config = require("../config/dbconfig");
-const { token } = require("morgan");
 var bcrypt = require("bcrypt");
-const nodemailer = require("nodemailer");
 const { createClient } = require("redis");
 const createWalletActions = require("./specialMethods/createWalletActions");
+const emailTemplate = require("../middleware/emailTemplate");
+const generateOTP = require("../middleware/generateOTP");
 var AddressStore = require("../models/address");
 
 //for redis
-const client = createClient();
+const client = createClient({ url: process.env.REDIS_URL });
 
-// client.on("error", (err) => console.log("Redis Client Error", err));
+client.on("error", (err) => console.log("Redis Client Error", err));
 
-// client.connect();
+client.connect();
 
 const logoUrl =
   "https://www.tinqlab.com/_next/image?url=%2Ftinqlab_logo.svg&w=32&q=75g";
@@ -23,24 +21,30 @@ const logoUrl =
 var functions = {
   addressTest: function (req, res) {
     //store the addresses in the database
-    try {
-      const addAddress = AddressStore.updateOne(
-        { userEmail: "jerrycifeanyi@gmail.com" },
-        {
-          $push: {
-            onRegistration: {
-              derivationKey: "serverResponse.data.derivationKey1",
-              currency: "serverResponse.data.currency1",
-              address: "serverResponse.data.address1",
-            },
-          },
-        }
-      ).then(() => {
-        console.log("done");
-      });
-    } catch (err) {
-      console.log(err);
-    }
+    // try {
+    //   const addAddress = AddressStore.updateOne(
+    //     { userEmail: "jerrycifeanyi@gmail.com" },
+    //     {
+    //       $push: {
+    //         onRegistration: {
+    //           derivationKey: "serverResponse.data.derivationKey1",
+    //           currency: "serverResponse.data.currency1",
+    //           address: "serverResponse.data.address1",
+    //         },
+    //       },
+    //     }
+    //   ).then(() => {
+    //     console.log("done");
+    //   });
+    // } catch (err) {
+    //   console.log(err);
+    // }
+    // const generatedOTP = generateOTP();
+    // const nickname = "jaymack";
+    // const lowerCaseEmail = "jerrycifeanyi@gmail.com";
+    // // res.send(otp);
+    // const email = emailTemplate.recover(generatedOTP, lowerCaseEmail, nickname);
+    // res.send(email);
   },
 
   //testing the account functions
@@ -80,14 +84,6 @@ var functions = {
 
   //***CREATE A NEW USER ACCOUNT***//
   signup: async function (req, res) {
-    function generateOTP() {
-      var digits = "0123456789";
-      let OTP = "";
-      for (let i = 0; i < 4; i++) {
-        OTP += digits[Math.floor(Math.random() * 10)];
-      }
-      return OTP;
-    }
     const generatedOTP = generateOTP();
     const defaultEmail = req.body.email;
     const lowerCaseEmail = defaultEmail.toLowerCase();
@@ -135,51 +131,8 @@ var functions = {
                 err,
               });
             } else {
-              let htmlWelcomeTemplate = `
-             <!DOCTYPE html>
-        <html>
-        <body>
-         <img src=${logoUrl} alt="Tinqlab Logo" style="display:block;width:150px;height:100px;margin-left:auto; margin-right:auto">
-        <h3 style="margin:0.4em; margin-bottom:2em; text-align:center; color:black">Please confirm your email</h3>
-        
-        <p style="line-spacing:4px; text-align:left;color:black">Hello ,</p>
-        <p style="line-spacing:4px; text-align:left;color:black">Please use this verification code to verify your email address.</p>
-        <p style="font-weight:bold; text-align:left;color:black;font-size:1.5em;margin-bottom:2em">${generatedOTP}</p>
-        <p style="font-size:3px;line-spacing:4px; text-allign:left;color:black;margin-bottom:3em"><span style="font-weight:bold">Note:</span> If you did not take this action, please contact us immediately at <span><a href="mailto:hello@comiblock.com">hello@tinqlab.com</a></span>.</p>
-        <p style="font-size:2px;line-spacing:4px; text-allign:left; margin-top:2em;color:black">Powerful investment strategies that help you invest in crypto confidently, grow and manage your capital expertly, available on <span><a href="">Andriod</a></span>, and coming soon on IOS</p>
-        </body>
-        </html>
-             `;
-              //send an email here
-              //step 1
-              //ALLOW LESS SECURE APPS TO MAKE THIS WORK FOR GMAIL
-              let transporter = nodemailer.createTransport({
-                host: "smtp.zoho.com",
-                secure: true,
-                port: 465,
-                auth: {
-                  user: process.env.NODEMAILER_EMAIL,
-                  pass: process.env.NODEMAILER_PASSWORD,
-                },
-              });
-
-              //step 2
-              let mailOptions = {
-                from: process.env.NODEMAILER_EMAIL,
-                to: lowerCaseEmail,
-                subject: "Please verify your email address",
-                html: htmlWelcomeTemplate,
-              };
-
-              //step3
-              transporter.sendMail(mailOptions, function (err, data) {
-                if (err) {
-                  console.log(err);
-                } else {
-                  console.log("Email Sent");
-                }
-              });
-
+              //SEND EMAIL TO USER
+              emailTemplate.signup(generatedOTP, lowerCaseEmail);
               res.json({
                 success: true,
                 msg: "User Account Successfully Created",
@@ -237,14 +190,6 @@ var functions = {
       });
     }
   },
-
-  // thisTest: function () {
-  //   return console.log("Testing this test 1");
-  // },
-
-  // thisTestTwo: function () {
-  //   return console.log("Testing this test 2");
-  // },
 
   //3****COMPLETE THE USER REGISTRATION***/
   completeSignup: async function (req, res) {
@@ -371,48 +316,8 @@ var functions = {
               });
             });
 
-            let htmlWelcomeTemplate = `
-              <!DOCTYPE html>
-              <html>
-              <body>
-              <img src=${logoUrl} alt="TinqFi Logo" style="display:block;width:150px;height:100px;margin-left:auto; margin-right:auto">
-              <h3 style="margin:0.4em; text-align:center; color:black">Welcome to TinqFi</h3>
-              
-              <p style="line-spacing:4px; text-align:left;color:black">Hello ${nickname},</p>
-              <p style="line-spacing:4px; text-align:left;color:black">Thank you for completing your registration today.</p>
-              <p style="font-size:2px;line-spacing:4px; text-align:left; margin-top:2em;color:black">Powerful investment strategies that help you invest in crypto confidently, grow and manage your capital expertly, available on <span><a href="">Andriod</a></span>, and coming soon on IOS.</p>
-              </body>
-              </html>
-             `;
-            //send an email here
-            //step 1
-            //ALLOW LESS SECURE APPS TO MAKE THIS WORK FOR GMAIL
-            let transporter = nodemailer.createTransport({
-              host: "smtp.zoho.com",
-              secure: true,
-              port: 465,
-              auth: {
-                user: process.env.NODEMAILER_EMAIL,
-                pass: process.env.NODEMAILER_PASSWORD,
-              },
-            });
-
-            //step 2
-            let mailOptions = {
-              from: process.env.NODEMAILER_EMAIL,
-              to: lowerCaseEmail,
-              subject: "Thank you for joining TinqFi",
-              html: htmlWelcomeTemplate,
-            };
-
-            //step3
-            transporter.sendMail(mailOptions, function (err, data) {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log("Email Sent");
-              }
-            });
+            //SEND EMAIL
+            emailTemplate.completeRegistration(lowerCaseEmail, nickname);
 
             res.json({
               success: true,
@@ -515,43 +420,20 @@ var functions = {
     const defaultEmail = req.body.email;
     const lowerCaseEmail = defaultEmail.toLowerCase();
 
-    let userEmail = await User.findOne({ email: lowerCaseEmail });
+    let userDetails = await User.findOne({ email: lowerCaseEmail });
     if (!lowerCaseEmail) {
       res
         .status(400)
         .send({ success: false, msg: "Please Enter an Email address" });
-    } else if (!userEmail) {
+    } else if (!userDetails) {
       return res.status(400).send({
         success: false,
         msg: "There is no user with this email address, Please signup!",
       });
     } else {
-      function generateOTP() {
-        var digits = "0123456789";
-        let OTP = "";
-        for (let i = 0; i < 4; i++) {
-          OTP += digits[Math.floor(Math.random() * 10)];
-        }
-        return OTP;
-      }
       const generatedOTP = generateOTP();
       //NOW I HAVE THE OTP, SEND IT TO THE DATABASE
-      // const logoUrl = "https://i.imgur.com/uNnD4YG.png";
-      let htmlRecoverTemplate = `
-            <!DOCTYPE html>
-            <html>
-            <body>
-            <img src=${logoUrl} alt="ComiBlock Logo" style="display:block;width:150px;height:100px;margin-left:auto; margin-right:auto">
-            <h3 style="margin:0.4em; margin-bottom:2em; text-align:center; color:black">Please confirm your email</h3>
-            
-            <p style="line-spacing:4px; text-align:left;color:black">Hello ${userEmail.fullname},</p>
-            <p style="line-spacing:4px; text-align:left;color:black">Please use this verification code to verify your email address.</p>
-            <p style="font-weight:bold; text-align:left;color:black;font-size:1.5em;margin-bottom:2em">${generatedOTP}</p>
-            <p style="font-size:3px;line-spacing:4px; text-allign:left;color:black;margin-bottom:3em"><span style="font-weight:bold">Note:</span> If you did not take this action, please contact us immediately at <span><a href="mailto:hello@comiblock.com">hello@comiblock.com</a></span>.</p>
-            <p style="font-size:2px;line-spacing:4px; text-allign:left; margin-top:2em;color:black">Powerful investment strategies that help you invest in crypto confidently, grow and manage your capital expertly, available on <span><a href="https://play.google.com/store/apps/details?id=com.sendVillageHQ.comi_block">Andriod</a></span>, and coming soon on IOS</p>
-            </body>
-            </html>
-    `;
+
       try {
         //hashing the otp
         bcrypt.genSalt(10, function (err, salt) {
@@ -571,33 +453,9 @@ var functions = {
                 },
               }
             ).then(() => {
-              //step 1
-              let transporter = nodemailer.createTransport({
-                host: "smtp.zoho.com",
-                secure: true,
-                port: 465,
-                auth: {
-                  user: process.env.NODEMAILER_EMAIL,
-                  pass: process.env.NODEMAILER_PASSWORD,
-                },
-              });
-
-              //step 2
-              let mailOptions = {
-                from: "support@comiblock.com",
-                to: lowerCaseEmail,
-                subject: "OTP Notification - ComiBlock",
-                html: htmlRecoverTemplate,
-              };
-
-              //step3
-              transporter.sendMail(mailOptions, function (err, data) {
-                if (err) {
-                  console.log("error occurs");
-                } else {
-                  console.log("Email Sent");
-                }
-              });
+              //SEND EMAIL HERE
+              const nickname = userDetails.nickname;
+              emailTemplate.recover(lowerCaseEmail, generatedOTP, nickname);
             });
           });
         });

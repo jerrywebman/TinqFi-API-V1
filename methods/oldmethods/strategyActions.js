@@ -1,4 +1,4 @@
-var Strategy = require("../models/Strategy");
+var Strategy = require("../../models/Strategy");
 
 var functions = {
   //CREATE A NEW STRATEGY
