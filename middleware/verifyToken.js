@@ -8,7 +8,13 @@ module.exports = async function (req, res, next) {
     req.headers.authorization.split(" ")[0] === "Bearer"
   ) {
     //connect redis connection
-    const client = createClient({ url: process.env.REDIS_URL });
+    const client = createClient({
+      url: process.env.REDIS_URL,
+      socket: {
+        tsl: true,
+        rejectUnauthorized: true,
+      },
+    });
 
     client.on("error", (err) => console.log("Redis Client Error", err));
 

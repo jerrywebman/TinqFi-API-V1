@@ -9,7 +9,13 @@ const generateOTP = require("../middleware/generateOTP");
 var AddressStore = require("../models/address");
 
 //for redis
-const client = createClient({ url: process.env.REDIS_URL });
+const client = createClient({
+  url: process.env.REDIS_URL,
+  socket: {
+    tsl: true,
+    rejectUnauthorized: true,
+  },
+});
 
 client.on("error", (err) => console.log("Redis Client Error", err));
 
