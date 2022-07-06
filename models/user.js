@@ -63,6 +63,9 @@ var userSchema = new mongoose.Schema({
     type: String,
     unique: true,
   },
+  onRegistrationLedgerAccnts: {
+    type: Array,
+  },
   dateOfBirth: {
     type: String,
     require: true,

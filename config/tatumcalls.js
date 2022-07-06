@@ -66,6 +66,7 @@ const tatumcalls = {
                             },
                             $push: {
                               onRegistration: {
+                                tokenAccountId: ledgerAccountDetails.id,
                                 derivationKey:
                                   offchainServerResponse.data.derivationKey,
                                 currency: offchainServerResponse.data.currency,
@@ -81,6 +82,14 @@ const tatumcalls = {
                                 $set: {
                                   ourCustomerTatumId:
                                     ledgerAccountDetails.customerId,
+                                },
+                                $push: {
+                                  onRegistrationLedgerAccnts: {
+                                    tokenAccountId: ledgerAccountDetails.id,
+                                    tokenAccountcurrency:
+                                      ledgerAccountDetails.currency,
+                                    createdAt: Date.now(),
+                                  },
                                 },
                               }
                             );
