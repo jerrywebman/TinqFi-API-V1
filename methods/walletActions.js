@@ -22,6 +22,7 @@ client.on("error", (err) => console.log("Redis Client Error", err));
 client.connect();
 
 var functions = {
+  //GET ALL THE TOKEN ACCOUNT
   getAllTokenAccounts: function (req, res) {
     const query = new URLSearchParams({
       pageSize: "4",
@@ -55,7 +56,6 @@ var functions = {
   },
 
   //GET A WALLET ADDRESS
-
   getAwalletAddress: function (req, res) {
     const id = req.params.id;
     const url = `${process.env.TATUM_BASE_URL}/offchain/account/${id}/address`;
@@ -85,7 +85,6 @@ var functions = {
   },
 
   //GET A Incoming transactions
-
   getIncomingTransactions: function (req, res) {
     res.send({ success: true, msg: "Wallet Address Route" });
   },

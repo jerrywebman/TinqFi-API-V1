@@ -163,6 +163,7 @@ var functions = {
   //DOGE WALLET XPUB
   createDOGEWallet: async function (clientEmail) {
     //step 1
+
     const url = `${process.env.TATUM_BASE_URL}/dogecoin/wallet`;
     try {
       const options = {

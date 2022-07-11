@@ -22,72 +22,92 @@ client.on("error", (err) => console.log("Redis Client Error", err));
 client.connect();
 
 var functions = {
-  getAllTokenAccounts: function (req, res) {
-    const query = new URLSearchParams({
-      pageSize: "4",
-      offset: "0",
-    }).toString();
-    const id = req.user.ourCustomerTatumId;
-    const url = `${process.env.TATUM_BASE_URL}/ledger/account/customer/${id}?${query}`;
-    try {
-      const options = {
-        method: "GET",
-        headers: {
-          "x-api-key": process.env.TATUM_API_KEY,
-        },
-        url,
-      };
-      //try creating the token offchain address
-      axios(options).then((ServerResponse) => {
-        const response = ServerResponse.data;
-        //remove the xpub from the server response
-        response.forEach((object) => {
-          delete object["xpub"];
-        });
-        res.status(200).send({
-          success: true,
-          data: response,
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  },
-
-  //GET A WALLET ADDRESS
-
-  getAwalletAddress: function (req, res) {
-    const id = req.params.id;
-    const url = `${process.env.TATUM_BASE_URL}/offchain/account/${id}/address`;
-    try {
-      const options = {
-        method: "GET",
-        headers: {
-          "x-api-key": process.env.TATUM_API_KEY,
-        },
-        url,
-      };
-      //try creating the token offchain address
-      axios(options).then((ServerResponse) => {
-        const response = ServerResponse.data;
-        //remove the xpub from the server response
-        response.forEach((object) => {
-          delete object["xpub"];
-        });
-        res.status(200).send({
-          success: true,
-          data: response[0],
-        });
-      });
-    } catch (err) {
-      res.status(400).send({ success: false, msg: err });
-    }
-  },
-
   //GET A Incoming transactions
 
-  getIncomingTransactions: function (req, res) {
-    res.send({ success: true, msg: "Wallet Address Route" });
+  makeInternalTransfer: function (req, res) {
+    res.send({ success: true, msg: "Internal transfer route" });
+  },
+
+  //INVEST IN TINQFI
+  investInTinqFi: function (req, res) {
+    const formData = {
+      // senderAccountId: req.user.onRegistrationLedgerAccnts[2].tokenAccountId,
+      senderAccountId: "62c4370f470caefdba76cba0",
+      recipientAccountId: "62cc2d58f185e6ef82d34792",
+      amount: "0.01",
+      anonymous: false,
+      compliant: false,
+      transactionCode: req.user.email,
+      paymentId: "req.user.ourCustomerTatumId",
+      recipientNote: "req.body.recipientNote",
+    };
+    const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
+    try {
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.TATUM_API_KEY,
+        },
+        url,
+        data: formData,
+      };
+      //step 2
+      //
+      axios(options)
+        .then((serverResponse) => {
+          if (serverResponse.data !== null) {
+            //the response from Tatum
+            console.log(serverResponse.data);
+          } else console.log(serverResponse);
+        })
+
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  },
+
+  //TRANSFER TO A BLOCKCHAIN
+  transferToBlockchain: function (req, res) {
+    const formData = {
+      senderAccountId: "62c4370f470caefdba76cba0",
+      recipientAccountId: "62cc2d58f185e6ef82d34792",
+      amount: "0.01",
+      anonymous: false,
+      compliant: false,
+      transactionCode: req.user.email,
+      paymentId: "req.user.ourCustomerTatumId",
+      recipientNote: "req.body.recipientNote",
+    };
+    const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
+    try {
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.TATUM_API_KEY,
+        },
+        url,
+        data: formData,
+      };
+      //step 2
+      axios(options)
+        .then((serverResponse) => {
+          if (serverResponse.data !== null) {
+            //the response from Tatum
+            console.log(serverResponse.data);
+          } else console.log(serverResponse);
+        })
+
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (e) {
+      console.log(e);
+    }
   },
 };
 

@@ -89,9 +89,11 @@ require("./config/passport")(passport);
 //get routes
 const routes = require("./routes/index");
 const wallet = require("./routes/wallet");
+const ledgerTransactions = require("./routes/ledgerTransactions");
 
 app.use(routes);
 app.use(wallet);
+app.use(ledgerTransactions);
 
 const PORT = process.env.PORT || 3000;
 

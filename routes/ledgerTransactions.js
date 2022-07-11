@@ -1,6 +1,6 @@
 const express = require("express");
 require("dotenv").config();
-const walletActions = require("../methods/walletActions");
+const ledgerTransactionActions = require("../methods/ledgerTransactionActions");
 
 const verify = require("../middleware/verifyToken");
 
@@ -8,25 +8,11 @@ const router = express.Router();
 
 //WALLETS ROUTES
 
-//GET ALL ACCOUNTS
+// INTERNAL WITHDRAWAL FUNCTIONS
 router.get(
-  "/api/v1/all_token_accounts",
+  "/api/v1/transaction/internal_transfer",
   verify,
-  walletActions.getAllTokenAccounts
-);
-
-//GET A WALLET ADDRESS
-router.get(
-  "/api/v1/token_account/:id/wallet_address",
-  verify,
-  walletActions.getAwalletAddress
-);
-
-//GET INCOMING TRANSACTIONS
-router.get(
-  "/api/v1/token_account/incoming_transactions",
-  //   verify,
-  walletActions.getIncomingTransactions
+  ledgerTransactionActions.investInTinqFi
 );
 
 module.exports = router;

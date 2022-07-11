@@ -66,9 +66,6 @@ router.post("/api/legal_agreement", verify, actions.updateLegal);
 router.get("/api/info/profile", actions.getInfo);
 
 // //@desc completes a user registration **
-// router.post("/api/v1/test_final", actions.finalTest);
-
-// //@desc completes a user registration **
 router.post("/api/v1/createAddress", actions.addressTest);
 
 //@desc update a user pin **
