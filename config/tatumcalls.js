@@ -57,6 +57,7 @@ const tatumcalls = {
                       );
 
                       try {
+                        //UPDATE THE CUSTOMER ADDRESS DB
                         const addAddress = AddressStore.updateOne(
                           { userEmail: externalId },
                           {
@@ -75,6 +76,7 @@ const tatumcalls = {
                             },
                           }
                         ).then(async () => {
+                          //UPDATE THE CUSTOMER USER PROFILE DB
                           try {
                             const addTatumUserID = await User.updateOne(
                               { email: externalId },

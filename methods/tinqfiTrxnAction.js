@@ -1,4 +1,4 @@
-var Transaction = require("../../models/Transaction");
+var Transaction = require("../models/Transaction");
 
 var functions = {
   //get all user transactions

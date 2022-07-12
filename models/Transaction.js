@@ -7,8 +7,24 @@ var transactionSchema = new mongoose.Schema({
     require: true,
     match: /.+\@.+\..+/,
   },
+  userTaTumId: {
+    type: String,
+    require: true,
+  },
   transactionAmount: {
     type: Number,
+  },
+  transactionToken: {
+    type: String,
+  },
+  from: {
+    type: String,
+  },
+  to: {
+    type: String,
+  },
+  trxnRefId: {
+    type: String,
   },
   transactionType: {
     type: String,
