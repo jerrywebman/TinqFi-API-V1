@@ -17,16 +17,19 @@ var moneySchema = new mongoose.Schema({
     require: true,
   },
   investmentBalance: {
-    type: Number,
+    type: Array,
   },
   loanBalance: {
-    type: Number,
+    type: Array,
+  },
+  earnBalance: {
+    type: Array,
   },
   savingsBalance: {
-    type: Number,
+    type: Array,
   },
   referralBonusBalance: {
-    type: Number,
+    type: Array,
   },
   lastUpdated: {
     type: Date,

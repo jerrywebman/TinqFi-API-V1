@@ -90,10 +90,12 @@ require("./config/passport")(passport);
 const routes = require("./routes/index");
 const wallet = require("./routes/wallet");
 const ledgerTransactions = require("./routes/ledgerTransactions");
+const externalData = require("./routes/externalData");
 
 app.use(routes);
 app.use(wallet);
 app.use(ledgerTransactions);
+app.use(externalData);
 
 const PORT = process.env.PORT || 3000;
 

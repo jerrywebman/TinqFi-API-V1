@@ -22,11 +22,4 @@ router.get(
   walletActions.getAwalletAddress
 );
 
-//GET INCOMING TRANSACTIONS
-router.get(
-  "/api/v1/token_account/incoming_transactions",
-  //   verify,
-  walletActions.getIncomingTransactions
-);
-
 module.exports = router;

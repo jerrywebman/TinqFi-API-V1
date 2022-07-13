@@ -38,7 +38,7 @@ var functions = {
         },
         url,
       };
-      //try creating the token offchain address
+
       axios(options).then((ServerResponse) => {
         const response = ServerResponse.data;
         //remove the xpub from the server response
@@ -51,7 +51,11 @@ var functions = {
         });
       });
     } catch (err) {
-      console.log(err);
+      res.status(500).send({
+        success: true,
+        msg: "Internal Server Error",
+        err: err,
+      });
     }
   },
 
@@ -82,11 +86,6 @@ var functions = {
     } catch (err) {
       res.status(400).send({ success: false, msg: err });
     }
-  },
-
-  //GET A Incoming transactions
-  getIncomingTransactions: function (req, res) {
-    res.send({ success: true, msg: "Wallet Address Route" });
   },
 };
 

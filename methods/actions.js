@@ -246,6 +246,7 @@ var functions = {
                     }
                   ).then(async (user) => {
                     //CREATING A NEW USER MONEY DATABASE
+
                     const userMoney = await Money.findOne({
                       userEmail: lowerCaseEmail,
                     });
@@ -390,7 +391,7 @@ var functions = {
     ) {
       var token = req.headers.authorization.split(" ")[1];
       jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
-        if (err) res.status(400).json({ success: false, msg: "Invalid Token" });
+        if (err) res.status(401).json({ success: false, msg: "Invalid Token" });
         else {
           res.send({ decoded });
         }
@@ -451,7 +452,11 @@ var functions = {
           Message: "OTP successfully sent to user email",
         });
       } catch (err) {
-        res.json({ message: err });
+        res.json({
+          success: false,
+          msg: "Failed to recover user account",
+          error: err,
+        });
       }
     }
   },
@@ -632,7 +637,7 @@ var functions = {
           passConfirmString.length < 6 &&
           passConfirmNewString.length < 6
         ) {
-          res.status(400).send({
+          res.status(401).send({
             success: false,
             msg: "Password not secure. it must be 6 characters or more",
           });
@@ -664,10 +669,14 @@ var functions = {
             });
             res.json({
               success: true,
-              Message: "Password Successfully updated",
+              msg: "Password Successfully updated",
             });
           } catch (err) {
-            res.json({ message: err });
+            res.json({
+              success: false,
+              msg: "Account recovery failed",
+              errormsg: err,
+            });
           }
         }
       }

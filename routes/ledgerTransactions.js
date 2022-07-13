@@ -13,14 +13,14 @@ router.get(
   ledgerTransactionActions.transferToBlockchain
 );
 
-//MAKE INTERNAL TRANSFER TESTER
+//MAKE INTERNAL TRANSFER TESTER docs done
 router.get(
   "/api/v1/transaction/internal_transfer",
   verify,
   ledgerTransactionActions.makeInternalTransfer
 );
 
-// INVEST USING BSC
+//INVEST USING BSC
 router.get(
   "/api/v1/transaction/invest/BSC",
   verify,
