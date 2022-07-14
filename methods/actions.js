@@ -10,15 +10,15 @@ var AddressStore = require("../models/address");
 const axios = require("axios");
 
 //for redis
-// const client = createClient({
-//   url: process.env.REDIS_URL,
-//   socket: {
-//     tsl: true,
-//     rejectUnauthorized: false,
-//   },
-// });
+const client = createClient({
+  url: process.env.REDIS_URL,
+  socket: {
+    tsl: true,
+    rejectUnauthorized: false,
+  },
+});
 
-const client = createClient();
+// const client = createClient();
 
 client.on("error", (err) => console.log("Redis Client Error", err));
 
