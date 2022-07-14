@@ -11,21 +11,21 @@ const router = express.Router();
 //GET TOP 70
 router.get(
   "/api/v1/data/market_data",
-  //   verify,
+  verify,
   externalDataActions.getExternalData
 );
 
 //GET TOP 2 coins
 router.get(
   "/api/v1/data/market_data/top_two",
-  //   verify,
+  verify,
   externalDataActions.getTopTwoExternalData
 );
 
 //GET nEWS
 router.get(
   "/api/v1/data/news_data",
-  //   verify,
+  verify,
   externalDataActions.getCnaLatestNews
 );
 

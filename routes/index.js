@@ -54,18 +54,18 @@ router.get("/api/v1/info/user", actions.getInfo);
 
 //DOCS FROM HERE
 //@desc change a user password **
-router.post("/api/change_password_auth", verify, actions.updatePasswordAuth);
+// router.post("/api/change_password_auth", verify, actions.updatePasswordAuth);
 
-// update legal aggreement**
-router.post("/api/legal_agreement", verify, actions.updateLegal);
+// // update legal aggreement**
+// router.post("/api/legal_agreement", verify, actions.updateLegal);
 
-//@desc get a User Profile
-router.get("/api/info/profile", actions.getInfo);
+// //@desc get a User Profile
+// router.get("/api/info/profile", actions.getInfo);
 
 // //@desc completes a user registration **
-router.post("/api/v1/createAddress", actions.addressTest);
+// router.post("/api/v1/createAddress", actions.addressTest);
 
-//@desc update a user pin **
-router.post("/api/change_pin", verify, actions.updatePin);
+// //@desc update a user pin **
+// router.post("/api/change_pin", verify, actions.updatePin);
 
 module.exports = router;
