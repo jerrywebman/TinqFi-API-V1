@@ -1,4 +1,3 @@
-// const jwt = require("jwt-simple");
 const jwt = require("jsonwebtoken");
 const { createClient } = require("redis");
 

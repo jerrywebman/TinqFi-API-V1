@@ -23,32 +23,7 @@ client.on("error", (err) => console.log("Redis Client Error", err));
 
 client.connect();
 
-const logoUrl =
-  "https://www.tinqlab.com/_next/image?url=%2Ftinqlab_logo.svg&w=32&q=75g";
-
 var functions = {
-  addressTest: function (req, res) {
-    const id = "62c4370fa7136f7f55ba1cdf";
-    const url = `${process.env.TATUM_BASE_URL}/ledger/account/${id}`;
-
-    try {
-      const options = {
-        method: "GET",
-        headers: {
-          "content-type": "application/json",
-          "x-api-key": process.env.TATUM_API_KEY,
-        },
-        url,
-      };
-      //try creating the token offchain address
-      axios(options).then((ServerResponse) => {
-        console.log(ServerResponse);
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  },
-
   // ** LOGOUT ROUTE **//
   logout: function (req, res) {
     if (req.session || req.user) {

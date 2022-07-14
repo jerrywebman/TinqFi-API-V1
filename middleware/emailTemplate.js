@@ -4,7 +4,7 @@ var functions = {
   //INITIATE SIGNUP
   signup: function (generatedOTP, lowerCaseEmail) {
     const logoUrl =
-      "https://www.tinqlab.com/_next/image?url=%2Ftinqlab_logo.svg&w=32&q=75g";
+      "https://www.tinqlab.com/_next/image?url=%2Ftinqlab_logo.svg&w=32&q=75";
 
     let htmlWelcomeTemplate = `
              <!DOCTYPE html>

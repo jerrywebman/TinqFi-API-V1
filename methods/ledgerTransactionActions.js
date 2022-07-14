@@ -1,25 +1,6 @@
-var User = require("../models/user");
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcrypt");
 const { createClient } = require("redis");
-const createWalletActions = require("./specialMethods/createWalletActions");
-const emailTemplate = require("../middleware/emailTemplate");
 var TinqfiTrxn = require("../models/Transaction");
 const axios = require("axios");
-
-//for redis
-// const client = createClient({
-//   url: process.env.REDIS_URL,
-//   socket: {
-//     tsl: true,
-//     rejectUnauthorized: false,
-//   },
-// });
-const client = createClient();
-
-client.on("error", (err) => console.log("Redis Client Error", err));
-
-client.connect();
 
 var functions = {
   makeInternalTransfer: function (req, res) {
