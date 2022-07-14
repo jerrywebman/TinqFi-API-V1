@@ -3,8 +3,7 @@ const nodemailer = require("nodemailer");
 var functions = {
   //INITIATE SIGNUP
   signup: function (generatedOTP, lowerCaseEmail) {
-    const logoUrl =
-      "https://www.tinqlab.com/_next/image?url=%2Ftinqlab_logo.svg&w=32&q=75";
+    const logoUrl = "https://i.imgur.com/1ioLR1r.png";
 
     let htmlWelcomeTemplate = `
              <!DOCTYPE html>
@@ -54,8 +53,7 @@ var functions = {
 
   //COMPLETE SIGNUP
   completeRegistration: function (lowerCaseEmail, nickname) {
-    const logoUrl =
-      "https://www.tinqlab.com/_next/image?url=%2Ftinqlab_logo.svg&w=32&q=75g";
+    const logoUrl = "https://i.imgur.com/1ioLR1r.png";
     let htmlWelcomeTemplate = `
               <!DOCTYPE html>
               <html>
@@ -102,8 +100,7 @@ var functions = {
 
   //RECOVER ACCOUNT
   recover: function (generatedOTP, lowerCaseEmail, nickname) {
-    const logoUrl =
-      "https://www.tinqlab.com/_next/image?url=%2Ftinqlab_logo.svg&w=32&q=75g";
+    const logoUrl = "https://i.imgur.com/1ioLR1r.png";
     let htmlRecoverTemplate = `
             <!DOCTYPE html>
             <html>

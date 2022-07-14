@@ -10,13 +10,15 @@ var AddressStore = require("../models/address");
 const axios = require("axios");
 
 //for redis
-const client = createClient({
-  url: process.env.REDIS_URL,
-  socket: {
-    tsl: true,
-    rejectUnauthorized: false,
-  },
-});
+// const client = createClient({
+//   url: process.env.REDIS_URL,
+//   socket: {
+//     tsl: true,
+//     rejectUnauthorized: false,
+//   },
+// });
+
+const client = createClient();
 
 client.on("error", (err) => console.log("Redis Client Error", err));
 
@@ -39,6 +41,71 @@ var functions = {
       });
     } else {
       res.end();
+    }
+  },
+
+  deleteUser: async function (req, res) {
+    const defaultEmail = req.body.email;
+    const lowerCaseEmail = defaultEmail.toLowerCase();
+    try {
+      const removedUser = await User.deleteOne({
+        email: lowerCaseEmail,
+      }).then(async () => {
+        const removedMoney = await Money.deleteOne({
+          userEmail: lowerCaseEmail,
+        });
+        const removedAddress = await AddressStore.deleteOne({
+          userEmail: lowerCaseEmail,
+        });
+        res.json({ success: true, Message: "User Deleted" });
+      });
+    } catch (err) {
+      res.json({ message: err });
+    }
+  },
+
+  resendOTP: async function (req, res) {
+    const generatedOTP = generateOTP();
+    const defaultEmail = req.body.email;
+    const lowerCaseEmail = defaultEmail.toLowerCase();
+
+    //check if the email exists
+    let userEmail = await User.findOne({ email: lowerCaseEmail });
+    if (!lowerCaseEmail) {
+      res.status(400).send({ success: false, msg: "No Email Provided" });
+    } else if (!userEmail) {
+      return res.status(401).send({
+        success: false,
+        msg: "no user with this email address, Please Signup",
+      });
+    } else {
+      //hashing the otp
+      bcrypt.genSalt(10, function (err, salt) {
+        if (err) {
+          return next(err);
+        }
+        bcrypt.hash(generatedOTP, salt, async function (err, hash) {
+          if (err) {
+            return next(err);
+          }
+
+          //CREATING THE NEW USER
+          const updatedOTP = await User.updateOne(
+            { email: lowerCaseEmail },
+            {
+              $set: {
+                verifyCode: hash,
+              },
+            }
+          ).then(() => {
+            emailTemplate.signup(generatedOTP, lowerCaseEmail);
+            res.json({
+              success: true,
+              msg: "Please check your email address for the OTP",
+            });
+          });
+        });
+      });
     }
   },
 
