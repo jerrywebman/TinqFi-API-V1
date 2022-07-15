@@ -29,6 +29,6 @@ router.get(
   externalDataActions.getCnaLatestNews
 );
 
-// router.get("/api/v1/data/tester", externalDataActions.gettester);
+router.get("/api/v1/data/tester", externalDataActions.gettester);
 
 module.exports = router;

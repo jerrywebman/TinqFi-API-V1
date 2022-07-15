@@ -24,9 +24,44 @@ var functions = {
         response.forEach((object) => {
           delete object["xpub"];
         });
-        res.status(200).send({
-          success: true,
-          data: response,
+
+        //GETTING DATA FROM COINGECKO
+        const geckoUrl =
+          "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&page=1";
+        const options = {
+          method: "GET",
+          headers: {
+            "x-api-key": process.env.TATUM_API_KEY,
+          },
+          url: geckoUrl,
+        };
+        //do something with the response object
+        axios(options).then(async (geckoResponse) => {
+          const newresponseFromGecko = [];
+          const responseFromGecko = await geckoResponse.data;
+          //do the heavy data processing
+          responseFromGecko.map(function (single) {
+            if (single.name === "BNB") {
+              single.name = "Binance Smart Chain";
+              single.symbol = "BSC";
+            }
+            var currency = single.symbol;
+            var image = single.image;
+            var name = single.name;
+            var current_price = single.current_price;
+            newresponseFromGecko.push({ name, currency, image, current_price });
+          });
+
+          //merge the arrays
+          let finalResponse = response.map((item, i) =>
+            Object.assign({}, item, newresponseFromGecko[i])
+          );
+          //send the user the token
+
+          res.status(200).send({
+            success: true,
+            data: finalResponse,
+          });
         });
       });
     } catch (err) {
