@@ -17,6 +17,10 @@ var transactionSchema = new mongoose.Schema({
   transactionToken: {
     type: String,
   },
+  debit: {
+    type: Boolean,
+    require: true,
+  },
   from: {
     type: String,
   },

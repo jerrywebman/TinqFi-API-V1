@@ -35,16 +35,19 @@ var functions = {
           },
           url: geckoUrl,
         };
-        //do something with the response object
+        //do something with the response object from coinGecko
         axios(options).then(async (geckoResponse) => {
           const newresponseFromGecko = [];
           const responseFromGecko = await geckoResponse.data;
-          //do the heavy data processing
+          //do the heavy data processing  by slicing the data and editing it
           responseFromGecko.map(function (single) {
             if (single.name === "BNB") {
               single.name = "Binance Smart Chain";
               single.symbol = "BSC";
-            }
+            } else if (single.symbol === "btc") single.symbol = "BTC";
+            else if (single.symbol === "eth") single.symbol = "ETH";
+            else single.symbol = "DOGE";
+
             var currency = single.symbol;
             var image = single.image;
             var name = single.name;
@@ -53,20 +56,28 @@ var functions = {
           });
 
           //merge the arrays
-          let finalResponse = response.map((item, i) =>
-            Object.assign({}, item, newresponseFromGecko[i])
+          const mergeArrayByCurrency = (response, newresponseFromGecko) =>
+            response.map((itm) => ({
+              ...newresponseFromGecko.find(
+                (item) => item.currency === itm.currency && item
+              ),
+              ...itm,
+            }));
+          let finalResponse = mergeArrayByCurrency(
+            response,
+            newresponseFromGecko
           );
           //send the user the token
-
           res.status(200).send({
             success: true,
+            msg: "Token balance has been updated successfully",
             data: finalResponse,
           });
         });
       });
     } catch (err) {
       res.status(500).send({
-        success: true,
+        success: false,
         msg: "Internal Server Error",
         err: err,
       });

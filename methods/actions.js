@@ -331,7 +331,11 @@ var functions = {
                           everythingETH,
                           everythingBSC,
                           everythingDOGE,
-                        ]).then(() => console.log("end test"));
+                        ]).then(() =>
+                          console.log(
+                            "end ledger acccount and address creation"
+                          )
+                        );
                       } catch (err) {
                         console.log(err);
                       }
@@ -407,7 +411,6 @@ var functions = {
                   // Set data to Redis
                   await client.set(user.email, token);
                   await client.expire(user.email, 18000);
-                  const value = await client.get(user.email);
                 } else {
                   return res.status(401).send({
                     success: false,
@@ -490,7 +493,7 @@ var functions = {
         });
         res.json({
           success: true,
-          Message: "OTP successfully sent to user email",
+          Msg: "OTP successfully sent to user email",
         });
       } catch (err) {
         res.json({

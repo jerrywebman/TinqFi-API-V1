@@ -91,11 +91,15 @@ const routes = require("./routes/index");
 const wallet = require("./routes/wallet");
 const ledgerTransactions = require("./routes/ledgerTransactions");
 const externalData = require("./routes/externalData");
+const transaction = require("./routes/transaction");
+const notification = require("./routes/notification");
 
 app.use(routes);
 app.use(wallet);
 app.use(ledgerTransactions);
 app.use(externalData);
+app.use(transaction);
+app.use(notification);
 
 const PORT = process.env.PORT || 3000;
 

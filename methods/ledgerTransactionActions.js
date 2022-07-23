@@ -3,6 +3,7 @@ var TinqfiTrxn = require("../models/Transaction");
 const axios = require("axios");
 
 var functions = {
+  //MAKE INTERNAL TRANSFER
   makeInternalTransfer: function (req, res) {
     //security checks: min withdrawal, max transfer, check amount,
     // res.send({ success: true, msg: "Internal transfer route" });
@@ -112,8 +113,60 @@ var functions = {
     //SEND THE TOKEN TO THE ADDRESS
   },
 
+  //MAKE WITHDRAWAL
+  makeWithdrawal: async function (req, res) {
+    //security checks: min withdrawal, max transfer, check amount,
+    // res.send({ success: true, msg: "Internal transfer route" });
+    //GET THE ADDRESS CURRENCY AND AMOUNT
+    const currency = req.body.currency;
+    const address = req.body.address;
+    const amount = req.body.amount;
+    //NOW GET THE  SENDER ACCOUNT ID FOR THE SELECTED TOKEN
+    const userAccountArray = req.user.onRegistrationLedgerAccnts;
+    const searchIndex = userAccountArray.find(
+      (user) => user.tokenAccountcurrency === "BTC"
+    );
+    const senderTokenAccountId = await searchIndex.tokenAccountId;
+    const url = `${process.env.TATUM_BASE_URL}/offchain/bitcoin/transfer`;
+    const formData = {
+      senderAccountId: senderTokenAccountId,
+      address: address,
+      amount: amount,
+      compliant: false,
+      fee: "0.0005",
+      mnemonic:
+        "urge pulp usage sister evidence arrest palm math please chief egg abuse",
+      xpub: "xpub6EsCk1uU6cJzqvP9CdsTiJwT2rF748YkPnhv5Qo8q44DG7nn2vbyt48YRsNSUYS44jFCW9gwvD9kLQu9AuqXpTpM1c5hgg9PsuBLdeNncid",
+      senderNote: "Sender note",
+    };
+    console.log(formData);
+    try {
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.TATUM_API_KEY,
+        },
+        url,
+        data: formData,
+      };
+      //step 2
+      axios(options)
+        .then(async (serverResponse) => {
+          res.json({ serverResponse: serverResponse.data });
+        })
+        .catch((err) => {
+          res.json({ axioserror: err });
+        });
+    } catch (e) {
+      console.log(e.data);
+      res.send("from catch", e);
+      res.json({ fcatch: e });
+    }
+  },
+
   //TRANSFER TO A BLOCKCHAIN
-  transferToBlockchain: function (req, res) {
+  transferToBlockchainTest: function (req, res) {
     const formData = {
       senderAccountId: "62c4370fa30e794c7a7b5cf1",
       recipientAccountId: "62cc2d586882783d8ae8c5e4",
