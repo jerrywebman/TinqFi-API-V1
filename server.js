@@ -93,6 +93,7 @@ const ledgerTransactions = require("./routes/ledgerTransactions");
 const externalData = require("./routes/externalData");
 const transaction = require("./routes/transaction");
 const notification = require("./routes/notification");
+const loan = require("./routes/loan");
 
 app.use(routes);
 app.use(wallet);
@@ -100,6 +101,7 @@ app.use(ledgerTransactions);
 app.use(externalData);
 app.use(transaction);
 app.use(notification);
+app.use(loan);
 
 const PORT = process.env.PORT || 3000;
 

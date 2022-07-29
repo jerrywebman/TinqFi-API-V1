@@ -33,6 +33,9 @@ var transactionSchema = new mongoose.Schema({
   transactionType: {
     type: String,
   },
+  tenure: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
