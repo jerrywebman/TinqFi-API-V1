@@ -30,9 +30,6 @@ var functions = {
           "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&page=1";
         const options = {
           method: "GET",
-          headers: {
-            "x-api-key": process.env.TATUM_API_KEY,
-          },
           url: geckoUrl,
         };
         //do something with the response object from coinGecko

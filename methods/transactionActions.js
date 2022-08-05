@@ -205,9 +205,9 @@ var functions = {
   //     const removedTransaction = await Transaction.remove({
   //       _id: req.params.id,
   //     });
-  //     res.json({ success: true, Message: "Transaction Deleted" });
+  //     res.json({ success: true, msg: "Transaction Deleted" });
   //   } catch (err) {
-  //     res.json({ message: err });
+  //     res.json({ msg: err });
   //   }
   // },
 };

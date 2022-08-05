@@ -111,64 +111,72 @@ var functions = {
 
   //***CREATE A NEW USER ACCOUNT***//
   signup: async function (req, res) {
-    const generatedOTP = generateOTP();
-    const defaultEmail = req.body.email;
-    const lowerCaseEmail = defaultEmail.toLowerCase();
+    try {
+      const generatedOTP = generateOTP();
+      const defaultEmail = req.body.email;
+      const lowerCaseEmail = defaultEmail.toLowerCase();
 
-    //check if the email exists
-    let userEmail = await User.findOne({ email: lowerCaseEmail });
-    if (!lowerCaseEmail) {
-      res.status(400).send({ success: false, msg: "No Email Provided" });
-    } else if (userEmail) {
-      return res.status(400).send({
-        success: false,
-        msg: "a user with this email address already exists!",
-      });
-    } else {
-      //hashing the otp
-      bcrypt.genSalt(10, function (err, salt) {
-        if (err) {
-          return next(err);
-        }
-        bcrypt.hash(generatedOTP, salt, async function (err, hash) {
+      //check if the email exists
+      let userEmail = await User.findOne({ email: lowerCaseEmail });
+      if (!lowerCaseEmail) {
+        res.status(400).send({ success: false, msg: "No Email Provided" });
+      } else if (userEmail) {
+        return res.status(400).send({
+          success: false,
+          msg: "a user with this email address already exists!",
+        });
+      } else {
+        //hashing the otp
+        bcrypt.genSalt(10, function (err, salt) {
           if (err) {
             return next(err);
           }
-          //CREATING THE NEW USER
-          var newUser = User({
-            fullname: "",
-            nickname: "",
-            phone: 00000000000,
-            occupation: "",
-            street: "",
-            city: "",
-            country: "",
-            dateOfBirth: "",
-            ourCustomerTatumId: lowerCaseEmail,
-            onRegistrationLedgerAccnts: [],
-            pin: "",
-            verifyCode: hash,
-            email: lowerCaseEmail,
-            password: null,
-          });
-          newUser.save(function (err, newUser) {
+          bcrypt.hash(generatedOTP, salt, async function (err, hash) {
             if (err) {
-              res.status(500).send({
-                success: false,
-                msg: "Failed to create user account",
-                err,
-              });
-            } else {
-              //SEND EMAIL TO USER
-              emailTemplate.signup(generatedOTP, lowerCaseEmail);
-              res.json({
-                success: true,
-                msg: "User Account Successfully Created",
-                userMsg: "Please check your email address for the next steps",
-              });
+              return next(err);
             }
+            //CREATING THE NEW USER
+            var newUser = User({
+              fullname: "",
+              nickname: "",
+              phone: 00000000000,
+              occupation: "",
+              street: "",
+              city: "",
+              country: "",
+              dateOfBirth: "",
+              ourCustomerTatumId: lowerCaseEmail,
+              onRegistrationLedgerAccnts: [],
+              pin: "",
+              verifyCode: hash,
+              email: lowerCaseEmail,
+              password: null,
+            });
+            newUser.save(function (err, newUser) {
+              if (err) {
+                res.status(500).send({
+                  success: false,
+                  msg: "Failed to create user account",
+                  err,
+                });
+              } else {
+                //SEND EMAIL TO USER
+                emailTemplate.signup(generatedOTP, lowerCaseEmail);
+                res.json({
+                  success: true,
+                  msg: "User Account Successfully Created",
+                  userMsg: "Please check your email address for the next steps",
+                });
+              }
+            });
           });
         });
+      }
+    } catch (e) {
+      res.status(503).send({
+        success: false,
+        msg: "An error occurred while processing the next steps",
+        error: e,
       });
     }
   },

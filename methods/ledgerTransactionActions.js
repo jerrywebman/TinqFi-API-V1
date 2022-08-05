@@ -78,26 +78,26 @@ var functions = {
                     new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
                       res.json({
                         success: true,
-                        Message: "Transaction Successful",
+                        msg: "Transaction Successful",
                         trxnRefId: referenceId,
                       })
                     );
                   } else
                     res.status(403).send({
                       success: false,
-                      Message: "Transaction Failed no response",
+                      msg: "Transaction Failed no response",
                     });
                 })
                 .catch((err) => {
                   res.status(401).send({
                     success: false,
-                    Message: "Transaction Failed, insufficient balance",
+                    msg: "Transaction Failed, insufficient balance",
                   });
                 });
             } catch (e) {
               res.status(500).send({
                 success: false,
-                Message: "Transaction Failed",
+                msg: "Transaction Failed",
               });
             }
             //TRANSFER FUNCTION ENDS HERE
@@ -254,26 +254,26 @@ var functions = {
             new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
               res.json({
                 success: true,
-                Message: "Transaction Successful",
+                msg: "Transaction Successful",
                 trxnRefId: referenceId,
               })
             );
           } else
             res.status(403).send({
               success: false,
-              Message: "Transaction Failed no response",
+              msg: "Transaction Failed no response",
             });
         })
         .catch((err) => {
           res.status(403).send({
             success: false,
-            Message: "Transaction Failed, insufficient balance",
+            msg: "Transaction Failed, insufficient balance",
           });
         });
     } catch (e) {
       res.status(500).send({
         success: false,
-        Message: "Transaction Failed",
+        msg: "Transaction Failed",
       });
     }
   },
@@ -328,26 +328,26 @@ var functions = {
             new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
               res.json({
                 success: true,
-                Message: "Transaction Successful",
+                msg: "Transaction Successful",
                 trxnRefId: referenceId,
               })
             );
           } else
             res.status(403).send({
               success: false,
-              Message: "Transaction Failed no response",
+              msg: "Transaction Failed no response",
             });
         })
         .catch((err) => {
           res.status(403).send({
             success: false,
-            Message: "Transaction Failed, insufficient balance",
+            msg: "Transaction Failed, insufficient balance",
           });
         });
     } catch (e) {
       res.status(503).send({
         success: false,
-        Message: "Transaction Failed",
+        msg: "Transaction Failed",
       });
     }
   },
@@ -401,26 +401,26 @@ var functions = {
             new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
               res.json({
                 success: true,
-                Message: "Transaction Successful",
+                msg: "Transaction Successful",
                 trxnRefId: referenceId,
               })
             );
           } else
             res.status(403).send({
               success: false,
-              Message: "Transaction Failed no response",
+              msg: "Transaction Failed no response",
             });
         })
         .catch((err) => {
           res.status(403).send({
             success: false,
-            Message: "Transaction Failed, insufficient balance",
+            msg: "Transaction Failed, insufficient balance",
           });
         });
     } catch (e) {
       res.status(403).send({
         success: false,
-        Message: "Transaction Failed",
+        msg: "Transaction Failed",
       });
     }
   },
@@ -474,26 +474,26 @@ var functions = {
             new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
               res.json({
                 success: true,
-                Message: "Transaction Successful",
+                msg: "Transaction Successful",
                 trxnRefId: referenceId,
               })
             );
           } else
             res.status(403).send({
               success: false,
-              Message: "Transaction Failed no response",
+              msg: "Transaction Failed no response",
             });
         })
         .catch((err) => {
           res.status(403).send({
             success: false,
-            Message: "Transaction Failed, insufficient balance",
+            msg: "Transaction Failed, insufficient balance",
           });
         });
     } catch (e) {
       res.status(500).send({
         success: false,
-        Message: "Transaction Failed",
+        msg: "Transaction Failed",
       });
     }
   },
