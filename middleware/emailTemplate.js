@@ -1,10 +1,22 @@
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
+const Sib = require("sib-api-v3-sdk");
+
+const client = Sib.ApiClient.instance;
+var apiKey = client.authentications["api-key"];
+apiKey.apiKey = process.env.SEND_IN_BLUE;
+
+const tranEmailApi = new Sib.TransactionalEmailsApi();
 
 var functions = {
   //INITIATE SIGNUP
   signup: function (generatedOTP, lowerCaseEmail) {
-    const logoUrl = "https://i.imgur.com/1ioLR1r.png";
+    const sender = {
+      name: "TinqFi",
+      email: "jerrycifeanyi@gmail.com",
+    };
 
+    const recievers = [{ email: lowerCaseEmail }];
+    const logoUrl = "https://i.imgur.com/1ioLR1r.png";
     let htmlWelcomeTemplate = `
              <!DOCTYPE html>
         <html>
@@ -20,39 +32,27 @@ var functions = {
         </body>
         </html>
              `;
-    //send an email here
-    //step 1
-    //ALLOW LESS SECURE APPS TO MAKE THIS WORK FOR GMAIL
-    let transporter = nodemailer.createTransport({
-      host: "smtp.zoho.com",
-      secure: true,
-      port: 465,
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD,
-      },
-    });
 
-    //step 2
-    let mailOptions = {
-      from: process.env.NODEMAILER_EMAIL,
-      to: lowerCaseEmail,
-      subject: "Please verify your email address",
-      html: htmlWelcomeTemplate,
-    };
-
-    //step3
-    transporter.sendMail(mailOptions, function (err, data) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Email Sent");
-      }
-    });
+    tranEmailApi
+      .sendTransacEmail({
+        sender,
+        to: recievers,
+        subject: "Please verify your email address",
+        htmlContent: htmlWelcomeTemplate,
+      })
+      .then(console.log("email sent successfully"))
+      .catch((e) => console.log("error occured", e));
   },
 
   //COMPLETE SIGNUP
   completeRegistration: function (lowerCaseEmail, nickname) {
+    const sender = {
+      name: "TinqFi",
+      email: "jerrycifeanyi@gmail.com",
+    };
+
+    const recievers = [{ email: lowerCaseEmail }];
+
     const logoUrl = "https://i.imgur.com/1ioLR1r.png";
     let htmlWelcomeTemplate = `
               <!DOCTYPE html>
@@ -67,35 +67,16 @@ var functions = {
               </body>
               </html>
              `;
-    //send an email here
-    //step 1
-    //ALLOW LESS SECURE APPS TO MAKE THIS WORK FOR GMAIL
-    let transporter = nodemailer.createTransport({
-      host: "smtp.zoho.com",
-      secure: true,
-      port: 465,
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD,
-      },
-    });
 
-    //step 2
-    let mailOptions = {
-      from: process.env.NODEMAILER_EMAIL,
-      to: lowerCaseEmail,
-      subject: "Thank you for joining TinqFi",
-      html: htmlWelcomeTemplate,
-    };
-
-    //step3
-    transporter.sendMail(mailOptions, function (err, data) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Email Sent");
-      }
-    });
+    tranEmailApi
+      .sendTransacEmail({
+        sender,
+        to: recievers,
+        subject: "Thank you for joining TinqFi",
+        htmlContent: htmlWelcomeTemplate,
+      })
+      .then(console.log("email sent successfully"))
+      .catch((e) => console.log("error occured", e));
   },
 
   //RECOVER ACCOUNT
@@ -116,32 +97,23 @@ var functions = {
             </body>
             </html>
     `;
-    let transporter = nodemailer.createTransport({
-      host: "smtp.zoho.com",
-      secure: true,
-      port: 465,
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD,
-      },
-    });
 
-    //step 2
-    let mailOptions = {
-      from: process.env.NODEMAILER_EMAIL,
-      to: lowerCaseEmail,
-      subject: "OTP Notification - TinqFi",
-      html: htmlRecoverTemplate,
+    const sender = {
+      name: "TinqFi",
+      email: "jerrycifeanyi@gmail.com",
     };
 
-    //step3
-    transporter.sendMail(mailOptions, function (err, data) {
-      if (err) {
-        console.log("error occurs");
-      } else {
-        console.log("Email Sent");
-      }
-    });
+    const recievers = [{ email: lowerCaseEmail }];
+
+    tranEmailApi
+      .sendTransacEmail({
+        sender,
+        to: recievers,
+        subject: "OTP Notification - TinqFi",
+        htmlContent: htmlRecoverTemplate,
+      })
+      .then(console.log("email sent successfully"))
+      .catch((e) => console.log("error occured", e));
   },
 };
 
