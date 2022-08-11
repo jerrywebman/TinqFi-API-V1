@@ -18,6 +18,14 @@ var loanSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  borrowedTatumRefID: {
+    type: String,
+    required: true,
+  },
+  borrowedTokenAmountInUsd: {
+    type: Number,
+    required: true,
+  },
   collateralToken: {
     type: String,
     required: true,
@@ -26,11 +34,35 @@ var loanSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  collateralTatumRefID: {
+    type: String,
+    required: true,
+  },
+  collateralTokenAmountInUsd: {
+    type: Number,
+    required: true,
+  },
   borrowedAmount: {
     type: Number,
     required: true,
   },
+  initialBorrowedTokenPrice: {
+    type: Number,
+    required: true,
+  },
   collateralAmount: {
+    type: Number,
+    required: true,
+  },
+  initialCollateralTokenPrice: {
+    type: Number,
+    required: true,
+  },
+  interestToPay: {
+    type: Number,
+    required: true,
+  },
+  interestPercentage: {
     type: Number,
     required: true,
   },

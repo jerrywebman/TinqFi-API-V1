@@ -237,8 +237,7 @@ var functions = {
     } catch (e) {
       res.status(503).send({
         success: false,
-        msg: "A server error occurred while processing the next steps",
-        error: e,
+        msg: `A server error occurred while processing the next steps, Error: ${e}`,
       });
     }
   },
@@ -383,7 +382,7 @@ var functions = {
 
               res.json({
                 success: true,
-                Message: "User Account successfully created, Please Login ",
+                msg: "User Account successfully created, Please Login ",
               });
             } catch (err) {
               res.json({ message: err });
@@ -394,8 +393,7 @@ var functions = {
     } catch (e) {
       res.status(503).send({
         success: false,
-        msg: "A server error occurred while processing the next steps",
-        error: e,
+        msg: `A server error occurred while processing the next steps, Error: ${e}`,
       });
     }
   },

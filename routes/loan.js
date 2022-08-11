@@ -11,7 +11,8 @@ const router = express.Router();
 //GET ALL LOANS
 // router.get("/api/v1/transaction/checkdata", loanActions.checkData);
 router.post("/api/v1/transaction/add_loan_ltv", loanActions.addLoanParams);
-router.get("/api/v1/transaction/get_loan_ltv", loanActions.selectLoan);
+router.get("/api/v1/transaction/get_loan_ltv", loanActions.selectLoanData);
+router.get("/api/v1/transaction/get_a_loan/:id", loanActions.selectALoan);
 // router.get("/api/v1/transaction/loans", loanActions.getLoanParams);
 
 module.exports = router;
