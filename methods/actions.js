@@ -773,7 +773,7 @@ var functions = {
                   return next(err);
                 }
                 bcrypt.hash(
-                  req.body.newPassword,
+                  req.body.password,
                   salt,
                   async function (err, hash) {
                     if (err) {
