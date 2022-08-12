@@ -463,8 +463,7 @@ var functions = {
     } catch (e) {
       res.status(503).send({
         success: false,
-        msg: "A server error occurred while processing the next steps",
-        error: e,
+        msg: `A server error occurred while processing the next steps, Error: ${e}`,
       });
     }
   },
@@ -545,21 +544,19 @@ var functions = {
           });
           res.json({
             success: true,
-            Msg: "OTP successfully sent to user email",
+            msg: "OTP successfully sent to user email",
           });
         } catch (err) {
           res.json({
             success: false,
-            msg: "Failed to recover user account",
-            error: err,
+            msg: `Failed to recover user account ${err}`,
           });
         }
       }
     } catch (e) {
       res.status(503).send({
         success: false,
-        msg: "A server error occurred while processing the next steps",
-        error: e,
+        msg: `A server error occurred while processing the next steps Error: ${e}`,
       });
     }
   },
@@ -618,8 +615,7 @@ var functions = {
     } catch (e) {
       res.status(503).send({
         success: false,
-        msg: "A server error occurred while processing the next steps",
-        error: e,
+        msg: `A server error occurred while processing the next steps, Error: ${e}`,
       });
     }
   },
@@ -805,8 +801,7 @@ var functions = {
             } catch (err) {
               res.json({
                 success: false,
-                msg: "Account recovery failed",
-                errormsg: err,
+                msg: `Account recovery failed ${err}`,
               });
             }
           }
@@ -815,8 +810,7 @@ var functions = {
     } catch (e) {
       res.status(503).send({
         success: false,
-        msg: "A server error occurred while processing the next steps",
-        error: e,
+        msg: `A server error occurred while processing the next steps ,Error: ${e}`,
       });
     }
   },
