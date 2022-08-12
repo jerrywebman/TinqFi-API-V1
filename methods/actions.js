@@ -739,7 +739,7 @@ var functions = {
 
       const userEmailAddress = lowerCaseEmail;
       let passConfirmString = req.body.confirmPassword;
-      let passConfirmNewString = req.body.newPassword;
+      let passConfirmNewString = req.body.password;
 
       User.findOne(
         {
@@ -752,10 +752,7 @@ var functions = {
               success: false,
               msg: "No account associated with this email",
             });
-          } else if (
-            user &&
-            req.body.confirmPassword !== req.body.newPassword
-          ) {
+          } else if (user && req.body.confirmPassword !== req.body.password) {
             res.status(400).send({
               success: false,
               msg: "Password did not match",
