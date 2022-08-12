@@ -80,7 +80,7 @@ var functions = {
   },
 
   //RECOVER ACCOUNT
-  recover: function (generatedOTP, lowerCaseEmail, nickname) {
+  recover: function (generatedOTP, lowerCaseEmail) {
     const logoUrl = "https://i.imgur.com/1ioLR1r.png";
     let htmlRecoverTemplate = `
             <!DOCTYPE html>
@@ -89,7 +89,7 @@ var functions = {
             <img src=${logoUrl} alt="ComiBlock Logo" style="display:block;width:150px;height:100px;margin-left:auto; margin-right:auto">
             <h3 style="margin:0.4em; margin-bottom:2em; text-align:center; color:black">Please confirm your email</h3>
             
-            <p style="line-spacing:4px; text-align:left;color:black">Hello ${nickname},</p>
+            <p style="line-spacing:4px; text-align:left;color:black">Hello ${lowerCaseEmail},</p>
             <p style="line-spacing:4px; text-align:left;color:black">Please use this verification code to verify your email address.</p>
             <p style="font-weight:bold; text-align:left;color:black;font-size:1.5em;margin-bottom:2em">${generatedOTP}</p>
             <p style="font-size:3px;line-spacing:4px; text-allign:left;color:black;margin-bottom:3em"><span style="font-weight:bold">Note:</span> If you did not take this action, please contact us immediately at <span><a href="mailto:hello@comiblock.com">hello@comiblock.com</a></span>.</p>

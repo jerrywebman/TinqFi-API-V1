@@ -537,8 +537,8 @@ var functions = {
                 }
               ).then(() => {
                 //SEND EMAIL HERE
-                const nickname = userDetails.nickname;
-                emailTemplate.recover(lowerCaseEmail, generatedOTP, nickname);
+                // const nickname = userDetails.nickname;
+                emailTemplate.recover(lowerCaseEmail, generatedOTP);
               });
             });
           });
