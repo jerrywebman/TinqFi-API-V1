@@ -11,17 +11,21 @@ const router = express.Router();
 // });
 
 router.get("/api", function (req, res) {
-  if (req.session.viewCount) {
-    req.session.viewCount++;
-  } else {
-    req.session.viewCount = 1;
+  try {
+    if (req.session.viewCount) {
+      req.session.viewCount++;
+    } else {
+      req.session.viewCount = 1;
+    }
+    res
+      .status(200)
+      .send(
+        `Hello Dev, Welcome to our Api Home screen. if you are seeing this, be rest assured that the server is up and running, you visited ${req.session.viewCount}`
+      );
+    console.log(req.session);
+  } catch (err) {
+    res.status(500).send(err);
   }
-  res
-    .status(200)
-    .send(
-      `Hello Tovia, Welcome to our Api Home screen. if you are seeing this, be rest assured that the server is up and running, you visited ${req.session.viewCount}`
-    );
-  console.log(req.session);
 });
 
 router.get("/", function (req, res) {

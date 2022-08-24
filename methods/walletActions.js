@@ -82,14 +82,12 @@ var functions = {
         res.status(500).send({
           success: false,
           msg: "Internal Server Error",
-          err: err,
         });
       }
     } catch (err) {
       res.status(503).send({
         success: false,
         msg: "Server unavailable",
-        err: err,
       });
     }
   },
@@ -116,6 +114,7 @@ var functions = {
           });
           res.status(200).send({
             success: true,
+            msg: "Address found",
             data: response[0],
           });
         });

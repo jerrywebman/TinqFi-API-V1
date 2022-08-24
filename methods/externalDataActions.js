@@ -57,8 +57,6 @@ var functions = {
       res.status(403).send({ success: false, msg: err });
     }
   },
-  //tester
-  gettester: function (req, res) {},
 };
 
 module.exports = functions;

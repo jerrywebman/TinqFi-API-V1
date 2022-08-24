@@ -2,10 +2,6 @@ var mongoose = require("mongoose");
 var schema = mongoose.Schema;
 
 var earnSchema = new mongoose.Schema({
-  _id: {
-    type: String,
-    require: true,
-  },
   userEmail: {
     type: String,
     require: true,
@@ -15,7 +11,15 @@ var earnSchema = new mongoose.Schema({
     type: Number,
     require: true,
   },
-  profitPercent: {
+  apy: {
+    type: Number,
+    require: true,
+  },
+  dailyProfit: {
+    type: Number,
+    require: true,
+  },
+  totalProfit: {
     type: Number,
     require: true,
   },
@@ -27,20 +31,35 @@ var earnSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-  earnTokenString: {
+  tokenName: {
     type: String,
     require: true,
   },
-  status: {
+  tokenTicker: {
+    type: String,
+    require: true,
+  },
+  tokenImageUrl: {
+    type: String,
+    require: true,
+  },
+  plan: {
+    type: String,
+    require: true,
+  },
+  active: {
     type: Boolean,
     default: true,
     require: true,
   },
-  activated: {
+  activatedDate: {
     type: Date,
     default: Date.now,
   },
-  closing: {
+  closingDate: {
+    type: Date,
+  },
+  valueDate: {
     type: Date,
   },
 });

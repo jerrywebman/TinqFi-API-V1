@@ -94,6 +94,7 @@ const externalData = require("./routes/externalData");
 const transaction = require("./routes/transaction");
 const notification = require("./routes/notification");
 const loan = require("./routes/loan");
+const earn = require("./routes/earn");
 
 app.use(routes);
 app.use(wallet);
@@ -102,6 +103,7 @@ app.use(externalData);
 app.use(transaction);
 app.use(notification);
 app.use(loan);
+app.use(earn);
 
 const PORT = process.env.PORT || 3000;
 
