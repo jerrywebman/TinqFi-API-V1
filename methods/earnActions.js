@@ -1,5 +1,5 @@
-const Earn = require("../models/Earn");
-const EarnLtv = require("../models/EarnLtv");
+var Earn = require("../models/earn");
+var EarnLtv = require("../models/EarnLtv");
 const axios = require("axios");
 var TinqfiTrxn = require("../models/Transaction");
 
