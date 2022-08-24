@@ -64,4 +64,4 @@ var earnSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("earn", earnSchema);
+module.exports = mongoose.model("Earn", earnSchema);
