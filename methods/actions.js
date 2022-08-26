@@ -385,25 +385,34 @@ var functions = {
               //   msg: "User Account successfully created, Please Login ",
               // });
               //PASS THE USER TOKEN TO CHECK
+              User.findOne(
+                {
+                  email: lowerCaseEmail,
+                },
+                function (err, theuser) {
+                  if (err) throw err;
+                  if (theuser) {
+                    const payload = {
+                      sub: theuser._id,
+                      user: theuser,
+                      iat: Date.now(),
+                    };
 
-              const payload = {
-                sub: user._id,
-                user: user,
-                iat: Date.now(),
-              };
-
-              var token = jwt.sign(payload, process.env.TOKEN_SECRET, {
-                expiresIn: "5d",
-              });
-              // Set data to Redis
-              client.set(user.email, token);
-              client.expire(user.email, 18000);
-              //give the response
-              res.json({
-                success: true,
-                user: user,
-                token: "Bearer " + token,
-              });
+                    var token = jwt.sign(payload, process.env.TOKEN_SECRET, {
+                      expiresIn: "5d",
+                    });
+                    // Set data to Redis
+                    client.set(theuser.email, token);
+                    client.expire(theuser.email, 18000);
+                    //give the response
+                    res.json({
+                      success: true,
+                      user: theuser,
+                      token: "Bearer " + token,
+                    });
+                  }
+                }
+              );
             } catch (err) {
               res.json({ message: err });
             }
