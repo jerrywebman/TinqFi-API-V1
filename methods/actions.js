@@ -380,9 +380,29 @@ var functions = {
               //SEND EMAIL
               emailTemplate.completeRegistration(lowerCaseEmail, nickname);
 
+              // res.json({
+              //   success: true,
+              //   msg: "User Account successfully created, Please Login ",
+              // });
+              //PASS THE USER TOKEN TO CHECK
+
+              const payload = {
+                sub: user._id,
+                user: user,
+                iat: Date.now(),
+              };
+
+              var token = jwt.sign(payload, process.env.TOKEN_SECRET, {
+                expiresIn: "5d",
+              });
+              // Set data to Redis
+              client.set(user.email, token);
+              client.expire(user.email, 18000);
+              //give the response
               res.json({
                 success: true,
-                msg: "User Account successfully created, Please Login ",
+                user: user,
+                token: "Bearer " + token,
               });
             } catch (err) {
               res.json({ message: err });

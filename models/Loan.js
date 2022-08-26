@@ -62,7 +62,7 @@ var loanSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  interestPercentage: {
+  dailyInterestRate: {
     type: Number,
     required: true,
   },
@@ -82,16 +82,20 @@ var loanSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  dailyRate: {
+  dailyInterestRateInUsd: {
     type: Number,
     required: true,
   },
-  totalRate: {
+  totalInterestRateInUsd: {
     type: Number,
     required: true,
   },
   repaymentAmount: {
     type: Number,
+    required: true,
+  },
+  topupLoan: {
+    type: Array,
     required: true,
   },
   createdAt: { type: Date, default: Date.now },

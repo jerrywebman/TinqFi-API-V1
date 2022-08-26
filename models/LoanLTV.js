@@ -5,7 +5,7 @@ var loanLTVSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-  totalInterestRate: {
+  dailyInterestRate: {
     type: Number,
     required: true,
   },
