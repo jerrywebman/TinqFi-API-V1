@@ -7,11 +7,10 @@ const verify = require("../middleware/verifyToken");
 const router = express.Router();
 
 // TRANSFER TESTER
-// router.get(
-//   "/api/v1/transaction/TRANSFER",
-//   verify,
-//   ledgerTransactionActions.transferToBlockchainTest
-// );
+router.get(
+  "/api/v1/transaction/TRANSFER",
+  ledgerTransactionActions.transferToBlockchainTest
+);
 
 //MAKE  WITHDRAWAL
 router.post(

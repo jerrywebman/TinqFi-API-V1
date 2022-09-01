@@ -384,35 +384,37 @@ var functions = {
               //   success: true,
               //   msg: "User Account successfully created, Please Login ",
               // });
-              //PASS THE USER TOKEN TO CHECK
-              User.findOne(
-                {
-                  email: lowerCaseEmail,
-                },
-                function (err, theuser) {
-                  if (err) throw err;
-                  if (theuser) {
-                    const payload = {
-                      sub: theuser._id,
-                      user: theuser,
-                      iat: Date.now(),
-                    };
+              //PASS THE USER TOKEN TO
+              const theFunction = async () => {
+                const theuser = await User.findOne({ email: lowerCaseEmail });
+                if (!theuser) {
+                  res.json({
+                    success: false,
+                    user: "error occured while creating user account. Please Login",
+                  });
+                } else {
+                  const payload = {
+                    sub: theuser._id,
+                    user: theuser,
+                    iat: Date.now(),
+                  };
 
-                    var token = jwt.sign(payload, process.env.TOKEN_SECRET, {
-                      expiresIn: "5d",
-                    });
-                    // Set data to Redis
-                    client.set(theuser.email, token);
-                    client.expire(theuser.email, 18000);
-                    //give the response
-                    res.json({
-                      success: true,
-                      user: theuser,
-                      token: "Bearer " + token,
-                    });
-                  }
+                  var token = jwt.sign(payload, process.env.TOKEN_SECRET, {
+                    expiresIn: "5d",
+                  });
+                  // Set data to Redis
+                  client.set(theuser.email, token);
+                  client.expire(theuser.email, 18000);
+                  //give the response
+                  res.json({
+                    success: true,
+                    user: theuser,
+                    token: "Bearer " + token,
+                  });
                 }
-              );
+              };
+
+              setTimeout(() => theFunction(), 6000);
             } catch (err) {
               res.json({ message: err });
             }

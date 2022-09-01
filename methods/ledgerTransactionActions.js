@@ -168,12 +168,12 @@ var functions = {
   //TRANSFER TO A BLOCKCHAIN
   transferToBlockchainTest: function (req, res) {
     const formData = {
-      senderAccountId: "62c4370fa30e794c7a7b5cf1",
-      recipientAccountId: "62cc2d586882783d8ae8c5e4",
-      amount: "30",
+      senderAccountId: "62fdea5b7235d1d981b0a69e",
+      recipientAccountId: "62fd5a6fab943e8010b9b204",
+      amount: "480",
       anonymous: false,
       compliant: false,
-      transactionCode: req.user.email,
+      transactionCode: "req.user.email",
       paymentId: "req.user.ourCustomerTatumId",
       recipientNote: "req.body.recipientNote",
     };

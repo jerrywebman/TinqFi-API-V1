@@ -6,6 +6,11 @@ var loanSchema = new mongoose.Schema({
     required: true,
     match: /.+\@.+\..+/,
   },
+  status: {
+    type: Boolean,
+    required: true,
+    default: true,
+  },
   ourCustomerTatumId: {
     type: String,
     required: true,
@@ -18,11 +23,19 @@ var loanSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  borrowedAmountInValue: {
+    type: Number,
+    required: true,
+  },
+  borrowedTokenAmountInUsd: {
+    type: Number,
+    required: true,
+  },
   borrowedTatumRefID: {
     type: String,
     required: true,
   },
-  borrowedTokenAmountInUsd: {
+  initialBorrowedTokenPrice: {
     type: Number,
     required: true,
   },
@@ -34,35 +47,23 @@ var loanSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  collateralTatumRefID: {
-    type: String,
+  collateralAmountInValue: {
+    type: Number,
     required: true,
   },
   collateralTokenAmountInUsd: {
     type: Number,
     required: true,
   },
-  borrowedAmount: {
-    type: Number,
-    required: true,
-  },
-  initialBorrowedTokenPrice: {
-    type: Number,
-    required: true,
-  },
-  collateralAmount: {
-    type: Number,
+  collateralTatumRefID: {
+    type: String,
     required: true,
   },
   initialCollateralTokenPrice: {
     type: Number,
     required: true,
   },
-  interestToPay: {
-    type: Number,
-    required: true,
-  },
-  dailyInterestRate: {
+  dailyInterestRateOnPlan: {
     type: Number,
     required: true,
   },
@@ -78,11 +79,11 @@ var loanSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  loanTenure: {
-    type: Date,
+  dailyInterestToPayInUsd: {
+    type: Number,
     required: true,
   },
-  dailyInterestRateInUsd: {
+  dailyInterestToPayInValue: {
     type: Number,
     required: true,
   },
@@ -90,7 +91,15 @@ var loanSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  repaymentAmount: {
+  totalInterestToPayInValue: {
+    type: Number,
+    required: true,
+  },
+  loanTenure: {
+    type: Number,
+    required: true,
+  },
+  repaymentAmountInValue: {
     type: Number,
     required: true,
   },
@@ -99,6 +108,7 @@ var loanSchema = new mongoose.Schema({
     required: true,
   },
   createdAt: { type: Date, default: Date.now },
+  endAt: { type: Date },
 });
 
 module.exports = mongoose.model("loan", loanSchema);
