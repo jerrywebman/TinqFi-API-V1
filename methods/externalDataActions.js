@@ -78,7 +78,7 @@ var functions = {
             .send({ success: false, msg: "error fetching news data" })
         );
     } catch (err) {
-      res.status(403).send({ success: false, msg: err });
+      res.status(403).send({ success: false, msg: "Server error occured" });
     }
   },
 };
