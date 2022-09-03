@@ -262,6 +262,7 @@ var functions = {
                               totalInterestToPayInValue + borrowedAmount, //amount to payback + interest
                             topupLoan: collateralAmountInValue,
                             endAt: closingDate,
+                            status: true,
                           };
                           new Loan(newLoan).save().then(() => {
                             //POST TRX HISTORY WITH THE USER DATA IN DB
@@ -457,7 +458,7 @@ var functions = {
     } catch (e) {
       res.status(500).send({
         success: false,
-        msg: "Its not you, its our Server",
+        msg: "A server error occurred while processing your request",
       });
     }
   },
@@ -478,15 +479,162 @@ var functions = {
           msg: "Loan is inactive/not available",
         });
       } else {
+        res.json({
+          success: true,
+          loan: theLoan,
+        });
         //do something with the loan data
-        // var arr1 = [1, 2, 3, 4];
-        // var sum = 0;
-        // for (var i in arr1) {
-        //   sum += arr1[i];
-        // }
-        // console.log(sum);
+        var topupArray = theLoan.topupLoan;
+        var topupSum = 0;
+        //get the sum of the topup arrays
+        for (var i in topupArray) {
+          topupSum += topupArray[i];
+        }
+        console.log(topupSum);
+
+        //get the daily interest rate and calculate the interest rate for the loan
+        const aDayInMilliseconds = 86400000; //24 * 60 * 60 * 1000
+        const today = Date.now();
+        const createdAt = new Date(theLoan.createdAt);
+        const dateDiff = today - createdAt;
+        const days = dateDiff / aDayInMilliseconds;
+        const totalInterest =
+          Math.ceil(days) * theLoan.dailyInterestToPayInValue;
+        console.log(totalInterest);
+        //THE AMOUNT + THE PROFIT
+        const borrowedTokenAndProfit =
+          totalInterest + theLoan.borrowedAmountInValue;
+        console.log(borrowedTokenAndProfit);
+        //COLLECT THE LOAN BORROWED TOKEN TO THE USER
+        const borrowedTokenData = {
+          recipientAccountId:
+            process.env["TINQFI_LOAN_ACCOUNT_" + theLoan.borrowedToken],
+          senderAccountId: theLoan.borrowedTokenAccount,
+          amount: String(borrowedTokenAndProfit),
+          anonymous: false,
+          compliant: false,
+          transactionCode: req.user.email,
+          paymentId: req.user.ourCustomerTatumId,
+          recipientNote: "borrowed token to TinqFi + Profit",
+        };
+        const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
+        try {
+          const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.TATUM_API_KEY,
+            },
+            url,
+            data: borrowedTokenData,
+          };
+          //DONE
+          axios(options)
+            .then(async (serverUserResponse) => {
+              if (serverUserResponse.data.reference !== null) {
+                //the response from Tatum
+                const borrowedTokenRefId = await serverUserResponse.data
+                  .reference;
+                //COLLECT THE COLLATERAL FROM TINQFI
+                const collateralTokenData = {
+                  recipientAccountId: theLoan.collateralTokenAccount,
+                  senderAccountId:
+                    process.env[
+                      "TINQFI_LOAN_ACCOUNT_" + theLoan.collateralToken
+                    ],
+                  amount: String(topupSum),
+                  anonymous: false,
+                  compliant: false,
+                  transactionCode: req.user.email,
+                  paymentId: req.user.ourCustomerTatumId,
+                  recipientNote: "all collateral token to user",
+                };
+                const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
+                try {
+                  const options = {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "x-api-key": process.env.TATUM_API_KEY,
+                    },
+                    url,
+                    data: collateralTokenData,
+                  };
+                  //DONE
+                  axios(options).then(async (serverTinqFiResponse) => {
+                    if (serverTinqFiResponse !== null) {
+                      //the response from Tatum
+                      const collateralTokenRefId = await serverTinqFiResponse
+                        .data.reference;
+
+                      //set the loan as inactive
+                      const updateLoan = await Loan.updateOne(
+                        {
+                          _id: req.params.id,
+                          userEmail: req.user.email,
+                          status: true,
+                        },
+                        {
+                          $set: {
+                            status: false,
+                          },
+                        }
+                      ).then(() => {
+                        //POST TRX HISTORY WITH THE USER DATA IN DB
+                        const newTinqfiTrxn = {
+                          userEmail: req.user.email,
+                          userTaTumId: req.user.ourCustomerTatumId,
+                          transactionAmount: borrowedTokenAndProfit,
+                          transactionToken: `Repayed -${borrowedTokenAndProfit} as loan + Profit with loan Id ${theLoan._id} and collected Collateral`,
+                          transactionType: "Loan",
+                          tenure: `${Math.ceil(days)} days`,
+                          from: "From TinqFI + User",
+                          to: senderTokenAccountId,
+                          trxnRefId:
+                            collateralTokenRefId + " - " + borrowedTokenRefId,
+                        };
+                        new TinqfiTrxn(newTinqfiTrxn).save();
+                        res.json({
+                          success: true,
+                          msg: "Loan Repayed successfully",
+                        });
+                      });
+                    } else {
+                      res.status(401).send({
+                        success: false,
+                        msg: "Transaction Failed no responses",
+                      });
+                    }
+                  });
+                } catch (error) {
+                  //the error from axios
+                }
+              } else {
+                res.status(401).send({
+                  success: false,
+                  msg: "Transaction Failed no responsess",
+                });
+              }
+            })
+            .catch((error) => {
+              res.status(401).send({
+                success: false,
+                msg: "Transaction Failed no responsesss",
+              });
+            });
+        } catch (e) {
+          res.status(401).send({
+            success: false,
+            msg: "Transaction Failed no responsessss",
+          });
+        }
       }
-    } catch (e) {}
+    } catch (e) {
+      res.status(500).send({
+        success: false,
+        msg: "A server error occurred while processing your request",
+      });
+    }
   },
 };
 

@@ -34,49 +34,56 @@ var functions = {
             url: geckoUrl,
           };
           //do something with the response object from coinGecko
-          axios(options).then(async (geckoResponse) => {
-            const newresponseFromGecko = [];
-            const responseFromGecko = await geckoResponse.data;
-            //do the heavy data processing  by slicing the data and editing it
-            responseFromGecko.map(function (single) {
-              if (single.name === "BNB") {
-                single.name = "Binance Smart Chain";
-                single.symbol = "BSC";
-              } else if (single.symbol === "btc") single.symbol = "BTC";
-              else if (single.symbol === "eth") single.symbol = "ETH";
-              else single.symbol = "DOGE";
+          axios(options)
+            .then(async (geckoResponse) => {
+              const newresponseFromGecko = [];
+              const responseFromGecko = await geckoResponse.data;
+              //do the heavy data processing  by slicing the data and editing it
+              responseFromGecko.map(function (single) {
+                if (single.name === "BNB") {
+                  single.name = "Binance Smart Chain";
+                  single.symbol = "BSC";
+                } else if (single.symbol === "btc") single.symbol = "BTC";
+                else if (single.symbol === "eth") single.symbol = "ETH";
+                else single.symbol = "DOGE";
 
-              var currency = single.symbol;
-              var image = single.image;
-              var name = single.name;
-              var current_price = single.current_price;
-              newresponseFromGecko.push({
-                name,
-                currency,
-                image,
-                current_price,
+                var currency = single.symbol;
+                var image = single.image;
+                var name = single.name;
+                var current_price = single.current_price;
+                newresponseFromGecko.push({
+                  name,
+                  currency,
+                  image,
+                  current_price,
+                });
+              });
+
+              //merge the arrays
+              const mergeArrayByCurrency = (response, newresponseFromGecko) =>
+                response.map((itm) => ({
+                  ...newresponseFromGecko.find(
+                    (item) => item.currency === itm.currency && item
+                  ),
+                  ...itm,
+                }));
+              let finalResponse = mergeArrayByCurrency(
+                response,
+                newresponseFromGecko
+              );
+              //send the user the token
+              res.status(200).send({
+                success: true,
+                msg: "Token balance has been updated successfully",
+                data: finalResponse,
+              });
+            })
+            .catch(() => {
+              res.status(500).send({
+                success: false,
+                msg: "Error occured while updating market data",
               });
             });
-
-            //merge the arrays
-            const mergeArrayByCurrency = (response, newresponseFromGecko) =>
-              response.map((itm) => ({
-                ...newresponseFromGecko.find(
-                  (item) => item.currency === itm.currency && item
-                ),
-                ...itm,
-              }));
-            let finalResponse = mergeArrayByCurrency(
-              response,
-              newresponseFromGecko
-            );
-            //send the user the token
-            res.status(200).send({
-              success: true,
-              msg: "Token balance has been updated successfully",
-              data: finalResponse,
-            });
-          });
         });
       } catch (err) {
         res.status(500).send({

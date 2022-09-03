@@ -134,7 +134,7 @@ var functions = {
           //step 2
           axios(options)
             .then(async (serverResponse) => {
-              if (serverResponse.data !== null) {
+              if (serverResponse.data.reference !== null) {
                 //the response from Tatum
                 const referenceId = await serverResponse.data.reference;
                 //POST NEW EARN ORDER
@@ -279,7 +279,7 @@ var functions = {
           //step 2
           axios(options)
             .then(async (serverResponse) => {
-              if (serverResponse.data !== null) {
+              if (serverResponse.data.reference !== null) {
                 //the response from Tatum
                 const referenceId = await serverResponse.data.reference;
                 //POST NEW EARN ORDER

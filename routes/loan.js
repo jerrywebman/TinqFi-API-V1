@@ -16,6 +16,7 @@ router.post("/api/v1/loan/apply", verify, loanActions.applyForLoan);
 router.get("/api/v1/loan/get_loans", verify, loanActions.getAllUserLoan);
 router.get("/api/v1/loan/get/:id", verify, loanActions.selectALoan);
 router.get("/api/v1/loan/topup/:id", verify, loanActions.topupCollateral);
+router.get("/api/v1/loan/repay/:id", verify, loanActions.repayLoan);
 // router.get("/api/v1/transaction/loans", loanActions.getLoanParams);
 
 module.exports = router;
