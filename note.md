@@ -4,6 +4,9 @@ heroku logs --tail
 heroku logs --tail --app tinqfi-api
 
 //tatum
+tatum-kms --help
 tatum-kms generatewallet BTC --testnet //generate wallet
 tatum-kms generatemanagedwallet BTC --testnet // generatemanagedwallet
 tatum-kms export // check ur wallets
+C:\Users\USER-PC\.tatumrc
+tatum-kms daemon --testnet --chain BSC --api-key f3e33f2b-8603-463a-b57d-70a2a29dd3b1 // CHECK THE CHAINS for transactions and sign it

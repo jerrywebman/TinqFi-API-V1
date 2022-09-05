@@ -6,3 +6,6 @@ yarn.lock
 package-lock.json
 .rest
 routes/user.js
+config/test.json
+note.md
+request.rest 
