@@ -8,10 +8,11 @@ var functions = {
     //security checks: min withdrawal, max transfer, check amount,
     // res.send({ success: true, msg: "Internal transfer route" });
     //CHECK THE ADDRESS, IF IN TATUM
-    const currency = req.body.currency;
-    const address = req.body.address;
-    const url = `${process.env.TATUM_BASE_URL}/offchain/account/address/${address}/${currency}`;
+
     try {
+      const currency = req.body.currency;
+      const address = req.body.address;
+      const url = `${process.env.TATUM_BASE_URL}/offchain/account/address/${address}/${currency}`;
       const options = {
         method: "GET",
         headers: {

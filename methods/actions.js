@@ -404,7 +404,7 @@ var functions = {
                   });
                   // Set data to Redis
                   client.set(theuser.email, token);
-                  client.expire(theuser.email, 18000);
+                  client.expire(theuser.email, 86400);
                   //give the response
                   res.json({
                     success: true,
@@ -476,7 +476,7 @@ var functions = {
 
                     // Set data to Redis
                     await client.set(user.email, token);
-                    await client.expire(user.email, 18000);
+                    await client.expire(user.email, 86400);
                   } else {
                     return res.status(401).send({
                       success: false,

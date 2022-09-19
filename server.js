@@ -95,6 +95,7 @@ const transaction = require("./routes/transaction");
 const notification = require("./routes/notification");
 const loan = require("./routes/loan");
 const earn = require("./routes/earn");
+const withdrawal = require("./routes/withdrawal");
 
 app.use(routes);
 app.use(wallet);
@@ -104,6 +105,7 @@ app.use(transaction);
 app.use(notification);
 app.use(loan);
 app.use(earn);
+app.use(withdrawal);
 
 const PORT = process.env.PORT || 3000;
 
