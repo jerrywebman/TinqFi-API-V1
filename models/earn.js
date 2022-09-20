@@ -11,6 +11,10 @@ var earnSchema = new mongoose.Schema({
     type: Number,
     require: true,
   },
+  duration: {
+    type: Number,
+    require: true,
+  },
   apy: {
     type: Number,
     require: true,
