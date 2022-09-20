@@ -9,11 +9,7 @@ const router = express.Router();
 //add earn ltv
 router.post("/api/v1/earn/add_earn_ltv", earnActions.addEarnLTV);
 //get all earn ltv
-router.get(
-  "/api/v1/earn/all_flexible_plan",
-  verify,
-  earnActions.getAllEarnPackage
-);
+router.get("/api/v1/earn/all_plan", verify, earnActions.getAllEarnPackage);
 //apply for fixed plan
 router.post(
   "/api/v1/earn/apply/fixed",
