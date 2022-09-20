@@ -81,7 +81,7 @@ var functions = {
               // }
             })
             .catch((err) => {
-              res.status(400).send({
+              res.status(401).send({
                 success: false,
                 msg: "Insufficient balance",
               });
@@ -93,7 +93,7 @@ var functions = {
           });
         }
       } else {
-        res.status(400).send({
+        res.status(403).send({
           success: false,
           msg: "An error occured, Wrong account details",
         });
