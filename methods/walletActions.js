@@ -74,7 +74,7 @@ var functions = {
               //send the user the token
               res.status(200).send({
                 success: true,
-                msg: "Token balance has been updated successfully.",
+                msg: "Token balance has been updated successfully",
                 data: finalResponse,
               });
             })
