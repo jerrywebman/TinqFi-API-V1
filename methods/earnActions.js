@@ -390,37 +390,56 @@ var functions = {
   },
 
   //GET ALL USER CLOSED FIXED EARN PLAN
-  getAllClosedFixedPlan: async function (req, res) {
-    try {
-      const earnParams = await Earn.find({
-        plan: "FIXED",
-        active: false,
-        userEmail: req.user.email,
-      }).sort({ activatedDate: -1 });
-      res.json({
-        success: true,
-        data: earnParams,
-        msg: "User Closed Fixed plans successfully fetched",
-      });
-    } catch (err) {
-      res
-        .status(500)
-        .send({ success: false, msg: "Internal Server Error Occcured" });
-    }
-  },
+  // getAllClosedFixedPlan: async function (req, res) {
+  //   try {
+  //     const earnParams = await Earn.find({
+  //       plan: "FIXED",
+  //       active: false,
+  //       userEmail: req.user.email,
+  //     }).sort({ activatedDate: -1 });
+  //     res.json({
+  //       success: true,
+  //       data: earnParams,
+  //       msg: "User Closed Fixed plans successfully fetched",
+  //     });
+  //   } catch (err) {
+  //     res
+  //       .status(500)
+  //       .send({ success: false, msg: "Internal Server Error Occcured" });
+  //   }
+  // },
 
   //GET ALL USER CLOSED FLEXIBLE EARN PLAN
-  getAllClosedFlexiblePlan: async function (req, res) {
+  // getAllClosedFlexiblePlan: async function (req, res) {
+  //   try {
+  //     const earnParams = await Earn.find({
+  //       plan: "FLEXIBLE",
+  //       active: false,
+  //       userEmail: req.user.email,
+  //     }).sort({ activatedDate: -1 });
+  //     res.json({
+  //       success: true,
+  //       data: earnParams,
+  //       msg: "User Closed Flexible plans successfully fetched",
+  //     });
+  //   } catch (err) {
+  //     res
+  //       .status(500)
+  //       .send({ success: false, msg: "Internal Server Error Occcured" });
+  //   }
+  // },
+
+  //GET ALL SUBSCRIPTIONS
+
+  getAllSubscriptions: async function (req, res) {
     try {
       const earnParams = await Earn.find({
-        plan: "FLEXIBLE",
-        active: false,
         userEmail: req.user.email,
       }).sort({ activatedDate: -1 });
       res.json({
         success: true,
         data: earnParams,
-        msg: "User Closed Flexible plans successfully fetched",
+        msg: "Subscriptions fetched",
       });
     } catch (err) {
       res

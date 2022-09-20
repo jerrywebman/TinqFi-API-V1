@@ -34,17 +34,24 @@ router.get(
   verify,
   earnActions.getAllActiveFixedPlan
 );
-//get all user closed flexible plan
-router.get(
-  "/api/v1/earn/get/closed/flexible",
-  verify,
-  earnActions.getAllClosedFlexiblePlan
-);
+// //get all user closed flexible plan
+// router.get(
+//   "/api/v1/earn/get/closed/flexible",
+//   verify,
+//   earnActions.getAllClosedFlexiblePlan
+// );
+// //get all user closed fixed plan
+// router.get(
+//   "/api/v1/earn/get/closed/fixed",
+//   verify,
+//   earnActions.getAllClosedFixedPlan
+// );
+
 //get all user closed fixed plan
 router.get(
-  "/api/v1/earn/get/closed/fixed",
+  "/api/v1/earn/get/subscriptions",
   verify,
-  earnActions.getAllClosedFixedPlan
+  earnActions.getAllSubscriptions
 );
 
 // close a fixed plan
