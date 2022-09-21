@@ -11,6 +11,7 @@ const passport = require("passport");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
+require("./middleware/init_redis");
 
 connectDB();
 

@@ -2,27 +2,12 @@ var User = require("../models/user");
 var Money = require("../models/money");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcrypt");
-const { createClient } = require("redis");
 const createWalletActions = require("./specialMethods/createWalletActions");
 const emailTemplate = require("../middleware/emailTemplate");
 const generateOTP = require("../middleware/generateOTP");
 var AddressStore = require("../models/address");
 const axios = require("axios");
-
-//for redis
-const client = createClient({
-  url: process.env.REDIS_URL,
-  socket: {
-    tsl: true,
-    rejectUnauthorized: false,
-  },
-});
-
-// const client = createClient();
-
-client.on("error", (err) => console.log("Redis Client Error", err));
-
-client.connect();
+const client = require("../middleware/init_redis");
 
 var functions = {
   // ** LOGOUT ROUTE **//
