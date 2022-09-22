@@ -7,8 +7,8 @@ const verify = require("../middleware/verifyToken");
 const router = express.Router();
 
 //add earn ltv
-// router.post("/api/v1/earn/add_earn_ltv", earnActions.addEarnLTV);
-//get all earn ltv
+// //get all earn ltvrouter.post("/api/v1/earn/add_earn_ltv", earnActions.addEarnLTV);
+
 router.get("/api/v1/earn/all_plan", verify, earnActions.getAllEarnPackage);
 //apply for fixed plan
 router.post(
