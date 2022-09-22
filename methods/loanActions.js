@@ -4,25 +4,6 @@ const axios = require("axios");
 var TinqfiTrxn = require("../models/Transaction");
 
 var functions = {
-  //add a loan params DONE
-  addLoanParams: function (req, res) {
-    try {
-      const newLoanLTV = {
-        _id: "DOGE",
-        dailyInterestRate: 0.1, //dailyinterest rate
-        initialLTV: 60, //60% of collateralTone. we give the user 60% of his collateral token
-        marginCall: 75, //  collateralAmount and Value in usd.. chck the initial value in usd by the current price of the token in usd
-        liquidationLTV: 70,
-        loanTenure: [30, 60, 90, 180],
-      };
-      new LoanLTV(newLoanLTV).save().then(() => {
-        res.json({ success: true, msg: "Loan Saved" });
-      });
-    } catch (e) {
-      res.json({ success: false, msg: e`Error = ${e}` });
-    }
-  },
-
   //SELECT A LOAN DATA DONE
   selectLoanData: async function (req, res) {
     try {
@@ -347,34 +328,6 @@ var functions = {
     }
   },
 
-  //SELECT A SPECIFIC LOANS
-  selectALoan: async function (req, res) {
-    try {
-      const loanParams = await Loan.findOne({
-        _id: req.params.id,
-        userEmail: req.user.email,
-        status: true,
-      });
-      if (loanParams === null) {
-        res.json({
-          success: false,
-          msg: "Loan not found",
-        });
-      } else {
-        res.json({
-          success: true,
-          data: loanParams,
-          msg: "Loan successfully fetched",
-        });
-      }
-    } catch (e) {
-      res.status(404).send({
-        success: false,
-        msg: "No Loan Found with that ID",
-      });
-    }
-  },
-
   //top up a loan collateral
   topupCollateral: async function (req, res) {
     try {
@@ -412,7 +365,7 @@ var functions = {
             };
 
             console.log("priceData", priceData);
-            //get the price of dogecoin collateral
+            //get the price of collateral token
             const currentCollateralPriceInUsd =
               priceData[theLoan.collateralToken] *
               theLoan.collateralAmountInValue;
@@ -428,7 +381,7 @@ var functions = {
             const checkLiquidationCall =
               theLoan.collateralTokenAmountInUsd * (80 / 100); //theLoan.liquidationLTV
             console.log("checkLiquidationCall", checkLiquidationCall);
-            //get the price of dogecoin collateral
+            //get the price of collateral token
 
             if (checkLiquidationCall <= currentCollateralPriceInUsd) {
               //end the loan plan and send the user and tinqfi an email notification
@@ -619,13 +572,13 @@ var functions = {
             .catch((error) => {
               res.status(401).send({
                 success: false,
-                msg: "Transaction Failed no responsesss",
+                msg: "Transaction Failed no responses",
               });
             });
         } catch (e) {
           res.status(401).send({
             success: false,
-            msg: "Transaction Failed no responsessss",
+            msg: "Transaction Failed no responses",
           });
         }
       }
@@ -634,6 +587,53 @@ var functions = {
         success: false,
         msg: "A server error occurred while processing your request",
       });
+    }
+  },
+
+  //SELECT A SPECIFIC LOANS
+  selectALoan: async function (req, res) {
+    try {
+      const loanParams = await Loan.findOne({
+        _id: req.params.id,
+        userEmail: req.user.email,
+        status: true,
+      });
+      if (loanParams === null) {
+        res.json({
+          success: false,
+          msg: "Loan not found",
+        });
+      } else {
+        res.json({
+          success: true,
+          data: loanParams,
+          msg: "Loan successfully fetched",
+        });
+      }
+    } catch (e) {
+      res.status(404).send({
+        success: false,
+        msg: "No Loan Found with that ID",
+      });
+    }
+  },
+
+  //add a loan params DONE
+  addLoanParams: function (req, res) {
+    try {
+      const newLoanLTV = {
+        _id: "DOGE",
+        dailyInterestRate: 0.1, //dailyinterest rate
+        initialLTV: 60, //60% of collateralTone. we give the user 60% of his collateral token
+        marginCall: 75, //  collateralAmount and Value in usd.. chck the initial value in usd by the current price of the token in usd
+        liquidationLTV: 70,
+        loanTenure: [30, 60, 90, 180],
+      };
+      new LoanLTV(newLoanLTV).save().then(() => {
+        res.json({ success: true, msg: "Loan Saved" });
+      });
+    } catch (e) {
+      res.json({ success: false, msg: e`Error = ${e}` });
     }
   },
 };

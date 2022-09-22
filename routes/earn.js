@@ -22,30 +22,6 @@ router.post(
   verify,
   earnActions.applyForFlexibleEarnPackage
 );
-//get all user active flexible plan
-router.get(
-  "/api/v1/earn/get/active/flexible",
-  verify,
-  earnActions.getAllActiveFlexiblePlan
-);
-//get all user active fixed plan
-router.get(
-  "/api/v1/earn/get/active/fixed",
-  verify,
-  earnActions.getAllActiveFixedPlan
-);
-// //get all user closed flexible plan
-// router.get(
-//   "/api/v1/earn/get/closed/flexible",
-//   verify,
-//   earnActions.getAllClosedFlexiblePlan
-// );
-// //get all user closed fixed plan
-// router.get(
-//   "/api/v1/earn/get/closed/fixed",
-//   verify,
-//   earnActions.getAllClosedFixedPlan
-// );
 
 //get all user closed fixed plan
 router.get(
@@ -67,5 +43,30 @@ router.get(
   verify,
   earnActions.closeAnEarnFlexiblePlan
 );
+
+//get all user active flexible plan
+// router.get(
+//   "/api/v1/earn/get/active/flexible",
+//   verify,
+//   earnActions.getAllActiveFlexiblePlan
+// );
+// //get all user active fixed plan
+// router.get(
+//   "/api/v1/earn/get/active/fixed",
+//   verify,
+//   earnActions.getAllActiveFixedPlan
+// );
+// //get all user closed flexible plan
+// router.get(
+//   "/api/v1/earn/get/closed/flexible",
+//   verify,
+//   earnActions.getAllClosedFlexiblePlan
+// );
+// //get all user closed fixed plan
+// router.get(
+//   "/api/v1/earn/get/closed/fixed",
+//   verify,
+//   earnActions.getAllClosedFixedPlan
+// );
 
 module.exports = router;

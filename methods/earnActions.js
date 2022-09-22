@@ -22,37 +22,6 @@ var functions = {
     }
   },
 
-  //ADD A NEW LOAN LTV
-  addEarnLTV: function (req, res) {
-    try {
-      const newEarnParams = {
-        tokenImage: req.body.tokenImage,
-        tokenName: req.body.tokenName,
-        tokenTicker: req.body.tokenTicker,
-        minAmount: req.body.minAmount,
-        apy: req.body.apy,
-        maxAmount: req.body.maxAmount,
-        plan: req.body.plan,
-        earnTenure: [
-          req.body.earnTenureOne,
-          req.body.earnTenureTwo,
-          req.body.earnTenureThree,
-        ],
-      };
-      new EarnLtv(newEarnParams).save().then(() =>
-        res.json({
-          success: true,
-          msg: "New Earn Parameter added successfully",
-        })
-      );
-    } catch (e) {
-      res.status(500).send({
-        success: false,
-        msg: "Internal Server Error Occcured",
-      });
-    }
-  },
-
   //APPLY FOR FIXED  EARN PACKAGE
   applyForFixedEarnPackage: async function (req, res) {
     try {
@@ -70,7 +39,6 @@ var functions = {
       let uppercasePlan = plan.toUpperCase();
 
       //GET EARN PLAN
-
       const thePlan = await EarnLtv.findOne({
         tokenTicker: earnTokenUppercase,
         plan: uppercasePlan,
@@ -349,90 +317,6 @@ var functions = {
     }
   },
 
-  //GET ALL USER ACTIVE FLEXIBLE EARN PLAN
-  getAllActiveFlexiblePlan: async function (req, res) {
-    try {
-      const earnParams = await Earn.find({
-        plan: "FLEXIBLE",
-        active: true,
-        userEmail: req.user.email,
-      }).sort({ activatedDate: -1 });
-
-      res.json({
-        success: true,
-        data: earnParams,
-        msg: "User Active Flexible plans successfully fetched",
-      });
-    } catch (err) {
-      res
-        .status(500)
-        .send({ success: false, msg: "Internal Server Error Occcured" });
-    }
-  },
-
-  //GET ALL USER ACTIVE FIXED EARN PLAN
-  getAllActiveFixedPlan: async function (req, res) {
-    try {
-      const earnParams = await Earn.find({
-        plan: "FIXED",
-        active: true,
-        userEmail: req.user.email,
-      }).sort({ activatedDate: -1 });
-
-      res.json({
-        success: true,
-        data: earnParams,
-        msg: "User Active FIXED plans successfully fetched",
-      });
-    } catch (err) {
-      res
-        .status(500)
-        .send({ success: false, msg: "Internal Server Error Occcured" });
-    }
-  },
-
-  //GET ALL USER CLOSED FIXED EARN PLAN
-  // getAllClosedFixedPlan: async function (req, res) {
-  //   try {
-  //     const earnParams = await Earn.find({
-  //       plan: "FIXED",
-  //       active: false,
-  //       userEmail: req.user.email,
-  //     }).sort({ activatedDate: -1 });
-  //     res.json({
-  //       success: true,
-  //       data: earnParams,
-  //       msg: "User Closed Fixed plans successfully fetched",
-  //     });
-  //   } catch (err) {
-  //     res
-  //       .status(500)
-  //       .send({ success: false, msg: "Internal Server Error Occcured" });
-  //   }
-  // },
-
-  //GET ALL USER CLOSED FLEXIBLE EARN PLAN
-  // getAllClosedFlexiblePlan: async function (req, res) {
-  //   try {
-  //     const earnParams = await Earn.find({
-  //       plan: "FLEXIBLE",
-  //       active: false,
-  //       userEmail: req.user.email,
-  //     }).sort({ activatedDate: -1 });
-  //     res.json({
-  //       success: true,
-  //       data: earnParams,
-  //       msg: "User Closed Flexible plans successfully fetched",
-  //     });
-  //   } catch (err) {
-  //     res
-  //       .status(500)
-  //       .send({ success: false, msg: "Internal Server Error Occcured" });
-  //   }
-  // },
-
-  //GET ALL SUBSCRIPTIONS
-
   getAllSubscriptions: async function (req, res) {
     try {
       const earnParams = await Earn.find({
@@ -455,7 +339,7 @@ var functions = {
     try {
       const orderId = req.params.orderId;
       const order = await Earn.findOne({ _id: orderId });
-      console.log(order);
+      // console.log(order);
       //check the dates
       const today = new Date();
       const endDate = order.closingDate;
@@ -727,6 +611,121 @@ var functions = {
         .send({ success: false, msg: "Internal Server Error Occcured" });
     }
   },
+
+  //ADD A NEW LOAN LTV
+  // addEarnLTV: function (req, res) {
+  //   try {
+  //     const newEarnParams = {
+  //       tokenImage: req.body.tokenImage,
+  //       tokenName: req.body.tokenName,
+  //       tokenTicker: req.body.tokenTicker,
+  //       minAmount: req.body.minAmount,
+  //       apy: req.body.apy,
+  //       maxAmount: req.body.maxAmount,
+  //       plan: req.body.plan,
+  //       earnTenure: [
+  //         req.body.earnTenureOne,
+  //         req.body.earnTenureTwo,
+  //         req.body.earnTenureThree,
+  //       ],
+  //     };
+  //     new EarnLtv(newEarnParams).save().then(() =>
+  //       res.json({
+  //         success: true,
+  //         msg: "New Earn Parameter added successfully",
+  //       })
+  //     );
+  //   } catch (e) {
+  //     res.status(500).send({
+  //       success: false,
+  //       msg: "Internal Server Error Occcured",
+  //     });
+  //   }
+  // },
+
+  // //GET ALL USER ACTIVE FLEXIBLE EARN PLAN
+  // getAllActiveFlexiblePlan: async function (req, res) {
+  //   try {
+  //     const earnParams = await Earn.find({
+  //       plan: "FLEXIBLE",
+  //       active: true,
+  //       userEmail: req.user.email,
+  //     }).sort({ activatedDate: -1 });
+
+  //     res.json({
+  //       success: true,
+  //       data: earnParams,
+  //       msg: "User Active Flexible plans successfully fetched",
+  //     });
+  //   } catch (err) {
+  //     res
+  //       .status(500)
+  //       .send({ success: false, msg: "Internal Server Error Occcured" });
+  //   }
+  // },
+
+  // //GET ALL USER ACTIVE FIXED EARN PLAN
+  // getAllActiveFixedPlan: async function (req, res) {
+  //   try {
+  //     const earnParams = await Earn.find({
+  //       plan: "FIXED",
+  //       active: true,
+  //       userEmail: req.user.email,
+  //     }).sort({ activatedDate: -1 });
+
+  //     res.json({
+  //       success: true,
+  //       data: earnParams,
+  //       msg: "User Active FIXED plans successfully fetched",
+  //     });
+  //   } catch (err) {
+  //     res
+  //       .status(500)
+  //       .send({ success: false, msg: "Internal Server Error Occcured" });
+  //   }
+  // },
+
+  //GET ALL USER CLOSED FIXED EARN PLAN
+  // getAllClosedFixedPlan: async function (req, res) {
+  //   try {
+  //     const earnParams = await Earn.find({
+  //       plan: "FIXED",
+  //       active: false,
+  //       userEmail: req.user.email,
+  //     }).sort({ activatedDate: -1 });
+  //     res.json({
+  //       success: true,
+  //       data: earnParams,
+  //       msg: "User Closed Fixed plans successfully fetched",
+  //     });
+  //   } catch (err) {
+  //     res
+  //       .status(500)
+  //       .send({ success: false, msg: "Internal Server Error Occcured" });
+  //   }
+  // },
+
+  //GET ALL USER CLOSED FLEXIBLE EARN PLAN
+  // getAllClosedFlexiblePlan: async function (req, res) {
+  //   try {
+  //     const earnParams = await Earn.find({
+  //       plan: "FLEXIBLE",
+  //       active: false,
+  //       userEmail: req.user.email,
+  //     }).sort({ activatedDate: -1 });
+  //     res.json({
+  //       success: true,
+  //       data: earnParams,
+  //       msg: "User Closed Flexible plans successfully fetched",
+  //     });
+  //   } catch (err) {
+  //     res
+  //       .status(500)
+  //       .send({ success: false, msg: "Internal Server Error Occcured" });
+  //   }
+  // },
+
+  //GET ALL SUBSCRIPTIONS
 };
 
 module.exports = functions;
