@@ -325,29 +325,36 @@ var functions = {
                               lastUpdated: Date.now(),
                             };
                             new AddressStore(newAddress).save();
-
-                            //CREATE TATUM ACCOUNT_SETUP AND RECIEVE ADDRESSES HERE
                             const clientEmail = lowerCaseEmail;
-                            var everythingBTC =
+                            //CREATE TATUM ACCOUNT_SETUP AND RECIEVE ADDRESSES HERE and delay the response by some seconds
+                            async function btc() {
+                              await new Promise((resolve) =>
+                                setTimeout(resolve, 500)
+                              );
                               createWalletActions.createBtcWallet(clientEmail);
-                            var everythingETH =
+                            }
+                            btc();
+                            async function eth() {
+                              await new Promise((resolve) =>
+                                setTimeout(resolve, 1000)
+                              );
                               createWalletActions.createETHWallet(clientEmail);
-                            var everythingBSC =
+                            }
+                            eth();
+                            async function bsc() {
+                              await new Promise((resolve) =>
+                                setTimeout(resolve, 1500)
+                              );
                               createWalletActions.createBSCWallet(clientEmail);
-                            var everythingDOGE =
+                            }
+                            bsc();
+                            async function doge() {
+                              await new Promise((resolve) =>
+                                setTimeout(resolve, 2000)
+                              );
                               createWalletActions.createDOGEWallet(clientEmail);
-
-                            //create all the wallet addresses
-                            Promise.all([
-                              everythingBTC,
-                              everythingETH,
-                              everythingBSC,
-                              everythingDOGE,
-                            ]).then(() =>
-                              console.log(
-                                "end ledger acccount and address creation"
-                              )
-                            );
+                            }
+                            doge();
                           } catch (err) {
                             console.log(err);
                           }
