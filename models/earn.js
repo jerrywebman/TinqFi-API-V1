@@ -27,6 +27,10 @@ var earnSchema = new mongoose.Schema({
     type: Number,
     require: true,
   },
+  imageUrl: {
+    type: String,
+    require: true,
+  },
   ourCustomerTatumId: {
     type: String,
     require: true,

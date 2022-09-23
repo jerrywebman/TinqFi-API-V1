@@ -12,6 +12,9 @@ var functions = {
     try {
       const currency = req.body.currency;
       const address = req.body.address;
+      const tokenAccountId = req.body.tokenAccountId;
+      const amount = req.body.amount;
+      //Check whether a blockchain address is assigned to a user
       const url = `${process.env.TATUM_BASE_URL}/offchain/account/address/${address}/${currency}`;
       const options = {
         method: "GET",
@@ -26,25 +29,26 @@ var functions = {
         .then(async (serverResponse) => {
           if (serverResponse.data !== null) {
             //the response from Tatum
-            console.log(serverResponse.data);
+            // console.log(serverResponse.data);
             const recieverTokenAccountId = await serverResponse.data.id;
             //NOW MAKE THE TRANSFER
-            const userArray = req.user.onRegistrationLedgerAccnts;
-            const searchIndex = userArray.find(
-              (user) => user.tokenAccountcurrency === currency
-            );
-            const senderTokenAccountId = await searchIndex.tokenAccountId;
-            console.log("SenderID", senderTokenAccountId);
-            console.log("RecieverID", recieverTokenAccountId);
+            // const userArray = req.user.onRegistrationLedgerAccnts;
+            // const searchIndex = userArray.find(
+            //   (user) => user.tokenAccountcurrency === currency
+            // );
+
+            const senderTokenAccountId = tokenAccountId;
+            // console.log("SenderID", senderTokenAccountId);
+            // console.log("RecieverID", recieverTokenAccountId);
             const formData = {
               senderAccountId: senderTokenAccountId,
               recipientAccountId: recieverTokenAccountId,
-              amount: req.body.amount,
+              amount: String(amount),
               anonymous: false,
               compliant: false,
               transactionCode: req.user.email,
               paymentId: req.user.ourCustomerTatumId,
-              recipientNote: req.body.recipientNote,
+              recipientNote: req.body.memo || "",
             };
             const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
             try {
@@ -75,6 +79,7 @@ var functions = {
                       from: senderTokenAccountId,
                       to: recieverTokenAccountId,
                       trxnRefId: referenceId,
+                      debit: true,
                     };
                     new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
                       res.json({
@@ -96,22 +101,31 @@ var functions = {
                   });
                 });
             } catch (e) {
-              res.status(500).send({
+              res.status(401).send({
                 success: false,
                 msg: "Transaction Failed",
               });
             }
             //TRANSFER FUNCTION ENDS HERE
-          } else console.log("serverResponse", serverResponse);
+          } else {
+            res.status(401).send({
+              success: false,
+              msg: "Transaction Failed, Wallet address is not a TinqFi address",
+            });
+          }
         })
-
         .catch((err) => {
-          console.log(err);
+          res.status(401).send({
+            success: false,
+            msg: "Transaction Failed, Address is not a TinqFi address",
+          });
         });
     } catch (e) {
-      console.log(e.data);
+      res.status(500).send({
+        success: false,
+        msg: "Internal Server Error",
+      });
     }
-    //SEND THE TOKEN TO THE ADDRESS
   },
 
   //MAKE WITHDRAWAL

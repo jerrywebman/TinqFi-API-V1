@@ -109,6 +109,7 @@ var functions = {
                 const newEarnOrder = {
                   userEmail: req.user.email,
                   amount: earnAmountNumber,
+                  imageUrl: thePlan.imageUrl,
                   apy: thePlan.apy,
                   duration: planTenure,
                   dailyProfit: userDailyProfit,
@@ -212,7 +213,7 @@ var functions = {
         const dailyProfitPrecent = monthlyProfitPercent / 30;
         //get the daily profit
         const userDailyProfit = (dailyProfitPrecent / 100) * earnAmountNumber;
-
+        // (apy/365)/100 *
         //GETTING THE DATE TO END THE PLAN
         const aDayInMilliseconds = 86400000;
         const today = Date.now();
@@ -257,6 +258,7 @@ var functions = {
                   amount: earnAmountNumber,
                   apy: thePlan.apy,
                   duration: 0,
+                  imageUrl: thePlan.imageUrl,
                   dailyProfit: userDailyProfit,
                   ourCustomerTatumId: req.user.ourCustomerTatumId,
                   ourCustomerTokenId: senderDBAccountId,
