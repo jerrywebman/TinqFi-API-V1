@@ -19,72 +19,79 @@ var functions = {
           url,
         };
 
-        axios(options).then((ServerResponse) => {
-          const response = ServerResponse.data;
-          //remove the xpub from the server response
-          response.forEach((object) => {
-            delete object["xpub"];
-          });
+        axios(options)
+          .then((ServerResponse) => {
+            const response = ServerResponse.data;
+            //remove the xpub from the server response
+            response.forEach((object) => {
+              delete object["xpub"];
+            });
 
-          //GETTING DATA FROM COINGECKO
-          const geckoUrl =
-            "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&page=1";
-          const options = {
-            method: "GET",
-            url: geckoUrl,
-          };
-          //do something with the response object from coinGecko
-          axios(options)
-            .then(async (geckoResponse) => {
-              const newresponseFromGecko = [];
-              const responseFromGecko = await geckoResponse.data;
-              //do the heavy data processing  by slicing the data and editing it
-              responseFromGecko.map(function (single) {
-                if (single.name === "BNB") {
-                  single.name = "Binance Smart Chain";
-                  single.symbol = "BSC";
-                } else if (single.symbol === "btc") single.symbol = "BTC";
-                else if (single.symbol === "eth") single.symbol = "ETH";
-                else single.symbol = "DOGE";
+            //GETTING DATA FROM COINGECKO
+            const geckoUrl =
+              "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&page=1";
+            const options = {
+              method: "GET",
+              url: geckoUrl,
+            };
+            //do something with the response object from coinGecko
+            axios(options)
+              .then(async (geckoResponse) => {
+                const newresponseFromGecko = [];
+                const responseFromGecko = await geckoResponse.data;
+                //do the heavy data processing  by slicing the data and editing it
+                responseFromGecko.map(function (single) {
+                  if (single.name === "BNB") {
+                    single.name = "Binance Smart Chain";
+                    single.symbol = "BSC";
+                  } else if (single.symbol === "btc") single.symbol = "BTC";
+                  else if (single.symbol === "eth") single.symbol = "ETH";
+                  else single.symbol = "DOGE";
 
-                var currency = single.symbol;
-                var image = single.image;
-                var name = single.name;
-                var current_price = single.current_price;
-                newresponseFromGecko.push({
-                  name,
-                  currency,
-                  image,
-                  current_price,
+                  var currency = single.symbol;
+                  var image = single.image;
+                  var name = single.name;
+                  var current_price = single.current_price;
+                  newresponseFromGecko.push({
+                    name,
+                    currency,
+                    image,
+                    current_price,
+                  });
+                });
+
+                //merge the arrays
+                const mergeArrayByCurrency = (response, newresponseFromGecko) =>
+                  response.map((itm) => ({
+                    ...newresponseFromGecko.find(
+                      (item) => item.currency === itm.currency && item
+                    ),
+                    ...itm,
+                  }));
+                let finalResponse = mergeArrayByCurrency(
+                  response,
+                  newresponseFromGecko
+                );
+                //send the user the token
+                res.status(200).send({
+                  success: true,
+                  msg: "Token balance has been updated successfully.",
+                  data: finalResponse,
+                });
+              })
+              .catch(() => {
+                res.status(500).send({
+                  success: false,
+                  msg: "Error occured while updating market data",
                 });
               });
-
-              //merge the arrays
-              const mergeArrayByCurrency = (response, newresponseFromGecko) =>
-                response.map((itm) => ({
-                  ...newresponseFromGecko.find(
-                    (item) => item.currency === itm.currency && item
-                  ),
-                  ...itm,
-                }));
-              let finalResponse = mergeArrayByCurrency(
-                response,
-                newresponseFromGecko
-              );
-              //send the user the token
-              res.status(200).send({
-                success: true,
-                msg: "Token balance has been updated successfully.",
-                data: finalResponse,
-              });
-            })
-            .catch(() => {
-              res.status(500).send({
-                success: false,
-                msg: "Error occured while updating market data",
-              });
+          })
+          .catch((e) => {
+            res.status(403).send({
+              success: false,
+              msg: "error from market data server",
             });
-        });
+          });
       } catch (err) {
         res.status(500).send({
           success: false,
@@ -113,18 +120,22 @@ var functions = {
           url,
         };
         //try creating the token offchain address
-        axios(options).then((ServerResponse) => {
-          const response = ServerResponse.data;
-          //remove the xpub from the server response
-          response.forEach((object) => {
-            delete object["xpub"];
-          });
-          res.status(200).send({
-            success: true,
-            msg: "Address found",
-            data: response[0],
-          });
-        });
+        axios(options)
+          .then((ServerResponse) => {
+            const response = ServerResponse.data;
+            //remove the xpub from the server response
+            response.forEach((object) => {
+              delete object["xpub"];
+            });
+            res.status(200).send({
+              success: true,
+              msg: "Address found",
+              data: response[0],
+            });
+          })
+          .catch(() =>
+            res.status(403).send({ success: false, msg: "error from axios" })
+          );
       } catch (err) {
         res.status(400).send({ success: false, msg: err });
       }
