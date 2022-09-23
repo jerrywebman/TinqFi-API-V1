@@ -336,7 +336,7 @@ var functions = {
         const senderNote = req.body.senderNote || "";
 
         //hit the tatum api
-        const url = `${process.env.TATUM_BASE_URL}/offchain/bitcoin/transfer`;
+        const url = `${process.env.TATUM_BASE_URL}/offchain/dogecoin/transfer`;
         const formData = {
           address,
           amount: String(amount),

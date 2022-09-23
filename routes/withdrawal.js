@@ -18,11 +18,11 @@ router.post(
   verify,
   withdrawalActions.withdrawEth
 );
-//SUBMIT A WITHDRAWAL REQUEST FOR BINANCE SMART CHAIN
+//SUBMIT A WITHDRAWAL REQUEST FOR DOGE
 router.post(
   "/api/v1/withdrawal/request/bsc",
   verify,
-  withdrawalActions.withdrawBsc
+  withdrawalActions.withdrawDoge
 );
 //SUBMIT A WITHDRAWAL REQUEST FOR BINANCE SMART CHAIN
 router.post(
