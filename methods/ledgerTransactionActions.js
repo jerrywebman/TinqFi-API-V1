@@ -85,7 +85,7 @@ var functions = {
                       res.json({
                         success: true,
                         msg: "Transaction Successful",
-                        trxnRefId: referenceId,
+                        // trxnRefId: referenceId,
                       })
                     );
                   } else
