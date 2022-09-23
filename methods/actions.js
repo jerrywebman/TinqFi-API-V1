@@ -328,31 +328,55 @@ var functions = {
                             const clientEmail = lowerCaseEmail;
                             //CREATE TATUM ACCOUNT_SETUP AND RECIEVE ADDRESSES HERE and delay the response by some seconds
                             async function btc() {
-                              await new Promise((resolve) =>
-                                setTimeout(resolve, 500)
-                              );
-                              createWalletActions.createBtcWallet(clientEmail);
+                              try {
+                                await new Promise((resolve) =>
+                                  setTimeout(resolve, 500)
+                                );
+                                createWalletActions.createBtcWallet(
+                                  clientEmail
+                                );
+                              } catch (e) {
+                                console.log(e);
+                              }
                             }
                             btc();
                             async function eth() {
-                              await new Promise((resolve) =>
-                                setTimeout(resolve, 1000)
-                              );
-                              createWalletActions.createETHWallet(clientEmail);
+                              try {
+                                await new Promise((resolve) =>
+                                  setTimeout(resolve, 1000)
+                                );
+                                createWalletActions.createETHWallet(
+                                  clientEmail
+                                );
+                              } catch (e) {
+                                console.log(e);
+                              }
                             }
                             eth();
                             async function bsc() {
-                              await new Promise((resolve) =>
-                                setTimeout(resolve, 1500)
-                              );
-                              createWalletActions.createBSCWallet(clientEmail);
+                              try {
+                                await new Promise((resolve) =>
+                                  setTimeout(resolve, 1500)
+                                );
+                                createWalletActions.createBSCWallet(
+                                  clientEmail
+                                );
+                              } catch (e) {
+                                console.log(e);
+                              }
                             }
                             bsc();
                             async function doge() {
-                              await new Promise((resolve) =>
-                                setTimeout(resolve, 2000)
-                              );
-                              createWalletActions.createDOGEWallet(clientEmail);
+                              try {
+                                await new Promise((resolve) =>
+                                  setTimeout(resolve, 2000)
+                                );
+                                createWalletActions.createDOGEWallet(
+                                  clientEmail
+                                );
+                              } catch (e) {
+                                console.log(e);
+                              }
                             }
                             doge();
                           } catch (err) {
