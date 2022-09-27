@@ -1,5 +1,4 @@
 const express = require("express");
-require("dotenv").config();
 const externalDataActions = require("../methods/externalDataActions");
 
 const verify = require("../middleware/verifyToken");

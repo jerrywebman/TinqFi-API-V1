@@ -1,5 +1,4 @@
 const express = require("express");
-require("dotenv").config();
 const earnActions = require("../methods/earnActions");
 
 const verify = require("../middleware/verifyToken");

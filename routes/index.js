@@ -1,9 +1,6 @@
 const express = require("express");
-require("dotenv").config();
 const actions = require("../methods/actions");
-
 const verify = require("../middleware/verifyToken");
-
 const router = express.Router();
 
 // router.get("/", function (req, res) {

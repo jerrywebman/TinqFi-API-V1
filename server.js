@@ -4,6 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const dbConfig = require("./config/dbconfig");
 const passport = require("passport");
+require("dotenv").config();
 // const multer = require("multer");
 // const path = require("path");
 // var Verification = require("./models/verification");
@@ -97,6 +98,7 @@ const notification = require("./routes/notification");
 const loan = require("./routes/loan");
 const earn = require("./routes/earn");
 const withdrawal = require("./routes/withdrawal");
+const faq = require("./routes/faq");
 
 app.use(routes);
 app.use(wallet);
@@ -107,6 +109,7 @@ app.use(notification);
 app.use(loan);
 app.use(earn);
 app.use(withdrawal);
+app.use(faq);
 
 const PORT = process.env.PORT || 3000;
 
