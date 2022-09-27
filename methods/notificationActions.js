@@ -4,7 +4,7 @@ var functions = {
   // GET ALL Notification
   getAllNotification: async function (req, res) {
     try {
-      const allNotification = await Notification.find();
+      const allNotification = await Notification.find().sort({ createdAt: -1 });
       res.json({
         success: true,
         data: allNotification,

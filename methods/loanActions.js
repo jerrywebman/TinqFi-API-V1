@@ -314,7 +314,7 @@ var functions = {
       const loanData = await Loan.find({
         userEmail: req.user.email,
         status: true,
-      });
+      }).sort({ createdAt: -1 });
       res.json({
         success: true,
         msg: "Loan data successfully fetched",

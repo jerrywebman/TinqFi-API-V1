@@ -5,7 +5,9 @@ var functions = {
   getAllTransaction: async function (req, res) {
     const email = req.user.email;
     try {
-      const allTransaction = await Transaction.find({ userEmail: email });
+      const allTransaction = await Transaction.find({ userEmail: email }).sort({
+        createdAt: -1,
+      });
       res.json({
         success: true,
         data: allTransaction,
