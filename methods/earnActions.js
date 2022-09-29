@@ -559,6 +559,7 @@ var functions = {
                     {
                       $set: {
                         active: false,
+                        closingDate: Date.now(),
                       },
                     }
                   ).then(() => {
