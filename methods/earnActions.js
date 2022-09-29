@@ -153,6 +153,7 @@ var functions = {
                 });
             })
             .catch((err) => {
+              console.log(err);
               res.status(403).send({
                 success: false,
                 msg: "Transaction Failed,sender Unauthorized",
