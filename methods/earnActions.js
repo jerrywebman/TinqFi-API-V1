@@ -268,7 +268,7 @@ var functions = {
                   tokenImg: thePlan.tokenImage,
                   plan: thePlan.plan,
                   totalProfit: 0,
-                  closingDate,
+                  // closingDate,
                 };
 
                 new Earn(newEarnOrder).save().then(() => {
