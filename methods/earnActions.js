@@ -280,7 +280,7 @@ var functions = {
                     transactionToken: earnTokenUppercase,
                     transactionType: "Earn",
                     from: senderDBAccountId,
-                    tenure: `${planTenure} days on ${uppercasePlan} plan`,
+                    tenure: `${uppercasePlan} plan for ${planTenure} days `,
                     to: process.env[
                       "TINQFI_EARN_ACCOUNT_" + earnTokenUppercase
                     ],
@@ -301,6 +301,7 @@ var functions = {
                 });
             })
             .catch((err) => {
+              console.log(err);
               res.status(401).send({
                 success: false,
                 msg: "Transaction Failed, Reciever or sender Unauthorized",
