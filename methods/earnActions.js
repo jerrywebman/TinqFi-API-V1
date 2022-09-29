@@ -201,7 +201,7 @@ var functions = {
           success: false,
           msg: `no ${uppercasePlan} Plan not found for ${earnTokenUppercase}`,
         });
-      } else if (thePlan.minAmount >= earnAmountNumber) {
+      } else if (thePlan.minAmount > earnAmountNumber) {
         res.status(400).send({
           success: false,
           msg: "amount is below minimum amount for this plan",
@@ -301,10 +301,9 @@ var functions = {
                 });
             })
             .catch((err) => {
-              console.log(err);
               res.status(401).send({
                 success: false,
-                msg: "Transaction Failed, Reciever or sender Unauthorized",
+                msg: "Transaction Failed, Insufficient Balance",
               });
             });
         } catch (e) {
