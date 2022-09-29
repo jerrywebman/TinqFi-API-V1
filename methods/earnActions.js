@@ -80,7 +80,7 @@ var functions = {
           senderAccountId: senderDBAccountId,
           recipientAccountId:
             process.env["TINQFI_EARN_ACCOUNT_" + earnTokenUppercase],
-          amount: earnAmount,
+          amount: String(earnAmount),
           anonymous: false,
           compliant: false,
           transactionCode: req.user.email,
@@ -132,7 +132,7 @@ var functions = {
                     transactionToken: earnTokenUppercase,
                     transactionType: "Earn",
                     from: senderDBAccountId,
-                    tenure: `${planTenure} days on ${uppercasePlan} plan`,
+                    tenure: `${uppercasePlan} plan for ${planTenure} days `,
                     to: process.env[
                       "TINQFI_EARN_ACCOUNT_" + earnTokenUppercase
                     ],
@@ -227,7 +227,7 @@ var functions = {
           senderAccountId: senderDBAccountId,
           recipientAccountId:
             process.env["TINQFI_EARN_ACCOUNT_" + earnTokenUppercase],
-          amount: earnAmount,
+          amount: String(earnAmount),
           anonymous: false,
           compliant: false,
           transactionCode: req.user.email,
