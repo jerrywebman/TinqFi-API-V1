@@ -280,7 +280,7 @@ var functions = {
                     transactionToken: earnTokenUppercase,
                     transactionType: "Earn",
                     from: senderDBAccountId,
-                    tenure: `${uppercasePlan} plan for ${planTenure} days `,
+                    tenure: `${uppercasePlan} Flexible plan `,
                     to: process.env[
                       "TINQFI_EARN_ACCOUNT_" + earnTokenUppercase
                     ],
