@@ -20,15 +20,15 @@ router.post(
 );
 //SUBMIT A WITHDRAWAL REQUEST FOR DOGE
 router.post(
-  "/api/v1/withdrawal/request/bsc",
+  "/api/v1/withdrawal/request/Doge",
   verify,
-  withdrawalActions.withdrawBsc
+  withdrawalActions.withdrawDoge
 );
 //SUBMIT A WITHDRAWAL REQUEST FOR BINANCE SMART CHAIN
 router.post(
   "/api/v1/withdrawal/request/bsc",
   verify,
-  withdrawalActions.withdrawDoge
+  withdrawalActions.withdrawBsc
 );
 
 module.exports = router;
