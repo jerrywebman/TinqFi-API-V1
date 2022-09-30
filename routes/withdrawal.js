@@ -22,13 +22,13 @@ router.post(
 router.post(
   "/api/v1/withdrawal/request/bsc",
   verify,
-  withdrawalActions.withdrawDoge
+  withdrawalActions.withdrawBsc
 );
 //SUBMIT A WITHDRAWAL REQUEST FOR BINANCE SMART CHAIN
 router.post(
   "/api/v1/withdrawal/request/bsc",
   verify,
-  withdrawalActions.withdrawBsc
+  withdrawalActions.withdrawDoge
 );
 
 module.exports = router;
