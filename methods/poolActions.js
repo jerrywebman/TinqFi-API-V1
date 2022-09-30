@@ -1,4 +1,4 @@
-var Pool = require("../models/pool");
+var Pool = require("../models/Pool");
 const axios = require("axios");
 var TinqfiTrxn = require("../models/Transaction");
 
