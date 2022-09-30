@@ -7,7 +7,7 @@ const verify = require("../middleware/verifyToken");
 const router = express.Router();
 
 //MAKE INTERNAL TRANSFER TESTER docs done
-router.get(
+router.post(
   "/api/v1/transaction/internal_transfer",
   verify,
   ledgerTransactionActions.makeInternalTransfer
