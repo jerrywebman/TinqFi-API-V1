@@ -99,6 +99,7 @@ const loan = require("./routes/loan");
 const earn = require("./routes/earn");
 const withdrawal = require("./routes/withdrawal");
 const faq = require("./routes/faq");
+const pool = require("./routes/pool");
 
 app.use(routes);
 app.use(wallet);
@@ -109,7 +110,7 @@ app.use(notification);
 app.use(loan);
 app.use(earn);
 app.use(withdrawal);
-app.use(faq);
+app.use(pool);
 
 const PORT = process.env.PORT || 3000;
 

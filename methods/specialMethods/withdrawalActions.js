@@ -38,6 +38,7 @@ var functions = {
           senderNote,
           xpub: process.env.BTC_XPUB,
         };
+        console.log(formData);
         try {
           const options = {
             method: "POST",
@@ -71,6 +72,7 @@ var functions = {
                 tenure: "Instant",
                 from: "wallet",
                 to: address,
+                debit: true,
                 trxnRefId: response,
               };
               new TinqfiTrxn(newTinqfiTrxn).save();
@@ -140,6 +142,7 @@ var functions = {
           signatureId: process.env.TATUM_ETH_SIGNATURE_ID,
           senderNote,
         };
+        console.log(formData);
         try {
           const options = {
             method: "POST",
@@ -173,6 +176,7 @@ var functions = {
                 tenure: "Instant",
                 from: "wallet",
                 to: address,
+                debit: true,
                 trxnRefId: response,
               };
               new TinqfiTrxn(newTinqfiTrxn).save();
@@ -242,6 +246,7 @@ var functions = {
           signatureId: process.env.TATUM_BSC_SIGNATURE_ID,
           senderNote,
         };
+        console.log(formData);
         try {
           const options = {
             method: "POST",
@@ -275,6 +280,7 @@ var functions = {
                 tenure: "Instant",
                 from: "wallet",
                 to: address,
+                debit: true,
                 trxnRefId: response,
               };
               new TinqfiTrxn(newTinqfiTrxn).save();
@@ -345,6 +351,7 @@ var functions = {
           senderNote,
           xpub: process.env.DOGE_XPUB,
         };
+        console.log(formData);
         try {
           const options = {
             method: "POST",
@@ -378,6 +385,7 @@ var functions = {
                 tenure: "Instant",
                 from: "wallet",
                 to: address,
+                debit: true,
                 trxnRefId: response,
               };
               new TinqfiTrxn(newTinqfiTrxn).save();

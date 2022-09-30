@@ -49,7 +49,7 @@ var functions = {
           success: false,
           msg: `Plan not found for ${earnTokenUppercase}`,
         });
-      } else if (thePlan.minAmount >= earnAmountNumber) {
+      } else if (thePlan.minAmount > earnAmountNumber) {
         res.status(400).send({
           success: false,
           msg: "amount is below minimum amount for this plan",
@@ -136,6 +136,7 @@ var functions = {
                     to: process.env[
                       "TINQFI_EARN_ACCOUNT_" + earnTokenUppercase
                     ],
+                    debit: true,
                     trxnRefId: referenceId,
                   };
                   new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
@@ -284,6 +285,7 @@ var functions = {
                     to: process.env[
                       "TINQFI_EARN_ACCOUNT_" + earnTokenUppercase
                     ],
+                    debit: true,
                     trxnRefId: referenceId,
                   };
                   new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
@@ -436,6 +438,7 @@ var functions = {
                       ],
                       tenure: `Somedays on ${order.tokenTicker} Flexible plan`,
                       to: order.ourCustomerTokenId,
+                      debit: false,
                       trxnRefId: referenceId,
                     };
                     new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
@@ -575,6 +578,7 @@ var functions = {
                       ],
                       tenure: `${daysToEarnProfit} days on ${order.tokenTicker} Flexible plan`,
                       to: order.ourCustomerTokenId,
+                      debit: false,
                       trxnRefId: referenceId,
                     };
                     new TinqfiTrxn(newTinqfiTrxn).save().then(() =>

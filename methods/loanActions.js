@@ -165,6 +165,23 @@ var functions = {
               axios(options)
                 .then((serverResponse) => {
                   if (serverResponse.data.reference !== null) {
+                    //post a transaction debit
+                    const newTinqfiTrxn = {
+                      userEmail: req.user.email,
+                      userTaTumId: req.user.ourCustomerTatumId,
+                      transactionAmount: collateralAmountInValue,
+                      transactionToken: ` ${collateralLoanToken} as Collateral at ${tokensPriceAndLoandata[collateralLoanToken]}`,
+                      transactionType: "Loan",
+                      tenure: `${loanTenure} days`,
+                      from: "Wallet",
+                      to: "Tinqfi",
+                      debit: true,
+                      trxnRefId:
+                        collateralReferenceId +
+                        " - " +
+                        borrowedTokenReferenceId,
+                    };
+                    new TinqfiTrxn(newTinqfiTrxn).save();
                     //the response from Tatum
                     const collateralReferenceId = serverResponse.data.reference;
                     //SENDING THE TOKEN TO THE USER FROM TINQFI_LOAN_ACCOUNT
@@ -256,6 +273,7 @@ var functions = {
                               tenure: `${loanTenure} days`,
                               from: "From TinqFI",
                               to: senderTokenAccountId,
+                              debit: false,
                               trxnRefId:
                                 collateralReferenceId +
                                 " - " +
@@ -328,7 +346,7 @@ var functions = {
     }
   },
 
-  //top up a loan collateral
+  //top up a loan collateral add the trxn data
   topupCollateral: async function (req, res) {
     try {
       //get the loan data from db
@@ -416,7 +434,7 @@ var functions = {
     }
   },
 
-  //repay a loan
+  //repay a loan complete this
   repayLoan: async function (req, res) {
     try {
       //get the loan data from db
@@ -543,6 +561,7 @@ var functions = {
                           tenure: `${Math.ceil(days)} days`,
                           from: "From TinqFI + User",
                           to: senderTokenAccountId,
+                          debit: true,
                           trxnRefId:
                             collateralTokenRefId + " - " + borrowedTokenRefId,
                         };
