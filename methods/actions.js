@@ -12,27 +12,36 @@ const client = require("../middleware/init_redis");
 var functions = {
   // ** LOGOUT ROUTE **//
   logout: function (req, res) {
-    if (req.session || req.user) {
-      req.session.destroy(async (err) => {
-        if (err) {
-          res.status(400).send({ success: false, message: "Unable to logout" });
-        } else {
-          await client.del(req.user.email);
-          res.status(200).json({
-            success: true,
-            msg: "User Successfully logged out.",
-          });
-        }
+    try {
+      if (req.session || req.user) {
+        req.session.destroy(async (err) => {
+          if (err) {
+            res
+              .status(400)
+              .send({ success: false, message: "Unable to logout" });
+          } else {
+            await client.del(req.user.email);
+            res.status(200).json({
+              success: true,
+              msg: "User Successfully logged out.",
+            });
+          }
+        });
+      } else {
+        res.end();
+      }
+    } catch (e) {
+      res.send({
+        success: false,
+        msg: "Server Error",
       });
-    } else {
-      res.end();
     }
   },
 
   deleteUser: async function (req, res) {
-    const defaultEmail = req.body.email;
-    const lowerCaseEmail = defaultEmail.toLowerCase();
     try {
+      const defaultEmail = req.body.email;
+      const lowerCaseEmail = defaultEmail.toLowerCase();
       const removedUser = await User.deleteOne({
         email: lowerCaseEmail,
       }).then(async () => {

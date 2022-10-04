@@ -5,8 +5,7 @@ var functions = {
   getAllTokenAccounts: function (req, res) {
     try {
       const query = new URLSearchParams({
-        pageSize: "4",
-        offset: "0",
+        pageSize: "10",
       }).toString();
       const id = req.user.ourCustomerTatumId;
       const url = `${process.env.TATUM_BASE_URL}/ledger/account/customer/${id}?${query}`;
@@ -22,6 +21,7 @@ var functions = {
         axios(options)
           .then((ServerResponse) => {
             const response = ServerResponse.data;
+            console.log(response);
             //remove the xpub from the server response
             response.forEach((object) => {
               delete object["xpub"];
@@ -29,7 +29,7 @@ var functions = {
 
             //GETTING DATA FROM COINGECKO
             const geckoUrl =
-              "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&page=1";
+              "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin%2Cbinance-usd&page=1";
             const options = {
               method: "GET",
               url: geckoUrl,
@@ -39,12 +39,15 @@ var functions = {
               .then(async (geckoResponse) => {
                 const newresponseFromGecko = [];
                 const responseFromGecko = await geckoResponse.data;
+                console.log(responseFromGecko);
                 //do the heavy data processing  by slicing the data and editing it
                 responseFromGecko.map(function (single) {
                   if (single.name === "BNB") {
-                    single.name = "Binance Smart Chain";
+                    single.name = "Smart Chain";
                     single.symbol = "BSC";
-                  } else if (single.symbol === "btc") single.symbol = "BTC";
+                  } else if (single.symbol === "busd")
+                    single.symbol = "MY_BUSD";
+                  else if (single.symbol === "btc") single.symbol = "BTC";
                   else if (single.symbol === "eth") single.symbol = "ETH";
                   else single.symbol = "DOGE";
 

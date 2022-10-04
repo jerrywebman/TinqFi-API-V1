@@ -13,7 +13,7 @@ var functions = {
       const address = req.body.address;
       const tokenAccountId = req.body.tokenAccountId;
       const amount = req.body.amount;
-      console.log(currency, address, tokenAccountId, amount);
+
       //Check whether a blockchain address is assigned to a user
       const url = `${process.env.TATUM_BASE_URL}/offchain/account/address/${address}/${currency}`;
       const options = {

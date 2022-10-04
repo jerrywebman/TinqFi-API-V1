@@ -57,7 +57,7 @@ var functions = {
   subscribeToPool: async function (req, res) {
     try {
       const poolParams = await Pool.find({ _id: req.params.id });
-      const token = req.body.token;
+      const token = poolParams.poolCurrency;
       const amount = req.body.amount;
       const uppercaseToken = token.toUpperCase();
 
@@ -106,6 +106,7 @@ var functions = {
                       tatumId: req.user.ourCustomerTatumId,
                       amount: Number(amount),
                       refId: referenceId,
+                      priceInUsd: Number(amount),
                       token: uppercaseToken,
                       subscribedOn: Date.now(),
                     },
@@ -128,8 +129,7 @@ var functions = {
                 new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
                   res.json({
                     success: true,
-                    msg: "Pool Transaction Successful",
-                    // trxnRefId: referenceId,
+                    msg: "Subscription Successful",
                   })
                 );
               });

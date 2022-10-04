@@ -44,7 +44,7 @@ var functions = {
   createBSCWallet: async function (clientEmail) {
     //step 1
     try {
-      //if successful create ETH ledger account
+      //if successful create BSC ledger account
       const currency = "BSC";
       const xpub = process.env.BSC_XPUB;
       const externalId = clientEmail;
@@ -59,7 +59,7 @@ var functions = {
     }
   },
 
-  //BNB BEACON CHAIN XPUB
+  //DOGE CHAIN XPUB
   // createBNBWallet: async function (clientEmail) {
   //   //step 1
   //   const url = `${process.env.TATUM_BASE_URL}/bnb/account`;

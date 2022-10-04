@@ -33,7 +33,7 @@ const tatumcalls = {
         await axios(options)
           .then((serverResponse) => {
             if (serverResponse.data !== null) {
-              console.log("Customer acount details", serverResponse.data);
+              // console.log("Customer acount details", serverResponse.data);
               const ledgerAccountDetails = serverResponse.data;
               const callthis = async (id) => {
                 const url = `${process.env.TATUM_BASE_URL}/offchain/account/${id}/address`;
@@ -52,10 +52,10 @@ const tatumcalls = {
                     .then((offchainServerResponse) => {
                       if (offchainServerResponse.data !== null) {
                         //store the addresses in the database
-                        console.log(
-                          "Customer offchainServerResponse",
-                          offchainServerResponse.data
-                        );
+                        // console.log(
+                        //   "Customer offchainServerResponse",
+                        //   offchainServerResponse.data
+                        // );
 
                         try {
                           //UPDATE THE CUSTOMER ADDRESS DB
