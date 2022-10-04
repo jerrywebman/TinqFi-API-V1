@@ -114,6 +114,7 @@ var functions = {
     try {
       const id = req.params.id;
       const url = `${process.env.TATUM_BASE_URL}/offchain/account/${id}/address`;
+      console.log(id);
       try {
         const options = {
           method: "GET",
@@ -137,7 +138,9 @@ var functions = {
             });
           })
           .catch(() =>
-            res.status(403).send({ success: false, msg: "error from axios" })
+            res
+              .status(403)
+              .send({ success: false, msg: "error from server ax" })
           );
       } catch (err) {
         res.status(400).send({ success: false, msg: err });
