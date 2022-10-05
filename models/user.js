@@ -35,11 +35,12 @@ var userSchema = new mongoose.Schema({
     max: 255,
   },
   phone: {
-    type: Number,
+    type: String,
     // require: true,
     // unique: true,
   },
-  bvn: {
+
+  address: {
     type: String,
     // require: true,
   },

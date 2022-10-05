@@ -548,7 +548,6 @@ var functions = {
       res.status(503).send({
         success: false,
         msg: "A server error occurred while processing the next steps",
-        error: e,
       });
     }
   },
@@ -946,6 +945,57 @@ var functions = {
         success: false,
         msg: "A server error occurred while processing the next steps",
         error: e,
+      });
+    }
+  },
+
+  //** GET USER INFORMATION */
+  getInfos: async function (req, res) {
+    try {
+      const user = await User.findOne({ email: req.user.email });
+      const userDetails = {
+        fullname: user.fullname,
+        email: user.email,
+        phone: user.phone,
+        nickname: user.nickname,
+        street: user.street,
+        country: user.country,
+        occupation: user.occupation,
+        dateOfBirth: user.dateOfBirth,
+        emailVerified: user.emailVerified,
+        accountSetup: user.accountSetup,
+        accountVerified: user.accountVerified,
+      };
+      res.send({ success: true, user: userDetails });
+    } catch (e) {
+      res.status(503).send({
+        success: false,
+        msg: "A server error occurred while processing the next steps",
+      });
+    }
+  },
+
+  //** UPDATE USER INFORMATION */
+  updateInfos: async function (req, res) {
+    try {
+      await User.updateOne(
+        { email: req.user.email },
+        {
+          $set: {
+            phone: req.body.phone,
+            city: req.body.city,
+            street: req.body.address,
+            country: req.body.country,
+            occupation: req.body.occupation,
+            dateOfBirth: req.body.dateOfBirth,
+          },
+        }
+      );
+      res.send({ success: true, msg: "Profile updated successfully" });
+    } catch (e) {
+      res.status(503).send({
+        success: false,
+        msg: "A server error occurred while processing the next steps",
       });
     }
   },

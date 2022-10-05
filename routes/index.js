@@ -56,23 +56,15 @@ router.post("/api/v1/recover_account", actions.recoverAccount);
 //@desc completes the user account recover **
 router.post("/api/v1/complete_recovery", actions.updatePassword);
 
+//** ACCOUNT SECTION DONE */
+
 //@desc get a User Information **
 router.get("/api/v1/info/user", actions.getInfo);
 
-//DOCS FROM HERE
-//@desc change a user password **
-// router.post("/api/change_password_auth", verify, actions.updatePasswordAuth);
+//@desc get a User Information **
+router.get("/api/v1/account/user", verify, actions.getInfos);
 
-// // update legal aggreement**
-// router.post("/api/legal_agreement", verify, actions.updateLegal);
-
-// //@desc get a User Profile
-// router.get("/api/info/profile", actions.getInfo);
-
-// //@desc completes a user registration **
-// router.post("/api/v1/createAddress", actions.addressTest);
-
-// //@desc update a user pin **
-// router.post("/api/change_pin", verify, actions.updatePin);
+//** @desc UPDATE USER PROFILE
+router.post("/api/v1/account/user/update", verify, actions.updateInfos);
 
 module.exports = router;
