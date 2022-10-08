@@ -4,16 +4,6 @@ var functions = {
   // ADD A NEW Response
   addResponse: function (req, res) {
     try {
-      if (
-        !req.body.responseOne ||
-        !req.body.responseTwo ||
-        !req.body.responseThree
-      ) {
-        res.status(403).send({
-          success: false,
-          msg: "Please submit all the requests",
-        });
-      }
       const newResponse = {
         userEmail: req.user.email,
         category: req.params.category,
