@@ -100,6 +100,7 @@ const earn = require("./routes/earn");
 const withdrawal = require("./routes/withdrawal");
 const faq = require("./routes/faq");
 const pool = require("./routes/pool");
+const response = require("./routes/response");
 
 app.use(routes);
 app.use(wallet);
@@ -112,6 +113,7 @@ app.use(earn);
 app.use(withdrawal);
 app.use(pool);
 app.use(faq);
+app.use(response);
 
 const PORT = process.env.PORT || 3000;
 
