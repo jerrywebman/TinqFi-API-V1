@@ -61,7 +61,7 @@ var functions = {
   //GET ALL THE FAQ
   getFaq: async function (req, res) {
     try {
-      const faqResponse = await Faq.find({});
+      const faqResponse = await Faq.find({ category: req.params.category });
       res.json({
         success: true,
         message: "Request successful",
