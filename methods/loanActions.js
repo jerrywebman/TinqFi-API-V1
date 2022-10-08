@@ -7,6 +7,56 @@ var functions = {
   //SELECT A LOAN DATA DONE
   selectLoanData: async function (req, res) {
     try {
+      const loanToken = req.query.loanToken;
+      const uppercaseLoanToken = loanToken.toUpperCase();
+      //GETTING DATA FROM COINGECKO
+      const geckoUrl =
+        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&vs_currencies=usd";
+      const options = {
+        method: "GET",
+        url: geckoUrl,
+      };
+      //do something with the response object from coinGecko
+      axios(options).then(async (geckoResponse) => {
+        if (geckoResponse) {
+          const responseFromGecko = await geckoResponse.data;
+          //rearrange the response object
+          const priceData = {
+            BTC: responseFromGecko.bitcoin.usd,
+            ETH: responseFromGecko.ethereum.usd,
+            BSC: responseFromGecko.binancecoin.usd,
+            DOGE: responseFromGecko.dogecoin.usd,
+          };
+          let theLoan = await LoanLTV.findOne({ _id: uppercaseLoanToken });
+          if (!theLoan) {
+            res.status(400).send({
+              success: false,
+              msg: `Failed to retrieve loan data for the token ${uppercaseLoanToken}`,
+            });
+          } else {
+            let tokensFromGecko = { ...theLoan._doc, ...priceData };
+            res.status(200).send({
+              success: true,
+              msg: "Data Retrieved successfully",
+              data: tokensFromGecko,
+            });
+          }
+        } else
+          res.status(404).send({
+            success: false,
+            msg: "Market data error",
+          });
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({
+        success: false,
+        msg: "An Internal Server Error Occurred",
+      });
+    }
+  },
+  selectLoanDataS: async function (req, res) {
+    try {
       const loanToken = req.params.loanToken;
       const uppercaseLoanToken = loanToken.toUpperCase();
       //GETTING DATA FROM COINGECKO

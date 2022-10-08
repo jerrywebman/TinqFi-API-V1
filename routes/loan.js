@@ -16,7 +16,8 @@ router.get("/api/v1/loan/get/:id", verify, loanActions.selectALoan);
 
 ////////////////
 //get the selected loan ltv
-router.get("/api/v1/loan/select_ltv/:loanToken", loanActions.selectLoanData);
+router.get("/api/v1/loan/select_ltv", loanActions.selectLoanData);
+router.get("/api/v1/loan/select_ltv/:loanToken", loanActions.selectLoanDataS);
 //APPLY FOR A LOAN
 router.post("/api/v1/loan/apply", verify, loanActions.applyForLoan);
 //GET ALL A USER LOAN
