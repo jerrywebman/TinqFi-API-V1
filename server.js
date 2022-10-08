@@ -111,6 +111,7 @@ app.use(loan);
 app.use(earn);
 app.use(withdrawal);
 app.use(pool);
+app.use(faq);
 
 const PORT = process.env.PORT || 3000;
 
