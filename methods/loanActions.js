@@ -7,7 +7,7 @@ var functions = {
   //SELECT A LOAN DATA DONE
   selectLoanData: async function (req, res) {
     try {
-      const loanToken = req.body.loanToken;
+      const loanToken = req.params.loanToken;
       const uppercaseLoanToken = loanToken.toUpperCase();
       //GETTING DATA FROM COINGECKO
       const geckoUrl =
