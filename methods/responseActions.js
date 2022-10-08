@@ -32,20 +32,12 @@ var functions = {
           },
         ],
       };
-      new Response(newResponse)
-        .save()
-        .then(() =>
-          res.json({
-            success: true,
-            msg: "User response saved successfully",
-          })
-        )
-        .catch((err) =>
-          res.status(403).send({
-            success: false,
-            msg: "Something went wrong",
-          })
-        );
+      new Response(newResponse).save().then(() =>
+        res.json({
+          success: true,
+          msg: "User response saved successfully",
+        })
+      );
     } catch (e) {
       res.status(500).send({
         success: false,
