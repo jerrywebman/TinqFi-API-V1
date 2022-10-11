@@ -6,7 +6,7 @@ const verify = require("../middleware/verifyToken");
 
 const router = express.Router();
 
-//GET ALL NOTIFICATION
+//GET ALL NOTIFICATIONs
 router.get(
   "/api/v1/notification/all_notifications",
   verify,
