@@ -21,7 +21,6 @@ var functions = {
         axios(options)
           .then((ServerResponse) => {
             const response = ServerResponse.data;
-            console.log(response);
             //remove the xpub from the server response
             response.forEach((object) => {
               delete object["xpub"];
@@ -39,7 +38,6 @@ var functions = {
               .then(async (geckoResponse) => {
                 const newresponseFromGecko = [];
                 const responseFromGecko = await geckoResponse.data;
-                console.log(responseFromGecko);
                 //do the heavy data processing  by slicing the data and editing it
                 responseFromGecko.map(function (single) {
                   if (single.name === "BNB") {
@@ -114,7 +112,7 @@ var functions = {
     try {
       const id = req.params.id;
       const url = `${process.env.TATUM_BASE_URL}/offchain/account/${id}/address`;
-      console.log(id);
+      // console.log(id);
       try {
         const options = {
           method: "GET",
