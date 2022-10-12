@@ -219,6 +219,7 @@ var functions = {
         //GETTING THE DATE TO END THE PLAN
         const aDayInMilliseconds = 86400000;
         const today = Date.now();
+        const closingDate = Date.now() + aDayInMilliseconds;
 
         const searchIndex = userArray.find(
           (user) => user.tokenAccountcurrency === earnTokenUppercase
@@ -269,7 +270,7 @@ var functions = {
                   tokenImg: thePlan.tokenImage,
                   plan: thePlan.plan,
                   totalProfit: 0,
-                  // closingDate,
+                  closingDate,
                 };
 
                 new Earn(newEarnOrder).save().then(() => {
@@ -619,121 +620,6 @@ var functions = {
         .send({ success: false, msg: "Internal Server Error Occcured" });
     }
   },
-
-  //ADD A NEW LOAN LTV
-  // addEarnLTV: function (req, res) {
-  //   try {
-  //     const newEarnParams = {
-  //       tokenImage: req.body.tokenImage,
-  //       tokenName: req.body.tokenName,
-  //       tokenTicker: req.body.tokenTicker,
-  //       minAmount: req.body.minAmount,
-  //       apy: req.body.apy,
-  //       maxAmount: req.body.maxAmount,
-  //       plan: req.body.plan,
-  //       earnTenure: [
-  //         req.body.earnTenureOne,
-  //         req.body.earnTenureTwo,
-  //         req.body.earnTenureThree,
-  //       ],
-  //     };
-  //     new EarnLtv(newEarnParams).save().then(() =>
-  //       res.json({
-  //         success: true,
-  //         msg: "New Earn Parameter added successfully",
-  //       })
-  //     );
-  //   } catch (e) {
-  //     res.status(500).send({
-  //       success: false,
-  //       msg: "Internal Server Error Occcured",
-  //     });
-  //   }
-  // },
-
-  // //GET ALL USER ACTIVE FLEXIBLE EARN PLAN
-  // getAllActiveFlexiblePlan: async function (req, res) {
-  //   try {
-  //     const earnParams = await Earn.find({
-  //       plan: "FLEXIBLE",
-  //       active: true,
-  //       userEmail: req.user.email,
-  //     }).sort({ activatedDate: -1 });
-
-  //     res.json({
-  //       success: true,
-  //       data: earnParams,
-  //       msg: "User Active Flexible plans successfully fetched",
-  //     });
-  //   } catch (err) {
-  //     res
-  //       .status(500)
-  //       .send({ success: false, msg: "Internal Server Error Occcured" });
-  //   }
-  // },
-
-  // //GET ALL USER ACTIVE FIXED EARN PLAN
-  // getAllActiveFixedPlan: async function (req, res) {
-  //   try {
-  //     const earnParams = await Earn.find({
-  //       plan: "FIXED",
-  //       active: true,
-  //       userEmail: req.user.email,
-  //     }).sort({ activatedDate: -1 });
-
-  //     res.json({
-  //       success: true,
-  //       data: earnParams,
-  //       msg: "User Active FIXED plans successfully fetched",
-  //     });
-  //   } catch (err) {
-  //     res
-  //       .status(500)
-  //       .send({ success: false, msg: "Internal Server Error Occcured" });
-  //   }
-  // },
-
-  //GET ALL USER CLOSED FIXED EARN PLAN
-  // getAllClosedFixedPlan: async function (req, res) {
-  //   try {
-  //     const earnParams = await Earn.find({
-  //       plan: "FIXED",
-  //       active: false,
-  //       userEmail: req.user.email,
-  //     }).sort({ activatedDate: -1 });
-  //     res.json({
-  //       success: true,
-  //       data: earnParams,
-  //       msg: "User Closed Fixed plans successfully fetched",
-  //     });
-  //   } catch (err) {
-  //     res
-  //       .status(500)
-  //       .send({ success: false, msg: "Internal Server Error Occcured" });
-  //   }
-  // },
-
-  //GET ALL USER CLOSED FLEXIBLE EARN PLAN
-  // getAllClosedFlexiblePlan: async function (req, res) {
-  //   try {
-  //     const earnParams = await Earn.find({
-  //       plan: "FLEXIBLE",
-  //       active: false,
-  //       userEmail: req.user.email,
-  //     }).sort({ activatedDate: -1 });
-  //     res.json({
-  //       success: true,
-  //       data: earnParams,
-  //       msg: "User Closed Flexible plans successfully fetched",
-  //     });
-  //   } catch (err) {
-  //     res
-  //       .status(500)
-  //       .send({ success: false, msg: "Internal Server Error Occcured" });
-  //   }
-  // },
-
-  //GET ALL SUBSCRIPTIONS
 };
 
 module.exports = functions;
