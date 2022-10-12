@@ -26,7 +26,7 @@ var functions = {
         //get the ammount and the address of the user
         const address = req.body.address;
         const amount = req.body.amount;
-        const senderNote = req.body.senderNote || "";
+        const senderNote = req.body.senderNote || "No note";
 
         //hit the tatum api
         const url = `${process.env.TATUM_BASE_URL}/offchain/bitcoin/transfer`;
@@ -131,7 +131,7 @@ var functions = {
         //get the ammount and the address of the user
         const address = req.body.address;
         const amount = req.body.amount;
-        const senderNote = req.body.senderNote || "";
+        const senderNote = req.body.senderNote || "No note";
 
         //hit the tatum api
         const url = `${process.env.TATUM_BASE_URL}/offchain/ethereum/transfer`;
@@ -235,7 +235,7 @@ var functions = {
         //get the ammount and the address of the user
         const address = req.body.address;
         const amount = req.body.amount;
-        const senderNote = req.body.senderNote || "";
+        const senderNote = req.body.senderNote || "No note ";
 
         //hit the tatum api
         const url = `${process.env.TATUM_BASE_URL}/offchain/bsc/transfer`;
@@ -339,7 +339,7 @@ var functions = {
         //get the ammount and the address of the user
         const address = req.body.address;
         const amount = req.body.amount;
-        const senderNote = req.body.senderNote || "";
+        const senderNote = req.body.senderNote || "No note";
 
         //hit the tatum api
         const url = `${process.env.TATUM_BASE_URL}/offchain/dogecoin/transfer`;
