@@ -48,7 +48,7 @@ var functions = {
               compliant: false,
               transactionCode: req.user.email,
               paymentId: req.user.ourCustomerTatumId,
-              recipientNote: req.body.memo || "",
+              recipientNote: req.body.memo || "no note",
             };
             const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
             try {
