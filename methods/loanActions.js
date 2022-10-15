@@ -442,7 +442,7 @@ var functions = {
         userEmail: req.user.email,
         status: true,
       });
-      console.log(theLoan);
+      // console.log(theLoan);
       if (!theLoan) {
         res.status(403).send({
           success: false,
@@ -460,7 +460,7 @@ var functions = {
         for (var i in topupArray) {
           topupSum += topupArray[i];
         }
-        console.log(topupSum);
+        // console.log(topupSum);
 
         //get the daily interest rate and calculate the interest rate for the loan
         const aDayInMilliseconds = 86400000; //24 * 60 * 60 * 1000
@@ -470,7 +470,7 @@ var functions = {
         const days = dateDiff / aDayInMilliseconds;
         const totalInterest =
           Math.ceil(days) * theLoan.dailyInterestToPayInValue;
-        console.log(totalInterest);
+        // console.log(totalInterest);
         //THE AMOUNT + THE PROFIT
         const borrowedTokenAndProfit =
           totalInterest + theLoan.borrowedAmountInValue;
@@ -564,11 +564,11 @@ var functions = {
                           trxnRefId:
                             collateralTokenRefId + " - " + borrowedTokenRefId,
                         };
-                        new TinqfiTrxn(newTinqfiTrxn).save();
-                        res.json({
+                        new TinqfiTrxn(newTinqfiTrxn).save().then(()=> res.json({
                           success: true,
                           msg: "Loan Repayed successfully",
-                        });
+                        }););
+                        
                       });
                     } else {
                       res.status(401).send({
