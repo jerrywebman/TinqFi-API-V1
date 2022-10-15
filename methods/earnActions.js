@@ -499,7 +499,7 @@ var functions = {
         });
       }
       //check if its not the user order
-      else if (order.userEmail !== req.user.email) {
+      else if (order.userEmail != req.user.email) {
         res.status(401).send({
           success: false,
           msg: "User not allowed to execute this function",
