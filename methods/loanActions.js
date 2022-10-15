@@ -559,7 +559,7 @@ var functions = {
                           transactionType: "Loan",
                           tenure: `${Math.ceil(days)} days`,
                           from: "From TinqFI + User",
-                          to: senderTokenAccountId,
+                          to: theLoan.collateralTokenAccount,
                           debit: true,
                           trxnRefId:
                             collateralTokenRefId + " - " + borrowedTokenRefId,
