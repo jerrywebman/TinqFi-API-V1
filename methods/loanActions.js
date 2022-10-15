@@ -474,7 +474,7 @@ var functions = {
         //THE AMOUNT + THE PROFIT
         const borrowedTokenAndProfit =
           totalInterest + theLoan.borrowedAmountInValue;
-        console.log(borrowedTokenAndProfit);
+        // console.log(borrowedTokenAndProfit);
         //COLLECT THE LOAN BORROWED TOKEN TO THE USER
         const borrowedTokenData = {
           recipientAccountId:
@@ -564,11 +564,12 @@ var functions = {
                           trxnRefId:
                             collateralTokenRefId + " - " + borrowedTokenRefId,
                         };
-                        new TinqfiTrxn(newTinqfiTrxn).save().then(()=> res.json({
-                          success: true,
-                          msg: "Loan Repayed successfully",
-                        }););
-                        
+                        new TinqfiTrxn(newTinqfiTrxn).save().then(() => {
+                          res.json({
+                            success: true,
+                            msg: "Loan Repayed successfully",
+                          });
+                        });
                       });
                     } else {
                       res.status(401).send({
