@@ -37,6 +37,14 @@ var poolSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  poolMinAmountInUsd: {
+    type: Number,
+    required: true,
+  },
+  poolMaxAmountInUsd: {
+    type: Number,
+    required: true,
+  },
   poolTarget: {
     type: Number,
     required: true,

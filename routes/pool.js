@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post("/api/v1/pool/add_pool", poolActions.addPool);
 router.get("/api/v1/pool/get_pool", poolActions.getPool);
-router.get("/api/v1/pool/subscribe", poolActions.subscribeToPool);
+router.get("/api/v1/pool/subscribe/:id", verify, poolActions.subscribeToPool);
+router.get("/api/v1/pool/try", poolActions.trying);
 
 module.exports = router;

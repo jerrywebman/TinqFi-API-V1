@@ -176,10 +176,7 @@ var functions = {
                       from: "Wallet",
                       to: "Tinqfi",
                       debit: true,
-                      trxnRefId:
-                        collateralReferenceId +
-                        " - " +
-                        borrowedTokenReferenceId,
+                      trxnRefId: serverResponse.data.reference,
                     };
                     new TinqfiTrxn(newTinqfiTrxn).save();
                     //the response from Tatum
@@ -300,6 +297,7 @@ var functions = {
                     });
                 })
                 .catch((err) => {
+                  console.log(err);
                   res.status(403).send({
                     success: false,
                     msg: "Transaction Failed, insufficient balance",
@@ -382,23 +380,23 @@ var functions = {
               DOGE: responseFromGecko.dogecoin.usd,
             };
 
-            console.log("priceData", priceData);
+            // console.log("priceData", priceData);
             //get the price of collateral token
             const currentCollateralPriceInUsd =
               priceData[theLoan.collateralToken] *
               theLoan.collateralAmountInValue;
-            console.log(
-              "currentCollateralPriceInUsd",
-              currentCollateralPriceInUsd
-            );
+            // console.log(
+            //   "currentCollateralPriceInUsd",
+            //   currentCollateralPriceInUsd
+            // );
             //get the margin call data
             const checkMarginCall =
               theLoan.collateralTokenAmountInUsd * (theLoan.marginCall / 100);
-            console.log("checkMarginCall", checkMarginCall);
+            // console.log("checkMarginCall", checkMarginCall);
             //get the liquidation call data
             const checkLiquidationCall =
               theLoan.collateralTokenAmountInUsd * (80 / 100); //theLoan.liquidationLTV
-            console.log("checkLiquidationCall", checkLiquidationCall);
+            // console.log("checkLiquidationCall", checkLiquidationCall);
             //get the price of collateral token
 
             if (checkLiquidationCall <= currentCollateralPriceInUsd) {
