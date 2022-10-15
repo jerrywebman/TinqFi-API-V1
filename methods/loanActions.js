@@ -449,10 +449,6 @@ var functions = {
           msg: "Loan is inactive/not available",
         });
       } else {
-        res.json({
-          success: true,
-          loan: theLoan,
-        });
         //do something with the loan data
         var topupArray = theLoan.topupLoan;
         var topupSum = 0;
@@ -532,44 +528,51 @@ var functions = {
                   };
                   //DONE
                   axios(options).then(async (serverTinqFiResponse) => {
-                    //the response from Tatum
-                    const collateralTokenRefId = await serverTinqFiResponse.data
-                      .reference;
+                    if (serverTinqFiResponse !== null) {
+                      //the response from Tatum
+                      const collateralTokenRefId = await serverTinqFiResponse
+                        .data.reference;
 
-                    //set the loan as inactive
-                    const updateLoan = await Loan.updateOne(
-                      {
-                        _id: req.params.id,
-                        userEmail: req.user.email,
-                        status: true,
-                      },
-                      {
-                        $set: {
-                          status: false,
+                      //set the loan as inactive
+                      const updateLoan = await Loan.updateOne(
+                        {
+                          _id: req.params.id,
+                          userEmail: req.user.email,
+                          status: true,
                         },
-                      }
-                    ).then(() => {
-                      //POST TRX HISTORY WITH THE USER DATA IN DB
-                      const newTinqfiTrxn = {
-                        userEmail: req.user.email,
-                        userTaTumId: req.user.ourCustomerTatumId,
-                        transactionAmount: borrowedTokenAndProfit,
-                        transactionToken: `Repayed -${borrowedTokenAndProfit} as loan + Profit with loan Id ${theLoan._id} and collected Collateral`,
-                        transactionType: "Loan",
-                        tenure: `${Math.ceil(days)} days`,
-                        from: "From TinqFI + User",
-                        to: theLoan.collateralTokenAccount,
-                        debit: true,
-                        trxnRefId:
-                          collateralTokenRefId + " - " + borrowedTokenRefId,
-                      };
-                      new TinqfiTrxn(newTinqfiTrxn).save().then(() => {
-                        res.json({
-                          success: true,
-                          msg: "Loan Repayed successfully",
+                        {
+                          $set: {
+                            status: false,
+                          },
+                        }
+                      ).then(() => {
+                        //POST TRX HISTORY WITH THE USER DATA IN DB
+                        const newTinqfiTrxn = {
+                          userEmail: req.user.email,
+                          userTaTumId: req.user.ourCustomerTatumId,
+                          transactionAmount: borrowedTokenAndProfit,
+                          transactionToken: `Repayed -${borrowedTokenAndProfit} as loan + Profit with loan Id ${theLoan._id} and collected Collateral`,
+                          transactionType: "Loan",
+                          tenure: `${Math.ceil(days)} days`,
+                          from: "From TinqFI + User",
+                          to: theLoan.collateralTokenAccount,
+                          debit: true,
+                          trxnRefId:
+                            collateralTokenRefId + " - " + borrowedTokenRefId,
+                        };
+                        new TinqfiTrxn(newTinqfiTrxn).save().then(() => {
+                          res.json({
+                            success: true,
+                            msg: "Loan Repayed successfully",
+                          });
                         });
                       });
-                    });
+                    } else {
+                      res.status(401).send({
+                        success: false,
+                        msg: "Transaction Failed no responses",
+                      });
+                    }
                   });
                 } catch (error) {
                   res.status(401).send({
