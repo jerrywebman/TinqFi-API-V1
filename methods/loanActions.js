@@ -254,7 +254,8 @@ var functions = {
                             totalInterestToPayInValue,
                             loanTenure,
                             repaymentAmountInValue:
-                              totalInterestToPayInValue + borrowedAmount, //amount to payback + interest
+                              totalInterestToPayInValue +
+                              Number(borrowedAmount), //amount to payback + interest
                             topupLoan: collateralAmountInValue,
                             endAt: closingDate,
                             status: true,
