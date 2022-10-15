@@ -532,54 +532,50 @@ var functions = {
                   };
                   //DONE
                   axios(options).then(async (serverTinqFiResponse) => {
-                    if (serverTinqFiResponse !== null) {
-                      //the response from Tatum
-                      const collateralTokenRefId = await serverTinqFiResponse
-                        .data.reference;
+                    //the response from Tatum
+                    const collateralTokenRefId = await serverTinqFiResponse.data
+                      .reference;
 
-                      //set the loan as inactive
-                      const updateLoan = await Loan.updateOne(
-                        {
-                          _id: req.params.id,
-                          userEmail: req.user.email,
-                          status: true,
+                    //set the loan as inactive
+                    const updateLoan = await Loan.updateOne(
+                      {
+                        _id: req.params.id,
+                        userEmail: req.user.email,
+                        status: true,
+                      },
+                      {
+                        $set: {
+                          status: false,
                         },
-                        {
-                          $set: {
-                            status: false,
-                          },
-                        }
-                      ).then(() => {
-                        //POST TRX HISTORY WITH THE USER DATA IN DB
-                        const newTinqfiTrxn = {
-                          userEmail: req.user.email,
-                          userTaTumId: req.user.ourCustomerTatumId,
-                          transactionAmount: borrowedTokenAndProfit,
-                          transactionToken: `Repayed -${borrowedTokenAndProfit} as loan + Profit with loan Id ${theLoan._id} and collected Collateral`,
-                          transactionType: "Loan",
-                          tenure: `${Math.ceil(days)} days`,
-                          from: "From TinqFI + User",
-                          to: theLoan.collateralTokenAccount,
-                          debit: true,
-                          trxnRefId:
-                            collateralTokenRefId + " - " + borrowedTokenRefId,
-                        };
-                        new TinqfiTrxn(newTinqfiTrxn).save().then(() => {
-                          res.json({
-                            success: true,
-                            msg: "Loan Repayed successfully",
-                          });
+                      }
+                    ).then(() => {
+                      //POST TRX HISTORY WITH THE USER DATA IN DB
+                      const newTinqfiTrxn = {
+                        userEmail: req.user.email,
+                        userTaTumId: req.user.ourCustomerTatumId,
+                        transactionAmount: borrowedTokenAndProfit,
+                        transactionToken: `Repayed -${borrowedTokenAndProfit} as loan + Profit with loan Id ${theLoan._id} and collected Collateral`,
+                        transactionType: "Loan",
+                        tenure: `${Math.ceil(days)} days`,
+                        from: "From TinqFI + User",
+                        to: theLoan.collateralTokenAccount,
+                        debit: true,
+                        trxnRefId:
+                          collateralTokenRefId + " - " + borrowedTokenRefId,
+                      };
+                      new TinqfiTrxn(newTinqfiTrxn).save().then(() => {
+                        res.json({
+                          success: true,
+                          msg: "Loan Repayed successfully",
                         });
                       });
-                    } else {
-                      res.status(401).send({
-                        success: false,
-                        msg: "Transaction Failed no responses",
-                      });
-                    }
+                    });
                   });
                 } catch (error) {
-                  //the error from axios
+                  res.status(401).send({
+                    success: false,
+                    msg: "An error occured, Please try again",
+                  });
                 }
               } else {
                 res.status(401).send({
