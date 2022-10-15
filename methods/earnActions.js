@@ -485,8 +485,7 @@ var functions = {
   closeAnEarnFlexiblePlan: async function (req, res) {
     try {
       const orderId = req.params.orderId;
-      const order = Earn.findOne({ _id: orderId });
-
+      const order = await Earn.findOne({ _id: orderId });
       //check if no order
       if (!order) {
         res.status(404).send({ success: false, msg: "order not found" });
