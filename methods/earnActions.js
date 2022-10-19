@@ -354,7 +354,7 @@ var functions = {
 
       //check if no order
       if (!order) {
-        res.status(404).send({ success: false, msg: "order not found" });
+        res.status(404).send({ success: false, msg: "Earn Plan not found" });
       }
       //check if its not the users order
       else if (order.userEmail !== req.user.email) {
@@ -363,6 +363,7 @@ var functions = {
           msg: "User not allowed to execute this function",
         });
       }
+
       //check if its not the users order is inactive
       else if (order.active === false) {
         res.status(401).send({
@@ -486,6 +487,13 @@ var functions = {
     try {
       const orderId = req.params.orderId;
       const order = await Earn.findOne({ _id: orderId });
+
+      //convert to timestamp
+      const createdAtInTimestamp = Date.parse(order.activatedDate);
+      const today = new Date();
+      const todaysDateTimestamp = Date.parse(today);
+      const dateDifference = createdAtInTimestamp - todaysDateTimestamp;
+
       //check if no order
       if (!order) {
         res.status(404).send({ success: false, msg: "order not found" });
@@ -504,7 +512,13 @@ var functions = {
           msg: "User not allowed to execute this function",
         });
       }
-
+      //check if its not up to 24 hrs
+      else if (dateDifference < 86400000) {
+        res.status(401).send({
+          success: false,
+          msg: "Plan can only be cancelled after 24hrs of activation",
+        });
+      }
       //check if order is FIXED
       else if (order.plan === "FIXED") {
         res.status(404).send({
@@ -514,8 +528,7 @@ var functions = {
       } else {
         //todays date
         const today = Date.now();
-        //convert to timestamp
-        const createdAtInTimestamp = Date.parse(order.activatedDate);
+
         //the difference between created date and todays date
         const dateDiff = today - createdAtInTimestamp;
         //convert to days 86400000 = one day in timestamp and do not round up

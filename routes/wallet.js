@@ -22,4 +22,7 @@ router.get(
   walletActions.getAwalletAddress
 );
 
+//GET ALL THE BALANCES
+router.get("/api/v1/portfolio/balance", verify, walletActions.getAllBalances);
+
 module.exports = router;
