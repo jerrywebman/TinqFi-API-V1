@@ -13,6 +13,10 @@ var poolSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  poolTrustee: {
+    type: String,
+    required: true,
+  },
   poolIntro: {
     type: String,
     required: true,
@@ -57,8 +61,19 @@ var poolSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  totalStakedToken: {
+    type: Number,
+    default: 0,
+  },
+  totalCommitment: {
+    type: Number,
+    default: 0,
+  },
   poolProfit: {
     type: Number,
+  },
+  endDate: {
+    type: Date,
   },
   createdAt: {
     type: Date,

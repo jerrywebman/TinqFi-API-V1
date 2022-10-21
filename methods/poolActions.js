@@ -6,10 +6,15 @@ var functions = {
   //ADD A POOL DATA
   addPool: function (req, res) {
     try {
+      //CALCULATING THE END DATE
+      const closingDate = Date.now() + 86400000 * Number(req.body.poolDuration);
+      //convert to date format
+      var endDate = new Date(closingDate * 1000);
       const newPoolParams = {
         poolName: req.body.poolName,
         poolImageUrl: req.body.poolImageUrl,
         poolStatus: req.body.poolStatus,
+        poolTrustee: req.body.poolTrustee,
         poolIntro: req.body.poolIntro,
         poolType: req.body.poolType,
         poolApy: req.body.poolApy,
@@ -23,6 +28,7 @@ var functions = {
         poolExpectedIncome: req.body.poolExpectedIncome,
         poolProfit: req.body.poolProfit,
         participants: [],
+        endDate,
       };
       new Pool(newPoolParams).save().then(() =>
         res.json({
@@ -39,15 +45,116 @@ var functions = {
   },
 
   //GET ALL AVAILABLE POOL DATA
-  getPool: async function (req, res) {
+  explorePool: async function (req, res) {
     try {
-      const poolParams = await Pool.find().sort({ createdAt: -1 });
-      res.json({
-        success: true,
-        msg: "User Active FIXED plans successfully fetched",
-        data: poolParams,
+      const poolParams = await Pool.find({ poolStatus: "Active" }).sort({
+        createdAt: -1,
       });
+      if (poolParams.length < 1) {
+        res.json({
+          success: true,
+          msg: "No Pool Data available",
+        });
+      } else {
+        res.json({
+          success: true,
+          msg: "Pool Data available ",
+          data: poolParams,
+        });
+      }
     } catch (e) {
+      res.status(500).send({
+        success: false,
+        msg: "Internal Server Error",
+      });
+    }
+  },
+  //GET ALL AVAILABLE POOL DATA
+  getAllUserPool: async function (req, res) {
+    try {
+      const poolParams = await Pool.find({
+        "participants.userEmail": req.user.email,
+      }).sort({ createdAt: -1 });
+      if (poolParams.length < 1) {
+        const poolInactiveParams = await Pool.find({
+          poolStatus: "Completed",
+        }).sort({ createdAt: -1 });
+        let newPoolData = [];
+        poolInactiveParams.forEach((single) => {
+          newPoolData.push({
+            _id: single._id,
+            poolName: single.poolName,
+            poolStatus: single.poolStatus,
+            poolTrustee: single.poolTrustee,
+            poolImageUrl: single.poolImageUrl,
+            poolIntro: single.poolIntro,
+            poolTarget: single.poolTarget,
+            poolCurrency: single.poolCurrency,
+            createdAt: single.createdAt,
+            endDate: single.endDate,
+            participants: single.participants.length,
+            stakedTokenValueInUsd: 0,
+            poolProfit: single.poolProfit,
+            stakedTokenValue: 0,
+            totalPoolReward: Number(
+              (single.poolProfit / 100) * single.totalStakedToken
+            ).toFixed(8),
+            totalStakedToken: single.totalStakedToken,
+            totalCommitment: single.totalCommitment,
+          });
+        });
+        res.json({
+          success: true,
+          msg: "Inactive Pool Data available ",
+          data: newPoolData,
+        });
+      } else {
+        let newPoolData = [];
+        poolParams.forEach((single) => {
+          //GET THE VALUE OF TOKEN USED
+          let stakedTokenValue = 0;
+          let stakedTokenValueInUsd = 0;
+
+          //GET THE TOTAL STAKED AND COMMITMENT OF TOKEN USED
+          const total = single;
+          const theUser = single.participants.filter(
+            (user) => user.userEmail === req.user.email
+          );
+
+          theUser.map((single) => {
+            stakedTokenValue += single.amount;
+            stakedTokenValueInUsd += single.priceInUsd;
+          });
+          newPoolData.push({
+            _id: single._id,
+            poolName: single.poolName,
+            poolStatus: single.poolStatus,
+            poolTrustee: single.poolTrustee,
+            poolImageUrl: single.poolImageUrl,
+            poolIntro: single.poolIntro,
+            poolTarget: single.poolTarget,
+            poolCurrency: single.poolCurrency,
+            createdAt: single.createdAt,
+            endDate: single.endDate,
+            participants: single.participants.length,
+            stakedTokenValueInUsd: stakedTokenValueInUsd.toFixed(2),
+            poolProfit: single.poolProfit,
+            stakedTokenValue: stakedTokenValue.toFixed(8),
+            totalPoolReward: Number(
+              (single.poolProfit / 100) * stakedTokenValue
+            ).toFixed(8),
+            totalStakedToken: single.totalStakedToken,
+            totalCommitment: single.totalCommitment,
+          });
+        });
+        res.json({
+          success: true,
+          msg: "Pool Data available ",
+          data: newPoolData,
+        });
+      }
+    } catch (e) {
+      console.log(e);
       res.status(500).send({
         success: false,
         msg: "Internal Server Error",
@@ -58,7 +165,10 @@ var functions = {
   //APPLY FOR A POOL
   subscribeToPool: async function (req, res) {
     try {
-      const poolParams = await Pool.findOne({ _id: req.params.id });
+      const poolParams = await Pool.findOne({
+        _id: req.params.id,
+        poolStatus: "Active",
+      });
       const userArray = await req.user.onRegistrationLedgerAccnts;
       const token = poolParams.poolCurrency;
       const amount = req.body.amount;
@@ -130,8 +240,14 @@ var functions = {
                     //the response from Tatum
                     const referenceId = await serverResponse.data.reference;
                     //ADD THE PARTICIPANT
-                    const addParticipant = Pool.updateOne(
+                    const addParticipant = await Pool.updateOne(
                       { _id: req.params.id },
+                      {
+                        $inc: {
+                          totalStakedToken: amountInNumber,
+                          totalCommitment: Number(tokenPriceInUsd),
+                        },
+                      },
                       {
                         $push: {
                           participants: {
