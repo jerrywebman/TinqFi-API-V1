@@ -51,7 +51,7 @@ var functions = {
         createdAt: -1,
       });
       if (poolParams.length < 1) {
-        res.json({
+        res.status(404).send({
           success: true,
           msg: "No Pool Data available",
         });
@@ -63,98 +63,6 @@ var functions = {
         });
       }
     } catch (e) {
-      res.status(500).send({
-        success: false,
-        msg: "Internal Server Error",
-      });
-    }
-  },
-  //GET ALL AVAILABLE POOL DATA
-  getAllUserPool: async function (req, res) {
-    try {
-      const poolParams = await Pool.find({
-        "participants.userEmail": req.user.email,
-      }).sort({ createdAt: -1 });
-      if (poolParams.length < 1) {
-        const poolInactiveParams = await Pool.find({
-          poolStatus: "Completed",
-        }).sort({ createdAt: -1 });
-        let newPoolData = [];
-        poolInactiveParams.forEach((single) => {
-          newPoolData.push({
-            _id: single._id,
-            poolName: single.poolName,
-            poolStatus: single.poolStatus,
-            poolTrustee: single.poolTrustee,
-            poolImageUrl: single.poolImageUrl,
-            poolIntro: single.poolIntro,
-            poolTarget: single.poolTarget,
-            poolCurrency: single.poolCurrency,
-            createdAt: single.createdAt,
-            endDate: single.endDate,
-            participants: single.participants.length,
-            stakedTokenValueInUsd: 0,
-            poolProfit: single.poolProfit,
-            stakedTokenValue: 0,
-            totalPoolReward: Number(
-              (single.poolProfit / 100) * single.totalStakedToken
-            ).toFixed(8),
-            totalStakedToken: single.totalStakedToken,
-            totalCommitment: single.totalCommitment,
-          });
-        });
-        res.json({
-          success: true,
-          msg: "Inactive Pool Data available ",
-          data: newPoolData,
-        });
-      } else {
-        let newPoolData = [];
-        poolParams.forEach((single) => {
-          //GET THE VALUE OF TOKEN USED
-          let stakedTokenValue = 0;
-          let stakedTokenValueInUsd = 0;
-
-          //GET THE TOTAL STAKED AND COMMITMENT OF TOKEN USED
-          const total = single;
-          const theUser = single.participants.filter(
-            (user) => user.userEmail === req.user.email
-          );
-
-          theUser.map((single) => {
-            stakedTokenValue += single.amount;
-            stakedTokenValueInUsd += single.priceInUsd;
-          });
-          newPoolData.push({
-            _id: single._id,
-            poolName: single.poolName,
-            poolStatus: single.poolStatus,
-            poolTrustee: single.poolTrustee,
-            poolImageUrl: single.poolImageUrl,
-            poolIntro: single.poolIntro,
-            poolTarget: single.poolTarget,
-            poolCurrency: single.poolCurrency,
-            createdAt: single.createdAt,
-            endDate: single.endDate,
-            participants: single.participants.length,
-            stakedTokenValueInUsd: stakedTokenValueInUsd.toFixed(2),
-            poolProfit: single.poolProfit,
-            stakedTokenValue: stakedTokenValue.toFixed(8),
-            totalPoolReward: Number(
-              (single.poolProfit / 100) * stakedTokenValue
-            ).toFixed(8),
-            totalStakedToken: single.totalStakedToken,
-            totalCommitment: single.totalCommitment,
-          });
-        });
-        res.json({
-          success: true,
-          msg: "Pool Data available ",
-          data: newPoolData,
-        });
-      }
-    } catch (e) {
-      console.log(e);
       res.status(500).send({
         success: false,
         msg: "Internal Server Error",
@@ -290,16 +198,15 @@ var functions = {
                     });
                 })
                 .catch((err) => {
-                  console.log(err);
                   res.status(403).send({
                     success: false,
                     msg: "insufficient balance or Sender unauthorized",
                   });
                 });
             } catch (e) {
-              res.status(500).send({
+              res.status(400).send({
                 success: false,
-                msg: "Transaction Failed, error from axios",
+                msg: "Transaction Failed, error ",
               });
             }
           }
@@ -319,40 +226,96 @@ var functions = {
     }
   },
 
-  trying: async function (req, res) {
-    //GET THE CURRENT PRICE OF THE TOKENS
-    const options = {
-      method: "GET",
-      url: process.env.PRICE_API,
-    };
-    //do something with the response object from coinGecko
-    axios(options)
-      .then(async (geckoResponse) => {
-        if (geckoResponse) {
-          const responseFromGecko = await geckoResponse.data;
-          const busd = "binance-usd";
-          //rearrange the response object
-          const priceData = {
-            BTC: responseFromGecko.bitcoin.usd,
-            ETH: responseFromGecko.ethereum.usd,
-            BSC: responseFromGecko.binancecoin.usd,
-            DOGE: responseFromGecko.dogecoin.usd,
-            BUSD: responseFromGecko[busd].usd,
-          };
-          res.send(priceData);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        const priceData = {
-          BTC: 1,
-          ETH: 1,
-          BSC: 1,
-          DOGE: 1,
-          BUSD: 1,
-        };
-        res.send(priceData);
+  //GET ALL AVAILABLE POOL DATA
+  getAllUserPool: async function (req, res) {
+    try {
+      const poolParams = await Pool.find({
+        "participants.userEmail": req.user.email,
+      }).sort({ createdAt: -1 });
+      if (poolParams.length < 1) {
+        const poolInactiveParams = await Pool.find({
+          poolStatus: "Completed",
+        }).sort({ createdAt: -1 });
+        let newPoolData = [];
+        poolInactiveParams.forEach((single) => {
+          newPoolData.push({
+            _id: single._id,
+            poolName: single.poolName,
+            poolStatus: single.poolStatus,
+            poolTrustee: single.poolTrustee,
+            poolImageUrl: single.poolImageUrl,
+            poolIntro: single.poolIntro,
+            poolTarget: single.poolTarget,
+            poolCurrency: single.poolCurrency,
+            createdAt: single.createdAt,
+            endDate: single.endDate,
+            participants: single.participants.length,
+            stakedTokenValueInUsd: 0,
+            poolProfit: single.poolProfit,
+            stakedTokenValue: 0,
+            totalPoolReward: Number(
+              (single.poolProfit / 100) * single.totalStakedToken
+            ).toFixed(8),
+            totalStakedToken: single.totalStakedToken,
+            totalCommitment: single.totalCommitment,
+          });
+        });
+        res.json({
+          success: true,
+          msg: "Inactive Pool Data available ",
+          data: newPoolData,
+        });
+      } else {
+        let newPoolData = [];
+        poolParams.forEach((single) => {
+          //GET THE VALUE OF TOKEN USED
+          let stakedTokenValue = 0;
+          let stakedTokenValueInUsd = 0;
+
+          //GET THE TOTAL STAKED AND COMMITMENT OF TOKEN USED
+          const total = single;
+          const theUser = single.participants.filter(
+            (user) => user.userEmail === req.user.email
+          );
+
+          theUser.map((single) => {
+            stakedTokenValue += single.amount;
+            stakedTokenValueInUsd += single.priceInUsd;
+          });
+          newPoolData.push({
+            _id: single._id,
+            poolName: single.poolName,
+            poolStatus: single.poolStatus,
+            poolTrustee: single.poolTrustee,
+            poolImageUrl: single.poolImageUrl,
+            poolIntro: single.poolIntro,
+            poolTarget: single.poolTarget,
+            poolCurrency: single.poolCurrency,
+            createdAt: single.createdAt,
+            endDate: single.endDate,
+            participants: single.participants.length,
+            stakedTokenValueInUsd: stakedTokenValueInUsd.toFixed(2),
+            poolProfit: single.poolProfit,
+            stakedTokenValue: stakedTokenValue.toFixed(8),
+            totalPoolReward: Number(
+              (single.poolProfit / 100) * stakedTokenValue
+            ).toFixed(8),
+            totalStakedToken: single.totalStakedToken,
+            totalCommitment: single.totalCommitment,
+          });
+        });
+        res.json({
+          success: true,
+          msg: "Pool Data available ",
+          data: newPoolData,
+        });
+      }
+    } catch (e) {
+      res.status(500).send({
+        success: false,
+        msg: "Internal Server Error",
       });
+    }
   },
 };
 
