@@ -58,10 +58,26 @@ var functions = {
     }
   },
 
-  //GET ALL THE FAQ
+  //GET ALL THE FAQ BASED ON CATEGORY
   getFaq: async function (req, res) {
     try {
       const faqResponse = await Faq.find({ category: req.params.category });
+      res.json({
+        success: true,
+        message: "Request successful",
+        faq: faqResponse,
+      });
+    } catch (e) {
+      res.status(500).send({
+        success: false,
+        msg: "Server error",
+      });
+    }
+  },
+  //GET ALL THE FAQ BASED ON CATEGORY
+  getAllFaq: async function (req, res) {
+    try {
+      const faqResponse = await Faq.find({});
       res.json({
         success: true,
         message: "Request successful",
