@@ -67,4 +67,7 @@ router.get("/api/v1/account/user", verify, actions.getInfos);
 //** @desc UPDATE USER PROFILE
 router.post("/api/v1/account/user/update", verify, actions.updateInfos);
 
+//** @desc GET THE APP INFO
+router.get("/api/v1/appinfo", actions.appInfo);
+
 module.exports = router;

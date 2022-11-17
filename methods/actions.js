@@ -999,6 +999,39 @@ var functions = {
       });
     }
   },
+
+  //** UPDATE USER INFORMATION */
+  appInfo: function (req, res) {
+    const data = {
+      andriodVersion: 12,
+      IOSVersion: 12,
+      andriodVersionText: "12",
+      IOSVersionText: "12",
+      termsAndConditions: "https://www.tinqfi.com/terms_and_condition",
+      privacyPolicy: "https://www.tinqfi.com/privacy_policy",
+      forceUpdate: false,
+      playStoreUrl: "",
+      appStoreUrl: "",
+      websiteUrl: "https://www.tinqfi.com/",
+      faqUrl: "https://www.tinqfi.com/faqs",
+      aboutUrl: "https://www.tinqfi.com/about",
+      supportEmail: "support@tinqfi.com",
+      supportPhone: "",
+      facebookUrl: "https://facebook.com/tinqfi",
+      twitterUrl: "https://twitter.com/tinqfi",
+      instagramUrl: "https://instagramcom/tinqfi",
+      linkedinUrl: "https://www.linkedin.com/company/tinqfi",
+      latestAppFeatures: "",
+    };
+    try {
+      res.send({ success: false, msg: "OK", data });
+    } catch (e) {
+      res.status(503).send({
+        success: false,
+        msg: "A server error occurred while processing your request",
+      });
+    }
+  },
 };
 
 module.exports = functions;
