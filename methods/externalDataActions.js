@@ -59,7 +59,7 @@ var functions = {
   //GET Coinnewsafrica news data
   getCnaLatestNews: function (req, res) {
     try {
-      const url = "https://coinnewsafrica-api.herokuapp.com/api/news";
+      const url = "https://coinnewsafrica.cyclic.app/api/news";
 
       const options = {
         method: "GET",
