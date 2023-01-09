@@ -570,7 +570,7 @@ var functions = {
                     } else {
                       res.status(401).send({
                         success: false,
-                        msg: "Transaction Failed no responses",
+                        msg: "Transaction Failed no responses.",
                       });
                     }
                   });
@@ -583,20 +583,20 @@ var functions = {
               } else {
                 res.status(401).send({
                   success: false,
-                  msg: "Transaction Failed no responsess",
+                  msg: "Transaction Failed no responses..",
                 });
               }
             })
             .catch((error) => {
               res.status(401).send({
                 success: false,
-                msg: "Transaction Failed no responses",
+                msg: "Transaction Failed no responses...",
               });
             });
         } catch (e) {
           res.status(401).send({
             success: false,
-            msg: "Transaction Failed no responses",
+            msg: "Transaction Failed no responses....",
           });
         }
       }
