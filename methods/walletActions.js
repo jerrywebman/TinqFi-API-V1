@@ -255,9 +255,9 @@ var functions = {
                 });
                 //ADDING THE LOAN BALANCE
                 let loanBalance = 0;
-                loanArray.map((single) => {
-                  loanBalance += single.amount * single.currentTokenPrice;
-                });
+                // loanArray.map((single) => {
+                //   loanBalance += single.amount * single.currentTokenPrice;
+                // });
                 //------------------------------LOAN ENDS
                 //------------------------------EARN STARTS
                 //GET THE EARN BALANCE IN USD
