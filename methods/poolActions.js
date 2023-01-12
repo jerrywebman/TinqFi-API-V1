@@ -232,88 +232,98 @@ var functions = {
     }
   },
 
-  //GET ALL AVAILABLE POOL DATA
+  //GET ALL AVAILABLE (**SUbSCRIBED**CLOSED) POOL DATA
   getAllUserPool: async function (req, res) {
     try {
-      const poolParams = await Pool.find({
+      //find the participant active pool data
+      const userPoolParams = await Pool.find({
         "participants.userEmail": req.user.email,
       }).sort({ createdAt: -1 });
-      if (poolParams.length < 1) {
-        const poolInactiveParams = await Pool.find().sort({ createdAt: -1 });
-        let newPoolData = [];
-        poolInactiveParams.forEach((single) => {
-          newPoolData.push({
-            _id: single._id,
-            poolName: single.poolName,
-            poolStatus: single.poolStatus,
-            poolTrustee: single.poolTrustee,
-            poolImageUrl: single.poolImageUrl,
-            poolIntro: single.poolIntro,
-            poolTarget: single.poolTarget,
-            poolCurrency: single.poolCurrency,
-            createdAt: single.createdAt,
-            endDate: single.endDate,
-            participants: single.participants.length,
-            stakedTokenValueInUsd: 0,
-            poolProfit: single.poolProfit,
-            stakedTokenValue: 0,
-            totalPoolReward: Number(
-              (single.poolProfit / 100) * single.totalStakedToken
-            ).toFixed(8),
-            totalStakedToken: single.totalStakedToken,
-            totalCommitment: single.totalCommitment,
-          });
+      //get all completed data
+      const allPoolParams = await Pool.find({ poolStatus: "Completed" }).sort({
+        createdAt: -1,
+      });
+      let allPoolData = [];
+      //destructure the data into a new array
+      allPoolParams.forEach((single) => {
+        allPoolData.push({
+          _id: single._id,
+          poolName: single.poolName,
+          poolStatus: single.poolStatus,
+          poolTrustee: single.poolTrustee,
+          poolImageUrl: single.poolImageUrl,
+          poolIntro: single.poolIntro,
+          poolTarget: single.poolTarget,
+          poolCurrency: single.poolCurrency,
+          createdAt: single.createdAt,
+          endDate: single.endDate,
+          participants: single.participants.length,
+          stakedTokenValueInUsd: 0,
+          poolProfit: single.poolProfit,
+          stakedTokenValue: 0,
+          totalPoolReward: Number(
+            (single.poolProfit / 100) * single.totalStakedToken
+          ).toFixed(8),
+          totalStakedToken: single.totalStakedToken,
+          totalCommitment: single.totalCommitment,
         });
-        res.json({
-          success: true,
-          msg: "Inactive Pool Data available ",
-          data: newPoolData,
-        });
-      } else {
-        let newPoolData = [];
-        poolParams.forEach((single) => {
-          //GET THE VALUE OF TOKEN USED
-          let stakedTokenValue = 0;
-          let stakedTokenValueInUsd = 0;
+      });
 
-          //GET THE TOTAL STAKED AND COMMITMENT OF TOKEN USED
-          const total = single;
-          const theUser = single.participants.filter(
-            (user) => user.userEmail === req.user.email
-          );
+      let userPoolData = [];
+      //destructure the data for the active pool array
+      userPoolParams.forEach((single) => {
+        //GET THE VALUE OF TOKEN USED
+        let stakedTokenValue = 0;
+        let stakedTokenValueInUsd = 0;
 
-          theUser.map((single) => {
-            stakedTokenValue += single.amount;
-            stakedTokenValueInUsd += single.priceInUsd;
-          });
-          newPoolData.push({
-            _id: single._id,
-            poolName: single.poolName,
-            poolStatus: single.poolStatus,
-            poolTrustee: single.poolTrustee,
-            poolImageUrl: single.poolImageUrl,
-            poolIntro: single.poolIntro,
-            poolTarget: single.poolTarget,
-            poolCurrency: single.poolCurrency,
-            createdAt: single.createdAt,
-            endDate: single.endDate,
-            participants: single.participants.length,
-            stakedTokenValueInUsd: stakedTokenValueInUsd.toFixed(2),
-            poolProfit: single.poolProfit,
-            stakedTokenValue: stakedTokenValue.toFixed(8),
-            totalPoolReward: Number(
-              (single.poolProfit / 100) * stakedTokenValue
-            ).toFixed(8),
-            totalStakedToken: single.totalStakedToken,
-            totalCommitment: single.totalCommitment,
-          });
+        //GET THE TOTAL STAKED AND COMMITMENT OF TOKEN USED
+        // const total = single;
+        const theUser = single.participants.filter(
+          (user) => user.userEmail === req.user.email
+        );
+
+        theUser.map((single) => {
+          stakedTokenValue += single.amount;
+          stakedTokenValueInUsd += single.priceInUsd;
         });
-        res.json({
-          success: true,
-          msg: "Pool Data available ",
-          data: newPoolData,
+        //destructure the user pool data
+        userPoolData.push({
+          _id: single._id,
+          poolName: single.poolName,
+          poolStatus: single.poolStatus,
+          poolTrustee: single.poolTrustee,
+          poolImageUrl: single.poolImageUrl,
+          poolIntro: single.poolIntro,
+          poolTarget: single.poolTarget,
+          poolCurrency: single.poolCurrency,
+          createdAt: single.createdAt,
+          endDate: single.endDate,
+          participants: single.participants.length,
+          stakedTokenValueInUsd: stakedTokenValueInUsd.toFixed(2),
+          poolProfit: single.poolProfit,
+          stakedTokenValue: stakedTokenValue.toFixed(8),
+          totalPoolReward: Number(
+            (single.poolProfit / 100) * stakedTokenValue
+          ).toFixed(8),
+          totalStakedToken: single.totalStakedToken,
+          totalCommitment: single.totalCommitment,
         });
-      }
+      });
+      //combine arrays without modification
+      let newPoolData = userPoolData.concat(allPoolData);
+      // modify pool data and remove duplicates
+      const result = newPoolData.reduce((finalArray, current) => {
+        let obj = finalArray.find((item) => item.poolName === current.poolName);
+        if (obj) {
+          return finalArray;
+        }
+        return finalArray.concat([current]);
+      }, []);
+      res.json({
+        success: true,
+        msg: "Pool Data available ",
+        data: result,
+      });
     } catch (e) {
       res.status(500).send({
         success: false,
