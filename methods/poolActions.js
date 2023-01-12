@@ -8,8 +8,8 @@ var functions = {
     try {
       //CALCULATING THE END DATE
       const closingDate = Date.now() + 86400000 * Number(req.body.poolDuration);
-      //convert to date format
-      var endDate = new Date(closingDate * 1000);
+      // //convert to date format
+      // var endDate = new Date(closingDate * 1000);
       const newPoolParams = {
         poolName: req.body.poolName,
         poolImageUrl: req.body.poolImageUrl,
@@ -28,7 +28,7 @@ var functions = {
         poolExpectedIncome: req.body.poolExpectedIncome,
         poolProfit: req.body.poolProfit,
         participants: [],
-        endDate,
+        endDate: closingDate,
       };
       new Pool(newPoolParams).save().then(() =>
         res.json({
@@ -116,7 +116,7 @@ var functions = {
           ) {
             res.status(401).send({
               success: false,
-              msg: `Minimum amount $${poolParams.poolMinAmountInUsd} is and maximum amount is $${poolParams.poolMaxAmountInUsd}  `,
+              msg: `Minimum amount is $${poolParams.poolMinAmountInUsd} and maximum amount is $${poolParams.poolMaxAmountInUsd}  `,
             });
           } else {
             const formData = {
@@ -151,12 +151,6 @@ var functions = {
                     const addParticipant = await Pool.updateOne(
                       { _id: req.params.id },
                       {
-                        $inc: {
-                          totalStakedToken: amountInNumber,
-                          totalCommitment: Number(tokenPriceInUsd),
-                        },
-                      },
-                      {
                         $push: {
                           participants: {
                             userEmail: req.user.email,
@@ -170,26 +164,38 @@ var functions = {
                           },
                         },
                       }
-                    ).then(() => {
-                      //POST TRX HISTORY WITH THE USER DATA IN DB
-                      const newTinqfiTrxn = {
-                        userEmail: req.user.email,
-                        userTaTumId: req.user.ourCustomerTatumId,
-                        transactionAmount: Number(amount),
-                        transactionToken: token,
-                        transactionType: "Pool",
-                        from: senderTokenAccountId,
-                        tenure: `${poolParams.poolName} pool `,
-                        to: "Tinqfi Pool Account",
-                        trxnRefId: referenceId,
-                        debit: true,
-                      };
-                      new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
-                        res.json({
-                          success: true,
-                          msg: "Subscription Successful",
-                        })
-                      );
+                    ).then(async () => {
+                      //INCREMENT
+                      //ADD THE PARTICIPANT
+                      const addParticipant = await Pool.updateOne(
+                        { _id: req.params.id },
+                        {
+                          $inc: {
+                            totalStakedToken: amountInNumber,
+                            totalCommitment: Number(tokenPriceInUsd),
+                          },
+                        }
+                      ).then(() => {
+                        //POST TRX HISTORY WITH THE USER DATA IN DB
+                        const newTinqfiTrxn = {
+                          userEmail: req.user.email,
+                          userTaTumId: req.user.ourCustomerTatumId,
+                          transactionAmount: Number(amount),
+                          transactionToken: token,
+                          transactionType: "Pool",
+                          from: senderTokenAccountId,
+                          tenure: `${poolParams.poolName} pool `,
+                          to: "Tinqfi Pool Account",
+                          trxnRefId: referenceId,
+                          debit: true,
+                        };
+                        new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
+                          res.json({
+                            success: true,
+                            msg: "Subscription Successful",
+                          })
+                        );
+                      });
                     });
                   } else
                     res.status(401).send({
@@ -233,9 +239,7 @@ var functions = {
         "participants.userEmail": req.user.email,
       }).sort({ createdAt: -1 });
       if (poolParams.length < 1) {
-        const poolInactiveParams = await Pool.find({
-          poolStatus: "Completed",
-        }).sort({ createdAt: -1 });
+        const poolInactiveParams = await Pool.find().sort({ createdAt: -1 });
         let newPoolData = [];
         poolInactiveParams.forEach((single) => {
           newPoolData.push({

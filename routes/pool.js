@@ -7,5 +7,6 @@ router.post("/api/v1/pool/add_pool", poolActions.addPool);
 router.get("/api/v1/pool/explore_pool", verify, poolActions.explorePool);
 router.get("/api/v1/pool/get_pool", verify, poolActions.getAllUserPool);
 router.post("/api/v1/pool/subscribe/:id", verify, poolActions.subscribeToPool);
+// router.post("/api/v1/pool/demo", verify, poolActions.pushDemo);
 
 module.exports = router;
