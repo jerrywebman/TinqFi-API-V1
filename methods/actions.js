@@ -242,6 +242,7 @@ var functions = {
       const userEmailAddress = req.body.email;
       const lowerCaseEmail = userEmailAddress.toLowerCase();
       let nickname = req.body.nickname;
+      let referredBy = req.body.referredBy || " ";
       let password = req.body.password;
       let confirmPassword = req.body.confirmPassword;
       //CHECKING IF USER HAS AN ACCOUNT WITH US AND EMAIL VERIFIED
@@ -302,6 +303,7 @@ var functions = {
                         {
                           $set: {
                             nickname,
+                            referredBy,
                             password: hash,
                             accountSetup: true,
                           },
@@ -317,6 +319,7 @@ var functions = {
                             const newMoney = {
                               _id: lowerCaseEmail,
                               userEmail: lowerCaseEmail,
+                              referredBy,
                               nickname,
                               investmentBalance: 0,
                               loanBalance: 0,

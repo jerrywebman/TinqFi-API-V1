@@ -22,6 +22,12 @@ var userSchema = new mongoose.Schema({
     min: 6,
     max: 6,
   },
+  referredBy: {
+    type: String,
+    // require: true,
+    min: 6,
+    max: 6,
+  },
   fullname: {
     type: String,
     // require: true,
