@@ -624,27 +624,33 @@ var functions = {
     try {
       const defaultEmail = req.user.email;
       const defaultPin = req.body.pin;
+      const defaultVerifyPin = req.body.verifyPin;
       const lowerCaseEmail = defaultEmail.toLowerCase();
 
       let userEmail = await User.findOne({ email: lowerCaseEmail });
       const theEmail = lowerCaseEmail;
       if (!userEmail) {
-        return res.status(401).send({
+        res.status(401).send({
           success: false,
           msg: "Please login to access this route!",
         });
       } else if (defaultPin == undefined) {
-        return res.status(401).send({
+        res.status(401).send({
           success: false,
           msg: "Please enter a 4 digit pin!",
         });
+      } else if (defaultPin !== defaultVerifyPin) {
+        res.status(401).send({
+          success: false,
+          msg: "Pin must match",
+        });
       } else if (Number(defaultPin.length) > 4) {
-        return res.status(400).send({
+        res.status(400).send({
           success: false,
           msg: "Pin is greater than 4 digits",
         });
       } else if (Number(defaultPin.length) < 4) {
-        return res.status(400).send({
+        res.status(400).send({
           success: false,
           msg: "Pin is less than 4 digits",
         });

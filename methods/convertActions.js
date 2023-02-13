@@ -48,7 +48,7 @@ var functions = {
 
           //stop the transaction if its too high
           if (toValueInDollar > fromValueInDollar) {
-            res.status(503).send({
+            res.status($03).send({
               success: false,
               msg: "Cannot complete transaction, price impact error",
             });
@@ -204,28 +204,28 @@ var functions = {
                               });
                             });
                           } else {
-                            res.status(503).send({
+                            res.status(403).send({
                               success: false,
                               msg: "Transaction failed, insufficient balance",
                             });
                           }
                         });
                       } catch (e) {
-                        res.status(503).send({
+                        res.status(403).send({
                           success: false,
                           msg: "Transaction failed, insufficient balance from converter",
                         });
                       }
                     });
                   } else {
-                    res.status(503).send({
+                    res.status(403).send({
                       success: false,
                       msg: "Transaction failed, insufficient balance",
                     });
                   }
                 });
               } catch (error) {
-                res.status(503).send({
+                res.status(400).send({
                   success: false,
                   msg: "Cannot complete transaction, price impact error",
                 });
