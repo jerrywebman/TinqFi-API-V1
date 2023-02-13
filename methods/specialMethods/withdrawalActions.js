@@ -17,7 +17,7 @@ var functions = {
       );
       const senderBtcAccountIdFromDb = searchIndex.tokenAccountId;
 
-      if (process.env.BTC_STOP_WITHDRAWAL === "true") {
+      if (process.env.BTC_STOP_WITHDRAWAL === true) {
         res.status(503).send({
           success: false,
           msg: "Bitcoin withdrawal is paused, maintenance ongoing",
@@ -122,7 +122,7 @@ var functions = {
       );
       const senderEthAccountIdFromDb = searchIndex.tokenAccountId;
 
-      if (process.env.ETH_STOP_WITHDRAWAL === "true") {
+      if (process.env.ETH_STOP_WITHDRAWAL === true) {
         res.status(503).send({
           success: false,
           msg: "Ethereum withdrawal is paused, maintenance ongoing",
@@ -226,7 +226,7 @@ var functions = {
       );
       const senderBscAccountIdFromDb = searchIndex.tokenAccountId;
 
-      if (process.env.BSC_STOP_WITHDRAWAL === "true") {
+      if (process.env.BSC_STOP_WITHDRAWAL === true) {
         res.status(503).send({
           success: false,
           msg: "Binance Smart Chain withdrawal is paused, maintenance ongoing",
@@ -330,7 +330,7 @@ var functions = {
       );
       const senderDogeAccountIdFromDb = searchIndex.tokenAccountId;
 
-      if (process.env.DOGE_STOP_WITHDRAWAL === "true") {
+      if (process.env.DOGE_STOP_WITHDRAWAL === true) {
         res.status(503).send({
           success: false,
           msg: "Dogecoin withdrawal is paused, maintenance ongoing",

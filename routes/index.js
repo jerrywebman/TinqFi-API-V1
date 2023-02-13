@@ -56,6 +56,9 @@ router.post("/api/v1/recover_account", actions.recoverAccount);
 //@desc completes the user account recover **
 router.post("/api/v1/complete_recovery", actions.updatePassword);
 
+//@desc updates the user pin **
+router.post("/api/v1/update_pin", verify, actions.updatePin);
+
 //** ACCOUNT SECTION DONE */
 
 //@desc get a User Information **

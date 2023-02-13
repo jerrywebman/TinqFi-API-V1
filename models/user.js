@@ -19,8 +19,8 @@ var userSchema = new mongoose.Schema({
   pin: {
     type: String,
     // require: true,
-    min: 6,
-    max: 6,
+    min: 4,
+    max: 4,
   },
   referredBy: {
     type: String,

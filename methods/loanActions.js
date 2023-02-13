@@ -77,8 +77,7 @@ var functions = {
       let borrowedLoanToken = borrowedToken.toUpperCase();
       let collateralLoanToken = collateralToken.toUpperCase();
       //GETTING DATA FROM COINGECKO
-      const geckoUrl =
-        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&vs_currencies=usd";
+      const geckoUrl = process.env.PRICE_API;
       const options = {
         method: "GET",
         url: geckoUrl,

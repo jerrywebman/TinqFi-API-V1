@@ -123,7 +123,7 @@ var functions = {
       if (!lowerCaseEmail) {
         res.status(400).send({ success: false, msg: "No Email Provided" });
       } else if (userEmail) {
-        return res.status(400).send({
+        res.status(400).send({
           success: false,
           msg: "a user with this email address already exists!",
         });
@@ -633,15 +633,20 @@ var functions = {
           success: false,
           msg: "Please login to access this route!",
         });
-      } else if (Number(defaultPin.length) > 6) {
-        return res.status(400).send({
+      } else if (defaultPin == undefined) {
+        return res.status(401).send({
           success: false,
-          msg: "Pin is greater than 6 digits",
+          msg: "Please enter a 4 digit pin!",
         });
-      } else if (Number(defaultPin.length) < 6) {
+      } else if (Number(defaultPin.length) > 4) {
         return res.status(400).send({
           success: false,
-          msg: "Pin is less than 6 digits",
+          msg: "Pin is greater than 4 digits",
+        });
+      } else if (Number(defaultPin.length) < 4) {
+        return res.status(400).send({
+          success: false,
+          msg: "Pin is less than 4 digits",
         });
       } else {
         //encrypt the pin and save
@@ -673,7 +678,7 @@ var functions = {
     } catch (e) {
       res.status(503).send({
         success: false,
-        msg: `A server error occurred while processing the next steps, Error: ${e}`,
+        msg: `A server error occurred while setting your pin, Error: ${e}`,
       });
     }
   },
