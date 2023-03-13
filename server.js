@@ -102,6 +102,7 @@ const faq = require("./routes/faq");
 const pool = require("./routes/pool");
 const response = require("./routes/response");
 const convert = require("./routes/convert");
+const biometrics = require("./routes/biometrics");
 
 app.use(routes);
 app.use(wallet);
@@ -116,6 +117,7 @@ app.use(pool);
 app.use(faq);
 app.use(response);
 app.use(convert);
+app.use(biometrics);
 
 const PORT = process.env.PORT || 3000;
 
