@@ -1,10 +1,9 @@
 var mongoose = require("mongoose");
-var schema = mongoose.Schema;
 var bcrypt = require("bcrypt");
 var userSchema = new mongoose.Schema({
   email: {
     type: String,
-    require: true,
+    required: true,
     match: /.+\@.+\..+/,
     unique: true,
     min: 6,
@@ -83,7 +82,7 @@ var userSchema = new mongoose.Schema({
   },
   verifyCode: {
     type: String,
-    require: true,
+    required: true,
   },
   emailVerified: {
     type: Boolean,
@@ -114,31 +113,9 @@ var userSchema = new mongoose.Schema({
     default: Date.now,
   },
   lastLoginAt: {
-    type: String,
-    require: true,
+    type: String
   },
 });
-
-//encrypt password
-// userSchema.pre("save", function (next) {
-//   var user = this;
-//   if (this.isModified("password") || this.isNew) {
-//     bcrypt.genSalt(10, function (err, salt) {
-//       if (err) {
-//         return next(err);
-//       }
-//       bcrypt.hash(user.password, salt, function (err, hash) {
-//         if (err) {
-//           return next(err);
-//         }
-//         user.password = hash;
-//         next();
-//       });
-//     });
-//   } else {
-//     return next();
-//   }
-// });
 
 //authenticate
 userSchema.methods.comparePassword = function (passw, cb) {
@@ -152,6 +129,16 @@ userSchema.methods.comparePassword = function (passw, cb) {
 //verifyEmail
 userSchema.methods.compareCode = function (code, cb) {
   bcrypt.compare(code, this.verifyCode, function (err, isMatch) {
+    if (err) {
+      return cb(err);
+    }
+    cb(null, isMatch);
+  });
+};
+
+//compare Pin
+userSchema.methods.comparePin = function (trxnPin, cb) {
+  bcrypt.compare(trxnPin, this.pin, function (err, isMatch) {
     if (err) {
       return cb(err);
     }

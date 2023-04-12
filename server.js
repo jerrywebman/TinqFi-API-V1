@@ -103,6 +103,8 @@ const pool = require("./routes/pool");
 const response = require("./routes/response");
 const convert = require("./routes/convert");
 const biometrics = require("./routes/biometrics");
+const adverts = require("./routes/adverts");
+const referral = require("./routes/referral");
 
 app.use(routes);
 app.use(wallet);
@@ -118,8 +120,10 @@ app.use(faq);
 app.use(response);
 app.use(convert);
 app.use(biometrics);
+app.use(adverts);
+app.use(referral);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 app.listen(
   PORT,

@@ -1,5 +1,8 @@
 var TinqfiTrxn = require("../../models/Transaction");
 const axios = require("axios");
+var Otp = require("../../models/Otp");
+var bcrypt = require("bcrypt");
+var User = require("../../models/user");
 
 var functions = {
   //BITCOIN WITHDRAWAL
@@ -418,6 +421,124 @@ var functions = {
         success: false,
         msg: "Server unavailable",
       });
+    }
+  },
+
+  //SEND OTP
+  sendOtp: async function (req, res) {
+    try {
+      const generatedOTP = generateOTP();
+      const userInfo = await OTP.findOne({ userEmail: req.user.email });
+      //hashing the otp
+      bcrypt.genSalt(10, function (err, salt) {
+        if (err) {
+          return next(err);
+        }
+        bcrypt.hash(generatedOTP, salt, async function (err, hash) {
+          if (err) {
+            return next(err);
+          }
+          else {
+            //if a document exist, just update it
+            if (userInfo) {
+              const updatedOTP = await OTP.updateOne(
+                { userEmail: req.user.email },
+                {
+                  $set: {
+                    verifyCode: hash,
+                    createdAt: Date.now()
+                  },
+                }
+              ).then(() => {
+                emailTemplate.verifyWithdrawal(generatedOTP, req.user.email);
+                res.json({
+                  success: true,
+                  msg: "Please check your email address for the OTP",
+                });
+              });
+
+            } else {
+              const newOTP = OTP({
+                userEmail: req.user.email,
+                verifyCode: generatedOTP,
+              })
+
+              newOTP.save(function (err, data) {
+                if (err) {
+                  res.status(401).send({
+                    success: false,
+                    msg: `error occurred ${err}`
+                  })
+                } else {
+                  emailTemplate.verifyWithdrawal(generatedOTP, req.user.email);
+                  res.json({
+                    success: true,
+                    msg: "Please check your email address for the OTP",
+                  });
+                }
+              })
+            }
+          }
+        });
+      });
+    } catch (e) {
+      res.status(500).send({
+        success: false,
+        msg: `server unavailable ${e.message}`
+      })
+    }
+  },
+
+  //COMPLETE WITHDRAWAL
+  completeWithdrawal: async function (req, res) {
+    try {
+      const code = req.body.code;
+      const pin = req.body.pin;
+      let userOtp = await Otp.find({ userEmail: req.user.email });
+      let user = await User.findOne({ email: req.user.email });
+      const timeDiff = userOtp.createdAt - Date.now();
+      //600 is 10 minutes in seconds
+      if (userOtp && timeDiff < 600) {
+        //compareCode is a method in the otp model
+        userOtp.compareCode(code, function (err, isMatch) {
+          //COMPARING THE OTP
+          if (isMatch && !err) {
+            //COMPARING THE USER PIN
+            user.comparePin(pin, function (err, isOk) {
+              //COMPARING THE PIN
+              if (isOk && !err) {
+                //delete the OTP document and send a true status message
+                const deletedOTP = Otp.deleteOne({ userEmail: req.user.email }).then(() => res.send({
+                  success: true,
+                  msg: "OTP and pin verified successfully"
+                }))
+              } else {
+                return res.status(401).send({
+                  success: false,
+                  msg: "Something went wrong, Please try again or request a new OTP",
+                });
+              }
+            });
+
+          } else {
+            return res.status(401).send({
+              success: false,
+              msg: "Something went wrong, Please try again or request a new OTP",
+            });
+          }
+        });
+      }
+      else {
+        res.status(401).send({
+          sucess: false,
+          msg: "Something went wrong, Please try again or request a new OTP"
+        })
+      }
+    } catch (e) {
+      res.status(500).send({
+        success: false,
+        msg: `Server error: ${e.message}`
+      })
     }
   },
 };

@@ -48,7 +48,7 @@ var functions = {
 
           //stop the transaction if its too high
           if (toValueInDollar > fromValueInDollar) {
-            res.status($03).send({
+            res.status(403).send({
               success: false,
               msg: "Cannot complete transaction, price impact error",
             });
@@ -122,11 +122,9 @@ var functions = {
                         userEmail: req.user.email,
                         userTaTumId: req.user.ourCustomerTatumId,
                         transactionAmount: fromValue,
-                        transactionToken: `Converted - ${
-                          fromValue + " " + fromUppercaseToken
-                        } at ${priceData[fromUppercaseToken]}- to - ${
-                          toValueAfterFee + " " + toUppercaseToken
-                        } at ${priceData[toUppercaseToken]}`,
+                        transactionToken: `Converted - ${fromValue + " " + fromUppercaseToken
+                          } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
+                          } at ${priceData[toUppercaseToken]}`,
                         transactionType: "Convert",
                         tenure: "Instant",
                         from: fromTokenId,
@@ -142,7 +140,7 @@ var functions = {
                         recipientAccountId: toTokenId,
                         senderAccountId:
                           process.env[
-                            "TINQFI_LOAN_ACCOUNT_" + toUppercaseToken
+                          "TINQFI_LOAN_ACCOUNT_" + toUppercaseToken
                           ],
                         amount: String(toValueAfterFee),
                         anonymous: false,
@@ -181,11 +179,9 @@ var functions = {
                                 userEmail: req.user.email,
                                 userTaTumId: req.user.ourCustomerTatumId,
                                 transactionAmount: toValueAfterFee,
-                                transactionToken: `Converted - ${
-                                  fromValue + " " + fromUppercaseToken
-                                } at ${priceData[fromUppercaseToken]}- to - ${
-                                  toValueAfterFee + " " + toUppercaseToken
-                                } at ${priceData[toUppercaseToken]}`,
+                                transactionToken: `Converted - ${fromValue + " " + fromUppercaseToken
+                                  } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
+                                  } at ${priceData[toUppercaseToken]}`,
                                 transactionType: "Convert",
                                 tenure: "Instant",
                                 from: "From Tinqfi",

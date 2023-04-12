@@ -10,6 +10,6 @@ router.post(
   verify,
   biometricsActions.activateAccount
 );
-router.post("/api/v1/biometrics/verify", biometricsActions.verifyAccount);
+router.get("/api/v1/biometrics/verify", verify, biometricsActions.verifyAccount);
 
 module.exports = router;

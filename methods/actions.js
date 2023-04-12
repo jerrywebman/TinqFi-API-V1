@@ -84,7 +84,7 @@ var functions = {
               return next(err);
             }
 
-            //CREATING THE NEW USER
+            //UPDATING THE USER OTP
             const updatedOTP = await User.updateOne(
               { email: lowerCaseEmail },
               {
@@ -620,36 +620,30 @@ var functions = {
   },
 
   //***UPDATE USER PIN***
-  updatePin: async function (req, res) {
+  updatePin: function (req, res) {
     try {
       const defaultEmail = req.user.email;
       const defaultPin = req.body.pin;
       const defaultVerifyPin = req.body.verifyPin;
       const lowerCaseEmail = defaultEmail.toLowerCase();
-
-      let userEmail = await User.findOne({ email: lowerCaseEmail });
       const theEmail = lowerCaseEmail;
-      if (!userEmail) {
-        res.status(401).send({
-          success: false,
-          msg: "Please login to access this route!",
-        });
-      } else if (defaultPin == undefined) {
+      if (defaultPin === null && defaultVerifyPin === undefined) {
         res.status(401).send({
           success: false,
           msg: "Please enter a 4 digit pin!",
         });
-      } else if (defaultPin !== defaultVerifyPin) {
+      }
+      else if (defaultPin !== defaultVerifyPin) {
         res.status(401).send({
           success: false,
           msg: "Pin must match",
         });
-      } else if (Number(defaultPin.length) > 4) {
+      } else if (defaultPin.length > 4 || defaultVerifyPin.length > 4) {
         res.status(400).send({
           success: false,
           msg: "Pin is greater than 4 digits",
         });
-      } else if (Number(defaultPin.length) < 4) {
+      } else if (defaultPin.length < 4 || defaultVerifyPin.length < 4) {
         res.status(400).send({
           success: false,
           msg: "Pin is less than 4 digits",

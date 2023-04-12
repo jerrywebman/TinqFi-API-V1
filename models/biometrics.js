@@ -20,6 +20,7 @@ var biometricsSchema = new mongoose.Schema({
     unique: true,
     min: 2,
     max: 255,
+    required: true,
   },
   deviceName: {
     type: String,

@@ -7,36 +7,37 @@ var functions = {
   // CREATE A BIOMETRICS PROFILE
   activateAccount: async function (req, res) {
     try {
-      let userExist = await Biometrics.findOne({ email: req.user.email });
       if (
         !req.body.modelNumber ||
-        !req.body.deviceName ||
-        !req.body.biometricsId
+        !req.body.deviceName
       ) {
         res.status(403).send({
           success: false,
-          msg: "Please provide the device name, bio id and model number",
-        });
-      } else if (userExist) {
-        res.status(400).send({
-          success: false,
-          msg: "you have already created a biometrics profile",
+          msg: "Please provide the device name and model number",
         });
       } else {
         const newBioData = {
           email: req.user.email,
-          biometricsId: req.body.biometricsId,
           modelNumber: req.body.modelNumber,
           deviceName: req.body.deviceName,
         };
         new Biometrics(newBioData)
           .save()
-          .then(() =>
-            res.json({
-              success: true,
-              msg: "Biometrics authentication successful",
-            })
-          )
+          .then(async (result) => {
+            await Biometrics.updateOne(
+              { email: req.user.email },
+              {
+                $set: {
+                  biometricsId: result._id,
+                },
+              }
+            ).then(() =>
+              res.json({
+                success: true,
+                msg: "Biometrics Activation successful",
+              })
+            )
+          })
           .catch((err) =>
             res.status(403).send({
               success: false,
@@ -55,14 +56,14 @@ var functions = {
   //VERIFY THE USER WITH JWT
   verifyAccount: async function (req, res) {
     try {
-      if (!req.body.biometricsId || !req.body.modelNumber) {
+      if (!req.body.deviceName || !req.body.modelNumber) {
         res.status(403).send({
           success: false,
-          msg: "Please provide the bioId and modelNumber",
+          msg: "Please provide the deviceName and modelNumber",
         });
       }
       const userBiometrics = await Biometrics.findOne({
-        biometricsId: req.body.biometricsId,
+        deviceName: req.body.deviceName,
         modelNumber: req.body.modelNumber,
       });
 
@@ -72,7 +73,7 @@ var functions = {
           msg: "No user found for this device",
         });
       } else if (
-        userBiometrics.biometricsId !== req.body.biometricsId ||
+        userBiometrics.deviceName !== req.body.deviceName ||
         userBiometrics.modelNumber !== req.body.modelNumber
       ) {
         res.status(401).send({
@@ -82,31 +83,33 @@ var functions = {
       } else {
         //PASS THE USER TOKEN TO CHECK
         const pass = async () => {
-          const user = await User.findOne({ email: userBiometrics.email });
+          const user = await User.findOne({ email: req.user.email });
           if (user.email !== userBiometrics.email) {
             res.status(401).send({
               success: false,
               msg: "you cannot login using this device, please login with email and password first.",
             });
           } else {
-            const payload = {
-              sub: user._id,
-              user: user,
-              iat: Date.now(),
-            };
-
-            var token = jwt.sign(payload, process.env.TOKEN_SECRET, {
-              expiresIn: "5d",
-            });
-            res.json({
+            res.send({
               success: true,
-              user: user,
-              token: "Bearer " + token,
+              msg: "Biometrics authentication successful",
             });
-
-            // Set data to Redis
-            await client.set(user.email, token);
-            await client.expire(user.email, 86400);
+            // const payload = {
+            //   sub: user._id,
+            //   user: user,
+            //   iat: Date.now(),
+            // };
+            // var token = jwt.sign(payload, process.env.TOKEN_SECRET, {
+            //   expiresIn: "5d",
+            // });
+            // res.json({
+            //   success: true,
+            //   user: user,
+            //   token: "Bearer " + token,
+            // });
+            // // Set data to Redis
+            // await client.set(user.email, token);
+            // await client.expire(user.email, 86400);
           }
         };
         //run the function

@@ -31,4 +31,18 @@ router.post(
   withdrawalActions.withdrawBsc
 );
 
+// SEND A WITHDRAWAL OTP
+router.get(
+  "/api/v1/withdrawal/otp",
+  verify,
+  withdrawalActions.sendOtp
+);
+
+// VERIFY A WITHDRAWAL REQUEST
+router.post(
+  "/api/v1/withdrawal/confirm",
+  verify,
+  withdrawalActions.completeWithdrawal
+);
+
 module.exports = router;

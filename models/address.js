@@ -3,7 +3,7 @@ var mongoose = require("mongoose");
 var addressSchema = new mongoose.Schema({
   userEmail: {
     type: String,
-    require: true,
+    required: true,
     unique: true,
     match: /.+\@.+\..+/,
     min: 6,
@@ -11,7 +11,7 @@ var addressSchema = new mongoose.Schema({
   },
   nickname: {
     type: String,
-    require: true,
+    required: true,
     min: 2,
     max: 255,
   },
@@ -27,12 +27,12 @@ var addressSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    require: true,
+    required: true,
     default: Date.now,
   },
   lastUpdated: {
     type: Date,
-    require: true,
+    required: true,
   },
 });
 

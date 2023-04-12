@@ -4,11 +4,11 @@ var schema = mongoose.Schema;
 var moneySchema = new mongoose.Schema({
   _id: {
     type: String,
-    require: true,
+    required: true,
   },
   userEmail: {
     type: String,
-    require: true,
+    required: true,
     match: /.+\@.+\..+/,
     unique: true,
   },
