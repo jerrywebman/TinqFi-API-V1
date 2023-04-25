@@ -29,4 +29,4 @@ otpSchema.methods.compareCode = function (code, cb) {
     });
 };
 
-exports.default = mongoose.model("Otp", otpSchema)
+module.exports = mongoose.model("otp", otpSchema)

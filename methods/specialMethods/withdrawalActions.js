@@ -3,6 +3,8 @@ const axios = require("axios");
 var Otp = require("../../models/Otp");
 var bcrypt = require("bcrypt");
 var User = require("../../models/user");
+const generateOTP = require("../../middleware/generateOTP");
+const emailTemplate = require("../../middleware/emailTemplate");
 
 var functions = {
   //BITCOIN WITHDRAWAL
@@ -428,7 +430,7 @@ var functions = {
   sendOtp: async function (req, res) {
     try {
       const generatedOTP = generateOTP();
-      const userInfo = await OTP.findOne({ userEmail: req.user.email });
+      const userInfo = await Otp.findOne({ userEmail: req.user.email });
       //hashing the otp
       bcrypt.genSalt(10, function (err, salt) {
         if (err) {
@@ -441,7 +443,7 @@ var functions = {
           else {
             //if a document exist, just update it
             if (userInfo) {
-              const updatedOTP = await OTP.updateOne(
+              const updatedOTP = await Otp.updateOne(
                 { userEmail: req.user.email },
                 {
                   $set: {
@@ -458,7 +460,7 @@ var functions = {
               });
 
             } else {
-              const newOTP = OTP({
+              const newOTP = Otp({
                 userEmail: req.user.email,
                 verifyCode: generatedOTP,
               })
