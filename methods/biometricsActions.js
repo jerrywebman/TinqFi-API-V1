@@ -7,7 +7,14 @@ var functions = {
   // CREATE A BIOMETRICS PROFILE
   activateAccount: async function (req, res) {
     try {
-      if (
+      const biodataActive = await Biometrics.findOne({ email: req.user.email })
+      if (biodataActive !== null) {
+        res.status(401).send({
+          success: false,
+          msg: "This user has already activated biometics on another device.",
+        });
+      }
+      else if (
         !req.body.modelNumber ||
         !req.body.deviceName
       ) {

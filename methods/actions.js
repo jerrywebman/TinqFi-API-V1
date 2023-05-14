@@ -149,7 +149,7 @@ var functions = {
               dateOfBirth: "",
               ourCustomerTatumId: lowerCaseEmail,
               onRegistrationLedgerAccnts: [],
-              pin: "",
+              pin: null,
               verifyCode: hash,
               email: lowerCaseEmail,
               password: null,
