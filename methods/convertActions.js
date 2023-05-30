@@ -242,6 +242,80 @@ var functions = {
       });
     }
   },
+
+  //GET THE DATA TO SHOW TO THE USER
+  getConvert: async function (req, res) {
+    try {
+      //get the required parameters
+      const fromToken = req.body.fromToken;
+      const toToken = req.body.toToken;
+      const fromValue = req.body.fromValue;
+      //CONVERT THE TOKENS TO UPPERCASE
+      let fromUppercaseToken = fromToken.toUpperCase();
+      let toUppercaseToken = toToken.toUpperCase();
+      //get the token price from coingecko
+      const geckoUrl = process.env.PRICE_API;
+      const options = {
+        method: "GET",
+        url: geckoUrl,
+      };
+      //do something with the response object from coinGecko
+      axios(options).then(async (geckoResponse) => {
+        if (geckoResponse) {
+          const responseFromGecko = await geckoResponse.data;
+          //rearrange the response object
+          const priceData = {
+            BTC: responseFromGecko.bitcoin.usd,
+            ETH: responseFromGecko.ethereum.usd,
+            BSC: responseFromGecko.binancecoin.usd,
+            DOGE: responseFromGecko.dogecoin.usd,
+          };
+          //DO THE DOLLAR CALCULATIONS HERE
+          const fromValueInDollar =
+            Number(priceData[fromUppercaseToken]) * Number(fromValue);
+          //fee to take
+          let trxnFee = (10 / 100) * Number(fromValueInDollar); //ten percent here
+          let trxnFeeInValue = (10 / 100) * Number(fromValue); //ten percent here
+          //value to send to user
+          //get the dollar value of the toValue
+          const toValueInDollar = fromValueInDollar;
+          const toValueBeforeFee =
+            toValueInDollar / Number(priceData[toUppercaseToken]);
+          const toValueInDollarAfterFee = toValueInDollar - trxnFee;
+          const toValueAfterFee =
+            toValueInDollarAfterFee / Number(priceData[toUppercaseToken]);
+
+          //Send the response to the user
+          res.status(200).send({
+            success: true,
+            msg: `Conversion Data Available`,
+            data: {
+              fromToken,
+              fromValue,
+              fromValueInDollar,
+              toToken,
+              toValueInDollar,
+              feeInDollar: trxnFee.toFixed(2),
+              feeInValue: trxnFeeInValue.toFixed(6),
+              toValueBeforeFee: toValueBeforeFee.toFixed(6),
+              toValueAfterFee: toValueAfterFee.toFixed(6),
+            }
+          });
+        }
+        else {
+          res.status(404).send({
+            success: false,
+            msg: "Error generating token price, please try again",
+          });
+        }
+      });
+    } catch (e) {
+      res.status(500).send({
+        success: false,
+        msg: "A server error occurred while processing your request",
+      });
+    }
+  },
 };
 
 module.exports = functions;
