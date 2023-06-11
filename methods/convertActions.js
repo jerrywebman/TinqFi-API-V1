@@ -3,15 +3,16 @@ const axios = require("axios");
 var TinqfiTrxn = require("../models/Transaction");
 
 var functions = {
+  //CONVERT THE TOKEN
   convert: async function (req, res) {
     try {
       //get the required parameters
       const userTokenArray = await req.user.onRegistrationLedgerAccnts;
       const userEmail = req.user.email;
       const userTatumId = req.user.ourCustomerTatumId;
-      const fromToken = req.body.fromToken;
-      const toToken = req.body.toToken;
-      const fromValue = req.body.fromValue;
+      const fromToken = req.query.fromToken;
+      const toToken = req.query.toToken;
+      const fromValue = req.query.fromValue;
       //CONVERT THE TOKENS TO UPPERCASE
       let fromUppercaseToken = fromToken.toUpperCase();
       let toUppercaseToken = toToken.toUpperCase();
@@ -93,139 +94,134 @@ var functions = {
                 recipientNote: "convert from user to tinqfi",
               };
               const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
-              try {
-                const options = {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": process.env.TATUM_API_KEY,
-                  },
-                  url,
-                  data: formUserData,
-                };
-                //DONE
-                axios(options).then((serverUserResponse) => {
-                  if (serverUserResponse.data.reference) {
-                    //update the db and post transaction
-                    const data = Convert.updateOne(
-                      {
-                        _id: createdData._id,
+              const options = {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "x-api-key": process.env.TATUM_API_KEY,
+                },
+                url,
+                data: formUserData,
+              };
+              //DONE
+              axios(options).then((serverUserResponse) => {
+                if (serverUserResponse.data.reference) {
+                  //update the db and post transaction
+                  const data = Convert.updateOne(
+                    {
+                      _id: createdData._id,
+                    },
+                    {
+                      $set: {
+                        toTinqFiAccount: true,
                       },
-                      {
-                        $set: {
-                          toTinqFiAccount: true,
-                        },
-                      }
-                    ).then(() => {
-                      //post transaction for the debit
-                      const newTinqfiTrxn = {
-                        userEmail: req.user.email,
-                        userTaTumId: req.user.ourCustomerTatumId,
-                        transactionAmount: fromValue,
-                        transactionToken: `Converted - ${fromValue + " " + fromUppercaseToken
-                          } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
-                          } at ${priceData[toUppercaseToken]}`,
-                        transactionType: "Convert",
-                        tenure: "Instant",
-                        from: fromTokenId,
-                        to: "To Tinqfi",
-                        debit: true,
-                        trxnRefId:
-                          serverUserResponse.data.reference + " - " + " ",
-                      };
-                      new TinqfiTrxn(newTinqfiTrxn).save();
-                      //here now
-                      //send from tinqfi to user after removing fees
-                      const formTinqfiData = {
-                        recipientAccountId: toTokenId,
-                        senderAccountId:
-                          process.env[
-                          "TINQFI_LOAN_ACCOUNT_" + toUppercaseToken
-                          ],
-                        amount: String(toValueAfterFee),
-                        anonymous: false,
-                        compliant: false,
-                        transactionCode: req.user.email,
-                        paymentId: req.user.ourCustomerTatumId,
-                        recipientNote: "convert from tinqfi to user ",
-                      };
-                      const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
-                      try {
-                        const options = {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            "x-api-key": process.env.TATUM_API_KEY,
+                    }
+                  ).then(() => {
+                    //post transaction for the debit
+                    const newTinqfiTrxn = {
+                      userEmail: req.user.email,
+                      userTaTumId: req.user.ourCustomerTatumId,
+                      transactionAmount: fromValue,
+                      transactionToken: `Converted - ${fromValue + " " + fromUppercaseToken
+                        } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
+                        } at ${priceData[toUppercaseToken]}`,
+                      transactionType: "Convert",
+                      tenure: "Instant",
+                      from: fromTokenId,
+                      to: "To Tinqfi",
+                      debit: true,
+                      trxnRefId:
+                        serverUserResponse.data.reference + " - " + " ",
+                    };
+                    new TinqfiTrxn(newTinqfiTrxn).save();
+                    //here now
+                    //send from tinqfi to user after removing fees
+                    const formTinqfiData = {
+                      recipientAccountId: toTokenId,
+                      senderAccountId:
+                        process.env[
+                        "TINQFI_LOAN_ACCOUNT_" + toUppercaseToken
+                        ],
+                      amount: String(toValueAfterFee),
+                      anonymous: false,
+                      compliant: false,
+                      transactionCode: req.user.email,
+                      paymentId: req.user.ourCustomerTatumId,
+                      recipientNote: "convert from tinqfi to user ",
+                    };
+                    const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
+                    const options = {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        "x-api-key": process.env.TATUM_API_KEY,
+                      },
+                      url,
+                      data: formTinqfiData,
+                    };
+                    //DONE
+                    axios(options).then((serverTinqfiResponse) => {
+                      if (serverTinqfiResponse.data.reference) {
+                        //update the db and post transaction
+                        const data = Convert.updateOne(
+                          {
+                            _id: createdData._id,
                           },
-                          url,
-                          data: formTinqfiData,
-                        };
-                        //DONE
-                        axios(options).then((serverTinqfiResponse) => {
-                          if (serverTinqfiResponse.data.reference) {
-                            //update the db and post transaction
-                            const data = Convert.updateOne(
-                              {
-                                _id: createdData._id,
-                              },
-                              {
-                                $set: {
-                                  toUserAccount: true,
-                                },
-                              }
-                            ).then(() => {
-                              //post transaction for the credit to user
-                              const newTinqfiTrxn = {
-                                userEmail: req.user.email,
-                                userTaTumId: req.user.ourCustomerTatumId,
-                                transactionAmount: toValueAfterFee,
-                                transactionToken: `Converted - ${fromValue + " " + fromUppercaseToken
-                                  } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
-                                  } at ${priceData[toUppercaseToken]}`,
-                                transactionType: "Convert",
-                                tenure: "Instant",
-                                from: "From Tinqfi",
-                                to: toTokenId,
-                                debit: false,
-                                trxnRefId:
-                                  serverUserResponse.data.reference +
-                                  " - " +
-                                  serverTinqfiResponse.data.reference,
-                              };
-                              new TinqfiTrxn(newTinqfiTrxn).save().then(() => {
-                                res.status(200).send({
-                                  success: true,
-                                  msg: `Conversion Successful, ${toUppercaseToken} transferred to your wallet`,
-                                });
-                              });
-                            });
-                          } else {
-                            res.status(403).send({
-                              success: false,
-                              msg: "Transaction failed, insufficient balance",
-                            });
+                          {
+                            $set: {
+                              toUserAccount: true,
+                            },
                           }
+                        ).then(() => {
+                          //post transaction for the credit to user
+                          const newTinqfiTrxn = {
+                            userEmail: req.user.email,
+                            userTaTumId: req.user.ourCustomerTatumId,
+                            transactionAmount: toValueAfterFee,
+                            transactionToken: `Converted - ${fromValue + " " + fromUppercaseToken
+                              } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
+                              } at ${priceData[toUppercaseToken]}`,
+                            transactionType: "Convert",
+                            tenure: "Instant",
+                            from: "From Tinqfi",
+                            to: toTokenId,
+                            debit: false,
+                            trxnRefId:
+                              serverUserResponse.data.reference +
+                              " - " +
+                              serverTinqfiResponse.data.reference,
+                          };
+                          new TinqfiTrxn(newTinqfiTrxn).save().then(() => {
+                            res.status(200).send({
+                              success: true,
+                              msg: `Conversion Successful, ${toUppercaseToken} transferred to your wallet`,
+                            });
+                          });
                         });
-                      } catch (e) {
+                      } else
                         res.status(403).send({
                           success: false,
-                          msg: "Transaction failed, insufficient balance from converter",
+                          msg: "Transaction failed, insufficient balance",
                         });
-                      }
-                    });
-                  } else {
-                    res.status(403).send({
+
+                    }).catch((e) => res.status(403).send({
                       success: false,
-                      msg: "Transaction failed, insufficient balance",
-                    });
-                  }
-                });
-              } catch (error) {
-                res.status(400).send({
-                  success: false,
-                  msg: "Cannot complete transaction, price impact error",
-                });
-              }
+                      msg: `Transaction failed, insufficient ${toUppercaseToken} balance from converter`,
+                    }))
+
+                  });
+                } else
+                  res.status(403).send({
+                    success: false,
+                    msg: "Transaction failed, insufficient balance",
+                  });
+
+              }).catch((e) => res.status(400).send({
+                success: false,
+                msg: `Insufficient ${fromUppercaseToken} balance, please topup your account`,
+              }))
+
+
             });
           }
         } else {
@@ -234,7 +230,10 @@ var functions = {
             msg: "Error generating token price, please try again",
           });
         }
-      });
+      }).catch(() => res.status(400).send({
+        success: false,
+        msg: "Error while generating token price, please try again",
+      }))
     } catch (e) {
       res.status(500).send({
         success: false,
@@ -247,9 +246,9 @@ var functions = {
   getConvert: async function (req, res) {
     try {
       //get the required parameters
-      const fromToken = req.body.fromToken;
-      const toToken = req.body.toToken;
-      const fromValue = req.body.fromValue;
+      const fromToken = req.query.fromToken;
+      const toToken = req.query.toToken;
+      const fromValue = req.query.fromValue;
       //CONVERT THE TOKENS TO UPPERCASE
       let fromUppercaseToken = fromToken.toUpperCase();
       let toUppercaseToken = toToken.toUpperCase();
@@ -308,7 +307,10 @@ var functions = {
             msg: "Error generating token price, please try again",
           });
         }
-      });
+      }).catch(() => res.status(400).send({
+        success: false,
+        msg: "Error generating token price",
+      }))
     } catch (e) {
       res.status(500).send({
         success: false,
