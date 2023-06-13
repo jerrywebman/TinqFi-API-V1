@@ -141,7 +141,6 @@ var functions = {
             var newUser = User({
               fullname: "",
               nickname: "",
-              phone: 00000000000,
               occupation: "",
               street: "",
               city: "",
