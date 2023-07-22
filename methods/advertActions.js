@@ -3,7 +3,7 @@
 var functions = {
     getAdvert: async function (req, res) {
         const pool = ["https://i.imgur.com/cdVHqjs.png", "https://i.imgur.com/yjyuEKM.png"]
-        const home = ["https://i.imgur.com/yjyuEKM.png", "https://i.imgur.com/LyuozYG.png"]
+        const home = ["https://i.imgur.com/lsswfBB.png", "https://i.imgur.com/LyuozYG.png"]
         try {
             res.send({
                 success: true,
