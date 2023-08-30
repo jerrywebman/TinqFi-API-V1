@@ -24,7 +24,7 @@ var earnSchema = new mongoose.Schema({
     require: true,
   },
   totalProfit: {
-    type: mongoose.Types.Decimal128,
+    type: Number,
     defaultValue: 0.00,
     required: true,
   },

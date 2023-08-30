@@ -270,7 +270,6 @@ var functions = {
                   tokenTicker: thePlan.tokenTicker,
                   tokenImg: thePlan.tokenImage,
                   plan: thePlan.plan,
-                  totalProfit: 0.00,
                   closingDateTimestamp: closingDate,
                   closingDate,
                 };
