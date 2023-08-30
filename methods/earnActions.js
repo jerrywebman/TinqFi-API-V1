@@ -349,31 +349,34 @@ var functions = {
       // console.log(order);
       //check the dates
       const today = new Date();
-      const endDate = order.closingDate;
+      const activatedDate = order.activatedDate;
       const todaysTimestamp = Date.parse(today);
-      const valueTimestamp = Date.parse(endDate) + 86400000;
+      const valueTimestamp = Date.parse(activatedDate) + 86400000;
+      //check the number of days 
+      const numberOfDays = (todaysTimestamp - valueTimestamp) / 86400000;
+      const isActive = (numberOfDays) > order.duration;
+
 
       //check if no order
       if (!order) {
-        res.status(404).send({ success: false, msg: "Earn Plan not found" });
+        res.status(404).send({ success: false, msg: "Earn plan not found" });
       }
       //check if its not the users order
       else if (order.userEmail !== req.user.email) {
         res.status(401).send({
           success: false,
-          msg: "User not allowed to execute this function",
+          msg: "Access Denied",
         });
       }
-
-      //check if its not the users order is inactive
+      //check if the users order is inactive
       else if (order.active === false) {
         res.status(401).send({
           success: false,
           msg: "Order is inactive or closed",
         });
       }
-      //check if its the time has elapsed
-      else if (valueTimestamp > todaysTimestamp) {
+      //check if the time has elapsed
+      else if (!isActive) {
         res.status(403).send({
           success: false,
           msg: "Plan is still active",
@@ -383,11 +386,11 @@ var functions = {
       else if (order.plan !== "FIXED") {
         res.status(401).send({
           success: false,
-          msg: "User not allowed to execute this function",
+          msg: "Access Denied",
         });
       } else {
         //get the total profit
-        const totalProfit = Number(order.totalProfit);
+        const totalProfit = Number(order.dailyProfit) * numberOfDays;
         try {
           //get the amount, daily profit + calculate the total days
           const totalEarnAmount = order.amount + totalProfit;
@@ -426,6 +429,8 @@ var functions = {
                     {
                       $set: {
                         active: false,
+                        duration: numberOfDays,
+                        closingDate: Date.now(),
                       },
                     }
                   ).then(() => {
@@ -439,7 +444,7 @@ var functions = {
                       from: process.env[
                         "TINQFI_EARN_ACCOUNT_" + order.tokenTicker
                       ],
-                      tenure: `Somedays on ${order.tokenTicker} Flexible plan`,
+                      tenure: `${numberOfDays} days on ${order.tokenTicker} Fixed plan`,
                       to: order.ourCustomerTokenId,
                       debit: false,
                       trxnRefId: referenceId,
@@ -466,7 +471,7 @@ var functions = {
           } catch (e) {
             res.status(500).send({
               success: false,
-              msg: "Transaction Failed, error from axios",
+              msg: "Transaction Failed, error from ax",
             });
           }
         } catch (err) {
