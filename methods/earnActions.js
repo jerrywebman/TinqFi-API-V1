@@ -353,7 +353,7 @@ var functions = {
       const todaysTimestamp = Date.parse(today);
       const valueTimestamp = Date.parse(activatedDate) + 86400000;
       //check the number of days 
-      const numberOfDays = (todaysTimestamp - valueTimestamp) / 86400000;
+      const numberOfDays = Math.trunc((todaysTimestamp - valueTimestamp) / 86400000);
       const isActive = (numberOfDays) > order.duration;
 
 
