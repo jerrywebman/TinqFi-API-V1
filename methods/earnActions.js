@@ -493,7 +493,7 @@ var functions = {
       const createdAtInTimestamp = Date.parse(order.activatedDate);
       const today = new Date();
       const todaysDateTimestamp = Date.parse(today);
-      const dateDifference = createdAtInTimestamp - todaysDateTimestamp;
+      const dateDifference = todaysDateTimestamp - createdAtInTimestamp;
 
       //check if no order
       if (!order) {

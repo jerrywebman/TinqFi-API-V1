@@ -68,7 +68,7 @@ var earnSchema = new mongoose.Schema({
     type: Date,
   },
   closingDateTimestamp: {
-    type: Number,
+    type: String,
     required: true,
   },
   valueDate: {
