@@ -120,6 +120,7 @@ var functions = {
                   tokenImg: thePlan.tokenImage,
                   plan: thePlan.plan,
                   totalProfit: totalProfitToPayUser,
+                  closingDateTimestamp: closingDate,
                   closingDate,
                 };
 
@@ -270,6 +271,7 @@ var functions = {
                   tokenImg: thePlan.tokenImage,
                   plan: thePlan.plan,
                   totalProfit: 0,
+                  closingDateTimestamp: closingDate,
                   closingDate,
                 };
 
