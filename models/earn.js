@@ -24,8 +24,9 @@ var earnSchema = new mongoose.Schema({
     require: true,
   },
   totalProfit: {
-    type: Number,
-    require: true,
+    type: mongoose.Types.Decimal128,
+    defaultValue: 0.00,
+    required: true,
   },
   imageUrl: {
     type: String,
