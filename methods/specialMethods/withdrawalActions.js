@@ -496,19 +496,18 @@ var functions = {
     try {
       const code = req.body.code;
       const pin = req.body.pin;
-      let userOtp = await Otp.find({ userEmail: req.user.email });
-      let user = await User.findOne({ email: req.user.email });
+      let userOtp = await Otp.findOne({ userEmail: req.user.email });
       const timeDiff = userOtp.createdAt - Date.now();
       //600 is 10 minutes in seconds
       if (userOtp && timeDiff < 600) {
         //compareCode is a method in the otp model
         userOtp.compareCode(code, function (err, isMatch) {
           //COMPARING THE OTP
-          if (isMatch && !err) {
+          if (isMatch && err === null) {
             //COMPARING THE USER PIN
-            user.comparePin(pin, function (err, isOk) {
+            req.user.comparePin(pin, function (err, isOk) {
               //COMPARING THE PIN
-              if (isOk && !err) {
+              if (isOk && err === null) {
                 //delete the OTP document and send a true status message
                 const deletedOTP = Otp.deleteOne({ userEmail: req.user.email }).then(() => res.send({
                   success: true,
@@ -533,7 +532,7 @@ var functions = {
       else {
         res.status(401).send({
           sucess: false,
-          msg: "Something went wrong, Please try again or request a new OTP"
+          msg: "Please request a new OTP, OTP expires after 10 minutes"
         })
       }
     } catch (e) {
