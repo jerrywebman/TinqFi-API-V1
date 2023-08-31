@@ -497,6 +497,7 @@ var functions = {
       const code = req.body.code;
       const pin = req.body.pin;
       let userOtp = await Otp.findOne({ userEmail: req.user.email });
+      let user = await User.findOne({ email: req.user.email });
       const timeDiff = userOtp.createdAt - Date.now();
       //600 is 10 minutes in seconds
       if (userOtp && timeDiff < 600) {
@@ -505,7 +506,7 @@ var functions = {
           //COMPARING THE OTP
           if (isMatch && err === null) {
             //COMPARING THE USER PIN
-            req.user.comparePin(pin, function (err, isOk) {
+            user.comparePin(pin, function (err, isOk) {
               //COMPARING THE PIN
               if (isOk && err === null) {
                 //delete the OTP document and send a true status message
