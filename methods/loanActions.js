@@ -56,7 +56,7 @@ var functions = {
     }
   },
 
-  //APPLY FOR lOAN DONE
+  //APPLY FOR lOAN DONE ** set min or max loan procurement
   applyForLoan: async function (req, res) {
     try {
       //GET THE USER LEDGER ACCOUNTS AND TOKENS TO WORK WITH
@@ -112,8 +112,8 @@ var functions = {
 
             // calculate to know how much collateral to collect in value
             const collateralAmountInValue =
-              collateralAmountInUsd /
-              tokensPriceAndLoandata[collateralLoanToken];
+              (collateralAmountInUsd /
+                tokensPriceAndLoandata[collateralLoanToken]);
 
             //INTEREST RATE IN USD
             const dailyInterestToPayInUsd =
@@ -122,14 +122,14 @@ var functions = {
 
             //INTEREST TO PAY IN VALUE
             const dailyInterestToPayInValue =
-              borrowedAmount * (tokensPriceAndLoandata.dailyInterestRate / 100);
+              (borrowedAmount * (tokensPriceAndLoandata.dailyInterestRate / 100));
 
             //TOTAL INTEREST TO PAY IN USD
             const totalInterestToPayInUsd =
               dailyInterestToPayInUsd * Number(loanTenure);
             //TOTAL INTEREST TO PAY IN VALUE
             const totalInterestToPayInValue =
-              dailyInterestToPayInValue * Number(loanTenure);
+              (dailyInterestToPayInValue * Number(loanTenure));
             // send to the next stage
             //SEARCH TO GET THE USER TOKEN ACCOUNT
             const searchIndex = await userArray.find(
@@ -289,7 +289,7 @@ var functions = {
                           });
                         }
                       });
-                    } catch (error) {}
+                    } catch (error) { }
                   } else
                     res.status(403).send({
                       success: false,
@@ -327,15 +327,39 @@ var functions = {
   //GET ALL USER LOANS DONE
   getAllUserLoan: async function (req, res) {
     try {
-      const loanData = await Loan.find({
-        userEmail: req.user.email,
-        status: true,
-      }).sort({ createdAt: -1 });
-      res.json({
-        success: true,
-        msg: "Loan data successfully fetched",
-        data: loanData,
+      //GETTING DATA FROM COINGECKO
+      const geckoUrl =
+        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&vs_currencies=usd";
+      const options = {
+        method: "GET",
+        url: geckoUrl,
+      };
+      //do something with the response object from coinGecko
+      axios(options).then(async (geckoResponse) => {
+        if (geckoResponse) {
+          const responseFromGecko = await geckoResponse.data;
+          //rearrange the response object
+          const priceData = {
+            BTC: responseFromGecko.bitcoin.usd,
+            ETH: responseFromGecko.ethereum.usd,
+            BSC: responseFromGecko.binancecoin.usd,
+            DOGE: responseFromGecko.dogecoin.usd,
+          };
+          //find the loan data
+          const loanData = await Loan.find({
+            userEmail: req.user.email,
+            status: true,
+          }).sort({ createdAt: -1 });
+          res.json({
+            success: true,
+            msg: "Loan data successfully fetched",
+            data: loanData,
+            currentPrice: priceData
+          });
+        }
+
       });
+
     } catch (err) {
       res.status(403).send({
         success: false,
@@ -505,7 +529,7 @@ var functions = {
                   recipientAccountId: theLoan.collateralTokenAccount,
                   senderAccountId:
                     process.env[
-                      "TINQFI_LOAN_ACCOUNT_" + theLoan.collateralToken
+                    "TINQFI_LOAN_ACCOUNT_" + theLoan.collateralToken
                     ],
                   amount: String(topupSum),
                   anonymous: false,
