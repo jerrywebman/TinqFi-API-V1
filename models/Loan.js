@@ -79,6 +79,14 @@ var loanSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  liquidationPriceInUsd: {
+    type: Number,
+    required: true,
+  },
+  marginCallPriceInUsd: {
+    type: Number,
+    required: true,
+  },
   dailyInterestToPayInUsd: {
     type: Number,
     required: true,
@@ -109,6 +117,7 @@ var loanSchema = new mongoose.Schema({
   },
   createdAt: { type: Date, default: Date.now },
   endAt: { type: Date },
+  closedAt: { type: Date },
 });
 
 module.exports = mongoose.model("loan", loanSchema);

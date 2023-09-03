@@ -110,6 +110,16 @@ var functions = {
             const collateralAmountInUsd =
               borrowedAmountInUsd * (balLtv / 100) + borrowedAmountInUsd;
 
+            //CALCULATE VALUES FOR THE MARGIN CALL AND LIQUIDATION LTV
+            //get price of the margin call and liquidation call in USD
+            const liquidationPriceInUsd = ((tokensPriceAndLoandata.liquidationLTV / 100) * collateralAmountInUsd).toFixed(2);
+            const marginCallPriceInUsd = ((tokensPriceAndLoandata.marginCall / 100) * collateralAmountInUsd).toFixed(2);
+            console.log("borrowedAmountInUsd", borrowedAmountInUsd)
+            console.log("collateralAmountInUsd", collateralAmountInUsd)
+            console.log("marginCallPriceInUsd", marginCallPriceInUsd)
+            console.log("liquidationPriceInUsd", liquidationPriceInUsd)
+
+
             // calculate to know how much collateral to collect in value
             const collateralAmountInValue =
               (collateralAmountInUsd /
@@ -247,6 +257,8 @@ var functions = {
                             marginCall: tokensPriceAndLoandata.marginCall,
                             liquidationLTV:
                               tokensPriceAndLoandata.liquidationLTV,
+                            liquidationPriceInUsd: Number(liquidationPriceInUsd),
+                            marginCallPriceInUsd: Number(marginCallPriceInUsd),
                             dailyInterestToPayInUsd,
                             dailyInterestToPayInValue,
                             totalInterestRateInUsd: totalInterestToPayInUsd,
@@ -377,7 +389,7 @@ var functions = {
         userEmail: req.user.email,
         status: true,
       });
-      console.log(theLoan);
+
       if (!theLoan) {
         res.status(403).send({
           success: false,
@@ -403,33 +415,19 @@ var functions = {
               BSC: responseFromGecko.binancecoin.usd,
               DOGE: responseFromGecko.dogecoin.usd,
             };
-
-            // console.log("priceData", priceData);
             //get the price of collateral token
             const currentCollateralPriceInUsd =
               priceData[theLoan.collateralToken] *
               theLoan.collateralAmountInValue;
-            // console.log(
-            //   "currentCollateralPriceInUsd",
-            //   currentCollateralPriceInUsd
-            // );
-            //get the margin call data
-            const checkMarginCall =
-              theLoan.collateralTokenAmountInUsd * (theLoan.marginCall / 100);
-            // console.log("checkMarginCall", checkMarginCall);
-            //get the liquidation call data
-            const checkLiquidationCall =
-              theLoan.collateralTokenAmountInUsd * (80 / 100); //theLoan.liquidationLTV
-            // console.log("checkLiquidationCall", checkLiquidationCall);
-            //get the price of collateral token
 
-            if (checkLiquidationCall <= currentCollateralPriceInUsd) {
+
+            if (theLoan.liquidationPriceInUsd <= currentCollateralPriceInUsd) {
               //end the loan plan and send the user and tinqfi an email notification
               console.log(
                 "end the loan plan and send the user and tinqfi an email notification"
               );
             }
-            if (checkMarginCall <= currentCollateralPriceInUsd) {
+            if (theLoan.marginCallPriceInUsd <= currentCollateralPriceInUsd) {
               console.log("Topup the loan");
               //add a new amount to the topup array
             }
