@@ -38,25 +38,25 @@ var functions = {
     }
   },
 
-  deleteUser: async function (req, res) {
-    try {
-      const defaultEmail = req.body.email;
-      const lowerCaseEmail = defaultEmail.toLowerCase();
-      const removedUser = await User.deleteOne({
-        email: lowerCaseEmail,
-      }).then(async () => {
-        const removedMoney = await Money.deleteOne({
-          userEmail: lowerCaseEmail,
-        });
-        const removedAddress = await AddressStore.deleteOne({
-          userEmail: lowerCaseEmail,
-        });
-        res.json({ success: true, Message: "User Deleted" });
-      });
-    } catch (err) {
-      res.json({ message: err });
-    }
-  },
+  // deleteUser: async function (req, res) {
+  //   try {
+  //     const defaultEmail = req.body.email;
+  //     const lowerCaseEmail = defaultEmail.toLowerCase();
+  //     const removedUser = await User.deleteOne({
+  //       email: lowerCaseEmail,
+  //     }).then(async () => {
+  //       const removedMoney = await Money.deleteOne({
+  //         userEmail: lowerCaseEmail,
+  //       });
+  //       const removedAddress = await AddressStore.deleteOne({
+  //         userEmail: lowerCaseEmail,
+  //       });
+  //       res.json({ success: true, Message: "User Deleted" });
+  //     });
+  //   } catch (err) {
+  //     res.json({ message: err });
+  //   }
+  // },
 
   resendOTP: async function (req, res) {
     try {
@@ -965,8 +965,9 @@ var functions = {
         email: user.email,
         phone: user.phone,
         nickname: user.nickname,
-        street: user.street,
+        address: user.address,
         country: user.country,
+        city: user.city,
         occupation: user.occupation,
         dateOfBirth: user.dateOfBirth,
         emailVerified: user.emailVerified,
@@ -989,9 +990,9 @@ var functions = {
         { email: req.user.email },
         {
           $set: {
-            phone: req.body.phone,
+            fullname: req.body.fullname,
             city: req.body.city,
-            street: req.body.address,
+            address: req.body.address,
             country: req.body.country,
             occupation: req.body.occupation,
             dateOfBirth: req.body.dateOfBirth,

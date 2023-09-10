@@ -114,10 +114,6 @@ var functions = {
             //get price of the margin call and liquidation call in USD
             const liquidationPriceInUsd = ((tokensPriceAndLoandata.liquidationLTV / 100) * collateralAmountInUsd).toFixed(2);
             const marginCallPriceInUsd = ((tokensPriceAndLoandata.marginCall / 100) * collateralAmountInUsd).toFixed(2);
-            console.log("borrowedAmountInUsd", borrowedAmountInUsd)
-            console.log("collateralAmountInUsd", collateralAmountInUsd)
-            console.log("marginCallPriceInUsd", marginCallPriceInUsd)
-            console.log("liquidationPriceInUsd", liquidationPriceInUsd)
 
 
             // calculate to know how much collateral to collect in value

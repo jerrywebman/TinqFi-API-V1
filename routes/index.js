@@ -42,7 +42,7 @@ router.post("/api/v1/verify_email", actions.verifyEmail);
 router.post("/api/v1/resend_otp", actions.resendOTP);
 
 //** @desc RESEND OTP**
-router.delete("/api/v1/delete_user", actions.deleteUser);
+// router.delete("/api/v1/delete_user", actions.deleteUser);
 
 //@desc completes a user registration **
 router.post("/api/v1/complete_signup", actions.completeSignup);
