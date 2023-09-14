@@ -1,7 +1,8 @@
 var Convert = require("../models/Convert");
 const axios = require("axios");
 var TinqfiTrxn = require("../models/Transaction");
-const formatAmount = require("../utils")
+const formatAmount = require("../utils/index")
+const formatAmountInUsd = require("../utils/formatUsd")
 
 var functions = {
   //CONVERT THE TOKEN
@@ -124,7 +125,7 @@ var functions = {
                       userTaTumId: req.user.ourCustomerTatumId,
                       transactionAmount: formatAmount(fromValue),
                       transactionToken: fromUppercaseToken,
-                      transactionAmountInUsd: formatAmount(fromValueInDollar),
+                      transactionAmountInUsd: formatAmountInUsd(fromValueInDollar),
                       transactionState: "Successful",
                       transactionDetails: `Converted - ${fromValue + " " + fromUppercaseToken
                         } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
@@ -184,7 +185,7 @@ var functions = {
                             transactionAmount: formatAmount(toValueAfterFee),
                             transactionToken: toUppercaseToken,
                             transactionState: "Successful",
-                            transactionAmountInUsd: formatAmount(toValueInDollar),
+                            transactionAmountInUsd: formatAmountInUsd(toValueInDollar),
                             transactionDetails: `Converted - ${fromValue + " " + fromUppercaseToken
                               } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
                               } at ${priceData[toUppercaseToken]}`,
