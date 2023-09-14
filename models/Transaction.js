@@ -4,12 +4,12 @@ var schema = mongoose.Schema;
 var transactionSchema = new mongoose.Schema({
   userEmail: {
     type: String,
-    require: true,
+    required: true,
     match: /.+\@.+\..+/,
   },
   userTaTumId: {
     type: String,
-    require: true,
+    required: true,
   },
   transactionAmount: {
     type: Number,
@@ -19,7 +19,7 @@ var transactionSchema = new mongoose.Schema({
   },
   debit: {
     type: Boolean,
-    require: true,
+    required: true,
   },
   from: {
     type: String,
@@ -31,6 +31,14 @@ var transactionSchema = new mongoose.Schema({
     type: String,
   },
   transactionType: {
+    type: String,
+  },
+  transactionState: {
+    type: String,
+    enum: ["Pending", "Successful", "Failed"],
+    required: true,
+  },
+  transactionDetails: {
     type: String,
   },
   tenure: {

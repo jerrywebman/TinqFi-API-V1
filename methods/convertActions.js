@@ -122,7 +122,9 @@ var functions = {
                       userEmail: req.user.email,
                       userTaTumId: req.user.ourCustomerTatumId,
                       transactionAmount: fromValue,
-                      transactionToken: `Converted - ${fromValue + " " + fromUppercaseToken
+                      transactionToken: fromUppercaseToken,
+                      transactionState: "Successful",
+                      transactionDetails: `Converted - ${fromValue + " " + fromUppercaseToken
                         } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
                         } at ${priceData[toUppercaseToken]}`,
                       transactionType: "Convert",
@@ -178,7 +180,9 @@ var functions = {
                             userEmail: req.user.email,
                             userTaTumId: req.user.ourCustomerTatumId,
                             transactionAmount: toValueAfterFee,
-                            transactionToken: `Converted - ${fromValue + " " + fromUppercaseToken
+                            transactionToken: toUppercaseToken,
+                            transactionState: "Successful",
+                            transactionDetails: `Converted - ${fromValue + " " + fromUppercaseToken
                               } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
                               } at ${priceData[toUppercaseToken]}`,
                             transactionType: "Convert",
