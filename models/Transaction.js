@@ -13,6 +13,11 @@ var transactionSchema = new mongoose.Schema({
   },
   transactionAmount: {
     type: Number,
+    required: true,
+  },
+  transactionAmountInUsd: {
+    type: Number,
+    required: true,
   },
   transactionToken: {
     type: String,

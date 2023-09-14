@@ -1,6 +1,7 @@
 var Convert = require("../models/Convert");
 const axios = require("axios");
 var TinqfiTrxn = require("../models/Transaction");
+const formatAmount = require("../utils")
 
 var functions = {
   //CONVERT THE TOKEN
@@ -71,8 +72,8 @@ var functions = {
               toTokenAccount: toTokenId,
               fromToken: fromUppercaseToken,
               toToken: toUppercaseToken,
-              fromValue,
-              toValue: toValueAfterFee,
+              fromValue: formatAmount(fromValue),
+              toValue: formatAmount(toValueAfterFee),
               fromValueInUsd: fromValueInDollar,
               toValueInUsd: toValueInDollarAfterFee,
               toValueInUsdBeforeFee: toValueInDollar,
@@ -121,8 +122,9 @@ var functions = {
                     const newTinqfiTrxn = {
                       userEmail: req.user.email,
                       userTaTumId: req.user.ourCustomerTatumId,
-                      transactionAmount: fromValue,
+                      transactionAmount: formatAmount(fromValue),
                       transactionToken: fromUppercaseToken,
+                      transactionAmountInUsd: formatAmount(fromValueInDollar),
                       transactionState: "Successful",
                       transactionDetails: `Converted - ${fromValue + " " + fromUppercaseToken
                         } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
@@ -179,9 +181,10 @@ var functions = {
                           const newTinqfiTrxn = {
                             userEmail: req.user.email,
                             userTaTumId: req.user.ourCustomerTatumId,
-                            transactionAmount: toValueAfterFee,
+                            transactionAmount: formatAmount(toValueAfterFee),
                             transactionToken: toUppercaseToken,
                             transactionState: "Successful",
+                            transactionAmountInUsd: formatAmount(toValueInDollar),
                             transactionDetails: `Converted - ${fromValue + " " + fromUppercaseToken
                               } at ${priceData[fromUppercaseToken]}- to - ${toValueAfterFee + " " + toUppercaseToken
                               } at ${priceData[toUppercaseToken]}`,
