@@ -237,15 +237,22 @@ var functions = {
             msg: "Error generating token price, please try again",
           });
         }
-      }).catch(() => res.status(400).send({
-        success: false,
-        msg: "Error while generating token price, please try again",
-      }))
+      }).catch((e) =>
+
+        res.status(400).send({
+          success: false,
+          msg: "Error while generating token price, please try again",
+        })
+
+
+      )
+
     } catch (e) {
       res.status(500).send({
         success: false,
         msg: "A server error occurred while processing your request",
       });
+
     }
   },
 
