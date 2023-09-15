@@ -2,6 +2,9 @@ var Earn = require("../models/earn");
 var EarnLtv = require("../models/EarnLtv");
 const axios = require("axios");
 var TinqfiTrxn = require("../models/Transaction");
+const formatAmount = require("../utils/index")
+const formatAmountInUsd = require("../utils/formatUsd")
+const getCurrentTokenPrice = require("../utils/getCurrentTokenPrice")
 
 var functions = {
   //FIND ALL FIXED PLAN LTV
@@ -37,6 +40,11 @@ var functions = {
       let earnTokenUppercase = earnToken.toUpperCase();
       let earnAmountNumber = Number(earnAmount);
       let uppercasePlan = plan.toUpperCase();
+
+      //GET THE EARN TOKEN VALUE IN DOLLAR
+      const priceData = await getCurrentTokenPrice();
+      const valueInDollar =
+        Number(priceData[earnTokenUppercase]) * earnAmountNumber;
 
       //GET EARN PLAN
       const thePlan = await EarnLtv.findOne({
@@ -129,10 +137,13 @@ var functions = {
                   const newTinqfiTrxn = {
                     userEmail: req.user.email,
                     userTaTumId: req.user.ourCustomerTatumId,
-                    transactionAmount: earnAmountNumber,
+                    transactionAmount: formatAmount(earnAmountNumber),
                     transactionToken: earnTokenUppercase,
+                    transactionState: "Successful",
+                    transactionAmountInUsd: formatAmountInUsd(valueInDollar),
                     transactionType: "Earn",
                     from: senderDBAccountId,
+                    transactionDetails: `${earnTokenUppercase} ${uppercasePlan} plan at ${valueInDollar} per ${earnTokenUppercase} `,
                     tenure: `${uppercasePlan} plan for ${planTenure} days `,
                     to: process.env[
                       "TINQFI_EARN_ACCOUNT_" + earnTokenUppercase
@@ -191,8 +202,12 @@ var functions = {
       let earnAmountNumber = Number(earnAmount);
       let uppercasePlan = plan.toUpperCase();
 
-      //GET EARN PLAN
+      //GET THE EARN TOKEN VALUE IN DOLLAR
+      const priceData = await getCurrentTokenPrice();
+      const valueInDollar =
+        Number(priceData[earnTokenUppercase]) * earnAmountNumber;
 
+      //GET EARN PLAN
       const thePlan = await EarnLtv.findOne({
         tokenTicker: earnTokenUppercase,
         plan: uppercasePlan,
@@ -279,11 +294,14 @@ var functions = {
                   const newTinqfiTrxn = {
                     userEmail: req.user.email,
                     userTaTumId: req.user.ourCustomerTatumId,
-                    transactionAmount: earnAmountNumber,
+                    transactionAmount: formatAmount(earnAmountNumber),
                     transactionToken: earnTokenUppercase,
+                    transactionAmountInUsd: formatAmountInUsd(valueInDollar),
+                    transactionState: "Successful",
+                    transactionDetails: `${earnTokenUppercase} ${uppercasePlan} plan at ${valueInDollar} per ${earnTokenUppercase} `,
                     transactionType: "Earn",
                     from: senderDBAccountId,
-                    tenure: `${uppercasePlan} Flexible plan `,
+                    tenure: `${uppercasePlan} plan `,
                     to: process.env[
                       "TINQFI_EARN_ACCOUNT_" + earnTokenUppercase
                     ],
@@ -356,7 +374,6 @@ var functions = {
       const numberOfDays = Math.trunc((todaysTimestamp - valueTimestamp) / 86400000);
       const isActive = (numberOfDays) > order.duration;
 
-
       //check if no order
       if (!order) {
         res.status(404).send({ success: false, msg: "Earn plan not found" });
@@ -389,6 +406,10 @@ var functions = {
           msg: "Access Denied",
         });
       } else {
+        //GET THE EARN TOKEN VALUE IN DOLLAR
+        const priceData = await getCurrentTokenPrice();
+        const valueInDollar =
+          Number(priceData[order.tokenTicker]) * order.amount;
         //get the total profit
         const totalProfit = Number(order.dailyProfit) * numberOfDays;
         try {
@@ -438,9 +459,12 @@ var functions = {
                     const newTinqfiTrxn = {
                       userEmail: req.user.email,
                       userTaTumId: req.user.ourCustomerTatumId,
-                      transactionAmount: totalEarnAmount,
+                      transactionAmount: formatAmount(totalEarnAmount),
                       transactionToken: order.tokenTicker,
                       transactionType: "Earn",
+                      transactionAmountInUsd: formatAmountInUsd(valueInDollar),
+                      transactionState: "Successful",
+                      transactionDetails: `${numberOfDays} days on ${order.tokenTicker} Fixed plan`,
                       from: process.env[
                         "TINQFI_EARN_ACCOUNT_" + order.tokenTicker
                       ],
@@ -532,6 +556,10 @@ var functions = {
           msg: "User not allowed to execute this function",
         });
       } else {
+        //GET THE EARN TOKEN VALUE IN DOLLAR
+        const priceData = await getCurrentTokenPrice();
+        const valueInDollar =
+          Number(priceData[order.tokenTicker]) * order.amount;
         //todays date
         const today = Date.now();
 
@@ -589,9 +617,12 @@ var functions = {
                     const newTinqfiTrxn = {
                       userEmail: req.user.email,
                       userTaTumId: req.user.ourCustomerTatumId,
-                      transactionAmount: totalEarnAmount,
+                      transactionAmount: formatAmount(totalEarnAmount),
                       transactionToken: order.tokenTicker,
                       transactionType: "Earn",
+                      transactionAmountInUsd: formatAmountInUsd(valueInDollar),
+                      transactionState: "Successful",
+                      transactionDetails: `${daysToEarnProfit} days on ${order.tokenTicker} Flexible plan`,
                       from: process.env[
                         "TINQFI_EARN_ACCOUNT_" + order.tokenTicker
                       ],

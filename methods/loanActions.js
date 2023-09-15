@@ -2,6 +2,9 @@ var Loan = require("../models/Loan");
 var LoanLTV = require("../models/LoanLTV");
 const axios = require("axios");
 var TinqfiTrxn = require("../models/Transaction");
+const formatAmount = require("../utils/index");
+const formatAmountInUsd = require("../utils/formatUsd");
+const getCurrentTokenPrice = require("../utils/getCurrentTokenPrice");
 
 var functions = {
   //SELECT A LOAN DATA DONE
@@ -9,45 +12,23 @@ var functions = {
     try {
       const loanToken = req.query.loanToken;
       const uppercaseLoanToken = loanToken.toUpperCase();
-      //GETTING DATA FROM COINGECKO
-      const geckoUrl =
-        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&vs_currencies=usd";
-      const options = {
-        method: "GET",
-        url: geckoUrl,
-      };
-      //do something with the response object from coinGecko
-      axios(options).then(async (geckoResponse) => {
-        if (geckoResponse) {
-          const responseFromGecko = await geckoResponse.data;
-          //rearrange the response object
-          const priceData = {
-            BTC: responseFromGecko.bitcoin.usd,
-            ETH: responseFromGecko.ethereum.usd,
-            BSC: responseFromGecko.binancecoin.usd,
-            DOGE: responseFromGecko.dogecoin.usd,
-          };
-          let theLoan = await LoanLTV.findOne({ _id: uppercaseLoanToken });
-          if (!theLoan) {
-            res.status(400).send({
-              success: false,
-              msg: `Failed to retrieve loan data for the token ${uppercaseLoanToken}`,
-            });
-          } else {
-            let tokensFromGecko = { ...theLoan._doc, ...priceData };
-            res.status(200).send({
-              success: true,
-              msg: "Data Retrieved successfully",
-              data: tokensFromGecko,
-            });
-          }
-        } else
-          res.status(404).send({
-            success: false,
-            msg: "Market data error",
-          });
-      });
-    } catch (err) {
+      let theLoan = await LoanLTV.findOne({ _id: uppercaseLoanToken });
+      const priceData = await getCurrentTokenPrice()
+      if (!theLoan) {
+        res.status(400).send({
+          success: false,
+          msg: `Failed to retrieve loan data for the token ${uppercaseLoanToken}`,
+        });
+      } else {
+        let tokensFromGecko = { ...theLoan._doc, ...priceData };
+        res.status(200).send({
+          success: true,
+          msg: "Data Retrieved successfully",
+          data: tokensFromGecko,
+        });
+      }
+    }
+    catch (err) {
       console.log(err);
       res.status(500).send({
         success: false,
@@ -77,253 +58,241 @@ var functions = {
       let borrowedLoanToken = borrowedToken.toUpperCase();
       let collateralLoanToken = collateralToken.toUpperCase();
       //GETTING DATA FROM COINGECKO
-      const geckoUrl = process.env.PRICE_API;
-      const options = {
-        method: "GET",
-        url: geckoUrl,
-      };
+      const priceData = await getCurrentTokenPrice()
       //do something with the response object from coinGecko
-      axios(options).then(async (geckoResponse) => {
-        if (geckoResponse) {
-          const responseFromGecko = await geckoResponse.data;
-          //rearrange the response object
-          const priceData = {
-            BTC: responseFromGecko.bitcoin.usd,
-            ETH: responseFromGecko.ethereum.usd,
-            BSC: responseFromGecko.binancecoin.usd,
-            DOGE: responseFromGecko.dogecoin.usd,
+
+      let theLoan = await LoanLTV.findOne({ _id: borrowedLoanToken });
+      if (!theLoan) {
+        res.status(400).send({
+          success: false,
+          msg: `Failed to retrieve loan data for the token ${borrowedLoanToken}`,
+        });
+      } else {
+        let tokensPriceAndLoandata = { ...theLoan._doc, ...priceData };
+        //GET THE PRICE OF THE BORROWED TOKEN IN USD
+        const borrowedAmountInUsd =
+          tokensPriceAndLoandata[borrowedLoanToken] * borrowedAmount;
+        //STORE THE BALANCE LTV
+        const balLtv = 100 - tokensPriceAndLoandata.initialLTV;
+        //GET THE PRICE OF THE COLLATERAL TOKEN IN USD
+        const collateralAmountInUsd =
+          borrowedAmountInUsd * (balLtv / 100) + borrowedAmountInUsd;
+
+        //CALCULATE VALUES FOR THE MARGIN CALL AND LIQUIDATION LTV
+        //get price of the margin call and liquidation call in USD
+        const liquidationPriceInUsd = ((tokensPriceAndLoandata.liquidationLTV / 100) * collateralAmountInUsd).toFixed(2);
+        const marginCallPriceInUsd = ((tokensPriceAndLoandata.marginCall / 100) * collateralAmountInUsd).toFixed(2);
+
+
+        // calculate to know how much collateral to collect in value
+        const collateralAmountInValue =
+          (collateralAmountInUsd /
+            tokensPriceAndLoandata[collateralLoanToken]);
+
+        //INTEREST RATE IN USD
+        const dailyInterestToPayInUsd =
+          borrowedAmountInUsd *
+          (tokensPriceAndLoandata.dailyInterestRate / 100);
+
+        //INTEREST TO PAY IN VALUE
+        const dailyInterestToPayInValue =
+          (borrowedAmount * (tokensPriceAndLoandata.dailyInterestRate / 100));
+
+        //TOTAL INTEREST TO PAY IN USD
+        const totalInterestToPayInUsd =
+          dailyInterestToPayInUsd * Number(loanTenure);
+        //TOTAL INTEREST TO PAY IN VALUE
+        const totalInterestToPayInValue =
+          (dailyInterestToPayInValue * Number(loanTenure));
+        // send to the next stage
+        //SEARCH TO GET THE USER TOKEN ACCOUNT
+        const searchIndex = await userArray.find(
+          (user) => user.tokenAccountcurrency === collateralLoanToken
+        );
+        const senderTokenAccountId = searchIndex.tokenAccountId;
+        //COLLECT THE COLLATERAL FROM THE USER TO TINQFI_LOAN_ACCOUNT_
+        const formUserMoneyData = {
+          senderAccountId: senderTokenAccountId,
+          recipientAccountId:
+            process.env["TINQFI_LOAN_ACCOUNT_" + collateralLoanToken],
+          amount: String(collateralAmountInValue),
+          anonymous: false,
+          compliant: false,
+          transactionCode: req.user.email,
+          paymentId: req.user.ourCustomerTatumId,
+          recipientNote: "collateralAmount to TinqFi",
+        };
+        const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
+        //MAKE THE POST REQUEST TO TINQFI
+        try {
+          const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.TATUM_API_KEY,
+            },
+            url,
+            data: formUserMoneyData,
           };
-          let theLoan = await LoanLTV.findOne({ _id: borrowedLoanToken });
-          if (!theLoan) {
-            res.status(400).send({
-              success: false,
-              msg: `Failed to retrieve loan data for the token ${borrowedLoanToken}`,
-            });
-          } else {
-            let tokensPriceAndLoandata = { ...theLoan._doc, ...priceData };
-            //GET THE PRICE OF THE BORROWED TOKEN IN USD
-            const borrowedAmountInUsd =
-              tokensPriceAndLoandata[borrowedLoanToken] * borrowedAmount;
-            //STORE THE BALANCE LTV
-            const balLtv = 100 - tokensPriceAndLoandata.initialLTV;
-            //GET THE PRICE OF THE COLLATERAL TOKEN IN USD
-            const collateralAmountInUsd =
-              borrowedAmountInUsd * (balLtv / 100) + borrowedAmountInUsd;
-
-            //CALCULATE VALUES FOR THE MARGIN CALL AND LIQUIDATION LTV
-            //get price of the margin call and liquidation call in USD
-            const liquidationPriceInUsd = ((tokensPriceAndLoandata.liquidationLTV / 100) * collateralAmountInUsd).toFixed(2);
-            const marginCallPriceInUsd = ((tokensPriceAndLoandata.marginCall / 100) * collateralAmountInUsd).toFixed(2);
-
-
-            // calculate to know how much collateral to collect in value
-            const collateralAmountInValue =
-              (collateralAmountInUsd /
-                tokensPriceAndLoandata[collateralLoanToken]);
-
-            //INTEREST RATE IN USD
-            const dailyInterestToPayInUsd =
-              borrowedAmountInUsd *
-              (tokensPriceAndLoandata.dailyInterestRate / 100);
-
-            //INTEREST TO PAY IN VALUE
-            const dailyInterestToPayInValue =
-              (borrowedAmount * (tokensPriceAndLoandata.dailyInterestRate / 100));
-
-            //TOTAL INTEREST TO PAY IN USD
-            const totalInterestToPayInUsd =
-              dailyInterestToPayInUsd * Number(loanTenure);
-            //TOTAL INTEREST TO PAY IN VALUE
-            const totalInterestToPayInValue =
-              (dailyInterestToPayInValue * Number(loanTenure));
-            // send to the next stage
-            //SEARCH TO GET THE USER TOKEN ACCOUNT
-            const searchIndex = await userArray.find(
-              (user) => user.tokenAccountcurrency === collateralLoanToken
-            );
-            const senderTokenAccountId = searchIndex.tokenAccountId;
-            //COLLECT THE COLLATERAL FROM THE USER TO TINQFI_LOAN_ACCOUNT_
-            const formUserMoneyData = {
-              senderAccountId: senderTokenAccountId,
-              recipientAccountId:
-                process.env["TINQFI_LOAN_ACCOUNT_" + collateralLoanToken],
-              amount: String(collateralAmountInValue),
-              anonymous: false,
-              compliant: false,
-              transactionCode: req.user.email,
-              paymentId: req.user.ourCustomerTatumId,
-              recipientNote: "collateralAmount to TinqFi",
-            };
-            const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
-            //MAKE THE POST REQUEST TO TINQFI
-            try {
-              const options = {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "x-api-key": process.env.TATUM_API_KEY,
-                },
-                url,
-                data: formUserMoneyData,
-              };
-              //step 2
-              axios(options)
-                .then((serverResponse) => {
-                  if (serverResponse.data.reference !== null) {
-                    //post a transaction debit
-                    const newTinqfiTrxn = {
-                      userEmail: req.user.email,
-                      userTaTumId: req.user.ourCustomerTatumId,
-                      transactionAmount: collateralAmountInValue,
-                      transactionToken: ` ${collateralLoanToken} as Collateral at ${tokensPriceAndLoandata[collateralLoanToken]}`,
-                      transactionType: "Loan",
-                      tenure: `${loanTenure} days`,
-                      from: "Wallet",
-                      to: "Tinqfi",
-                      debit: true,
-                      trxnRefId: serverResponse.data.reference,
-                    };
-                    new TinqfiTrxn(newTinqfiTrxn).save();
-                    //the response from Tatum
-                    const collateralReferenceId = serverResponse.data.reference;
-                    //SENDING THE TOKEN TO THE USER FROM TINQFI_LOAN_ACCOUNT
-                    const collateralSearchIndex = userArray.find(
-                      (user) => user.tokenAccountcurrency === borrowedLoanToken
-                    );
-                    //GET THE USER BORROWED TOKEN ID
-                    const recieverBorrowedTokenAccountId =
-                      collateralSearchIndex.tokenAccountId;
-                    const formTinqfiMoneyData = {
-                      recipientAccountId: recieverBorrowedTokenAccountId,
-                      senderAccountId:
-                        process.env["TINQFI_LOAN_ACCOUNT_" + borrowedLoanToken],
-                      amount: String(borrowedAmount),
-                      anonymous: false,
-                      compliant: false,
-                      transactionCode: req.user.email,
-                      paymentId: req.user.ourCustomerTatumId,
-                      recipientNote: "borrowed token to User",
-                    };
-                    const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
-                    try {
-                      const options = {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                          "x-api-key": process.env.TATUM_API_KEY,
-                        },
-                        url,
-                        data: formTinqfiMoneyData,
+          //step 2
+          axios(options)
+            .then((serverResponse) => {
+              if (serverResponse.data.reference !== null) {
+                //post a transaction debit
+                const newTinqfiTrxn = {
+                  userEmail: req.user.email,
+                  userTaTumId: req.user.ourCustomerTatumId,
+                  transactionAmount: formatAmount(collateralAmountInValue),
+                  transactionAmountInUsd: formatAmountInUsd(collateralAmountInUsd),
+                  transactionState: "Successful",
+                  transactionDetails: ` ${collateralLoanToken} as Collateral at ${tokensPriceAndLoandata[collateralLoanToken]}`,
+                  transactionToken: collateralLoanToken,
+                  transactionType: "Loan",
+                  tenure: `${loanTenure} days`,
+                  from: "User Wallet",
+                  to: "Tinqfi",
+                  debit: true,
+                  trxnRefId: serverResponse.data.reference,
+                };
+                new TinqfiTrxn(newTinqfiTrxn).save();
+                //the response from Tatum
+                const collateralReferenceId = serverResponse.data.reference;
+                //SENDING THE TOKEN TO THE USER FROM TINQFI_LOAN_ACCOUNT
+                const collateralSearchIndex = userArray.find(
+                  (user) => user.tokenAccountcurrency === borrowedLoanToken
+                );
+                //GET THE USER BORROWED TOKEN ID
+                const recieverBorrowedTokenAccountId =
+                  collateralSearchIndex.tokenAccountId;
+                const formTinqfiMoneyData = {
+                  recipientAccountId: recieverBorrowedTokenAccountId,
+                  senderAccountId:
+                    process.env["TINQFI_LOAN_ACCOUNT_" + borrowedLoanToken],
+                  amount: String(borrowedAmount),
+                  anonymous: false,
+                  compliant: false,
+                  transactionCode: req.user.email,
+                  paymentId: req.user.ourCustomerTatumId,
+                  recipientNote: "borrowed token to User",
+                };
+                const url = `${process.env.TATUM_BASE_URL}/ledger/transaction`;
+                try {
+                  const options = {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "x-api-key": process.env.TATUM_API_KEY,
+                    },
+                    url,
+                    data: formTinqfiMoneyData,
+                  };
+                  //DONE
+                  axios(options).then((serverUserResponse) => {
+                    if (serverUserResponse.data.reference) {
+                      const borrowedTokenReferenceId =
+                        serverUserResponse.data.reference;
+                      //CREATE A NEW LOAN OBJECT
+                      const newLoan = {
+                        userEmail: req.user.email,
+                        ourCustomerTatumId: req.user.ourCustomerTatumId,
+                        borrowedToken: borrowedLoanToken,
+                        borrowedTokenAccount:
+                          recieverBorrowedTokenAccountId,
+                        borrowedAmountInValue: Number(borrowedAmount),
+                        borrowedTokenAmountInUsd:
+                          Number(borrowedAmountInUsd),
+                        borrowedTatumRefID: borrowedTokenReferenceId,
+                        initialBorrowedTokenPrice: Number(
+                          tokensPriceAndLoandata[borrowedLoanToken]
+                        ),
+                        collateralToken: collateralLoanToken,
+                        collateralTokenAccount: senderTokenAccountId,
+                        collateralAmountInValue: Number(
+                          collateralAmountInValue
+                        ),
+                        collateralTokenAmountInUsd: Number(
+                          collateralAmountInUsd
+                        ),
+                        collateralTatumRefID: collateralReferenceId,
+                        initialCollateralTokenPrice: Number(
+                          tokensPriceAndLoandata[collateralLoanToken]
+                        ),
+                        dailyInterestRateOnPlan: Number(
+                          tokensPriceAndLoandata.dailyInterestRate
+                        ),
+                        initialLTV: tokensPriceAndLoandata.initialLTV,
+                        marginCall: tokensPriceAndLoandata.marginCall,
+                        liquidationLTV:
+                          tokensPriceAndLoandata.liquidationLTV,
+                        liquidationPriceInUsd: Number(liquidationPriceInUsd),
+                        marginCallPriceInUsd: Number(marginCallPriceInUsd),
+                        dailyInterestToPayInUsd,
+                        dailyInterestToPayInValue,
+                        totalInterestRateInUsd: totalInterestToPayInUsd,
+                        totalInterestToPayInValue,
+                        loanTenure,
+                        repaymentAmountInValue:
+                          totalInterestToPayInValue +
+                          Number(borrowedAmount), //amount to payback + interest
+                        topupLoan: collateralAmountInValue,
+                        endAt: closingDate,
+                        status: true,
                       };
-                      //DONE
-                      axios(options).then((serverUserResponse) => {
-                        if (serverUserResponse.data.reference) {
-                          const borrowedTokenReferenceId =
-                            serverUserResponse.data.reference;
-                          //CREATE A NEW LOAN OBJECT
-                          const newLoan = {
-                            userEmail: req.user.email,
-                            ourCustomerTatumId: req.user.ourCustomerTatumId,
-                            borrowedToken: borrowedLoanToken,
-                            borrowedTokenAccount:
-                              recieverBorrowedTokenAccountId,
-                            borrowedAmountInValue: Number(borrowedAmount),
-                            borrowedTokenAmountInUsd:
-                              Number(borrowedAmountInUsd),
-                            borrowedTatumRefID: borrowedTokenReferenceId,
-                            initialBorrowedTokenPrice: Number(
-                              tokensPriceAndLoandata[borrowedLoanToken]
-                            ),
-                            collateralToken: collateralLoanToken,
-                            collateralTokenAccount: senderTokenAccountId,
-                            collateralAmountInValue: Number(
-                              collateralAmountInValue
-                            ),
-                            collateralTokenAmountInUsd: Number(
-                              collateralAmountInUsd
-                            ),
-                            collateralTatumRefID: collateralReferenceId,
-                            initialCollateralTokenPrice: Number(
-                              tokensPriceAndLoandata[collateralLoanToken]
-                            ),
-                            dailyInterestRateOnPlan: Number(
-                              tokensPriceAndLoandata.dailyInterestRate
-                            ),
-                            initialLTV: tokensPriceAndLoandata.initialLTV,
-                            marginCall: tokensPriceAndLoandata.marginCall,
-                            liquidationLTV:
-                              tokensPriceAndLoandata.liquidationLTV,
-                            liquidationPriceInUsd: Number(liquidationPriceInUsd),
-                            marginCallPriceInUsd: Number(marginCallPriceInUsd),
-                            dailyInterestToPayInUsd,
-                            dailyInterestToPayInValue,
-                            totalInterestRateInUsd: totalInterestToPayInUsd,
-                            totalInterestToPayInValue,
-                            loanTenure,
-                            repaymentAmountInValue:
-                              totalInterestToPayInValue +
-                              Number(borrowedAmount), //amount to payback + interest
-                            topupLoan: collateralAmountInValue,
-                            endAt: closingDate,
-                            status: true,
-                          };
-                          new Loan(newLoan).save().then(() => {
-                            //POST TRX HISTORY WITH THE USER DATA IN DB
-                            const newTinqfiTrxn = {
-                              userEmail: req.user.email,
-                              userTaTumId: req.user.ourCustomerTatumId,
-                              transactionAmount: borrowedAmount,
-                              transactionToken: `Bowwered -${borrowedLoanToken} at ${tokensPriceAndLoandata[borrowedLoanToken]}- with - ${collateralLoanToken} at ${tokensPriceAndLoandata[collateralLoanToken]} as collateral`,
-                              transactionType: "Loan",
-                              tenure: `${loanTenure} days`,
-                              from: "From TinqFI",
-                              to: senderTokenAccountId,
-                              debit: false,
-                              trxnRefId:
-                                collateralReferenceId +
-                                " - " +
-                                borrowedTokenReferenceId,
-                            };
-                            new TinqfiTrxn(newTinqfiTrxn).save();
-                            res.json({
-                              success: true,
-                              msg: "Loan Approved ",
-                            });
-                          });
-                        } else {
-                          res.status(403).send({
-                            success: false,
-                            msg: "Transaction Failed while sending Loan Token to user",
-                          });
-                        }
+                      new Loan(newLoan).save().then(() => {
+                        //POST TRX HISTORY WITH THE USER DATA IN DB
+                        const newTinqfiTrxn = {
+                          userEmail: req.user.email,
+                          userTaTumId: req.user.ourCustomerTatumId,
+                          transactionAmount: formatAmount(borrowedAmount),
+                          transactionAmountInUsd: formatAmountInUsd(borrowedAmountInUsd),
+                          transactionState: "Successful",
+                          transactionDetails: `Bowwered -${borrowedLoanToken} at ${tokensPriceAndLoandata[borrowedLoanToken]}- with - ${collateralLoanToken} at ${tokensPriceAndLoandata[collateralLoanToken]} as collateral`,
+                          transactionToken: borrowedLoanToken,
+                          transactionType: "Loan",
+                          tenure: `${loanTenure} days`,
+                          from: "From TinqFI",
+                          to: senderTokenAccountId,
+                          debit: false,
+                          trxnRefId:
+                            collateralReferenceId +
+                            " - " +
+                            borrowedTokenReferenceId,
+                        };
+                        new TinqfiTrxn(newTinqfiTrxn).save();
+                        res.json({
+                          success: true,
+                          msg: "Loan approved",
+                        });
                       });
-                    } catch (error) { }
-                  } else
-                    res.status(403).send({
-                      success: false,
-                      msg: "Transaction Failed no response",
-                    });
-                })
-                .catch((err) => {
-                  console.log(err);
-                  res.status(403).send({
-                    success: false,
-                    msg: "Transaction Failed, insufficient balance",
+                    } else {
+                      res.status(403).send({
+                        success: false,
+                        msg: "Transaction Failed while sending Loan Token to user",
+                      });
+                    }
                   });
+                } catch (error) { }
+              } else
+                res.status(403).send({
+                  success: false,
+                  msg: "Transaction Failed no response",
                 });
-            } catch (e) {
-              res.status(500).send({
+            })
+            .catch((err) => {
+              console.log(err);
+              res.status(403).send({
                 success: false,
-                msg: "Transaction Failed",
+                msg: "Transaction Failed, insufficient balance",
               });
-            }
-          }
-        } else
-          res.status(404).send({
+            });
+        } catch (e) {
+          res.status(500).send({
             success: false,
-            msg: "Market data error",
+            msg: "Transaction Failed",
           });
-      });
+        }
+      }
+
     } catch (err) {
       res.status(500).send({
         success: false,
@@ -336,38 +305,18 @@ var functions = {
   getAllUserLoan: async function (req, res) {
     try {
       //GETTING DATA FROM COINGECKO
-      const geckoUrl =
-        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&vs_currencies=usd";
-      const options = {
-        method: "GET",
-        url: geckoUrl,
-      };
-      //do something with the response object from coinGecko
-      axios(options).then(async (geckoResponse) => {
-        if (geckoResponse) {
-          const responseFromGecko = await geckoResponse.data;
-          //rearrange the response object
-          const priceData = {
-            BTC: responseFromGecko.bitcoin.usd,
-            ETH: responseFromGecko.ethereum.usd,
-            BSC: responseFromGecko.binancecoin.usd,
-            DOGE: responseFromGecko.dogecoin.usd,
-          };
-          //find the loan data
-          const loanData = await Loan.find({
-            userEmail: req.user.email,
-            status: true,
-          }).sort({ createdAt: -1 });
-          res.json({
-            success: true,
-            msg: "Loan data successfully fetched",
-            data: loanData,
-            currentPrice: priceData
-          });
-        }
-
+      const priceData = await getCurrentTokenPrice()
+      //find the loan data
+      const loanData = await Loan.find({
+        userEmail: req.user.email,
+        status: true,
+      }).sort({ createdAt: -1 });
+      res.json({
+        success: true,
+        msg: "Loan data successfully fetched",
+        data: loanData,
+        currentPrice: priceData
       });
-
     } catch (err) {
       res.status(403).send({
         success: false,
@@ -394,53 +343,32 @@ var functions = {
       } else {
         //check for the current price of the collateral
         //GETTING DATA FROM COINGECKO
-        const geckoUrl =
-          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin&vs_currencies=usd";
-        const options = {
-          method: "GET",
-          url: geckoUrl,
-        };
-        //do something with the response object from coinGecko
-        axios(options).then(async (geckoResponse) => {
-          if (geckoResponse) {
-            const responseFromGecko = await geckoResponse.data;
-            //rearrange the response object
-            const priceData = {
-              BTC: responseFromGecko.bitcoin.usd,
-              ETH: responseFromGecko.ethereum.usd,
-              BSC: responseFromGecko.binancecoin.usd,
-              DOGE: responseFromGecko.dogecoin.usd,
-            };
-            //get the price of collateral token
-            const currentCollateralPriceInUsd =
-              priceData[theLoan.collateralToken] *
-              theLoan.collateralAmountInValue;
+        const priceData = await getCurrentTokenPrice()
+
+        const currentCollateralPriceInUsd =
+          priceData[theLoan.collateralToken] *
+          theLoan.collateralAmountInValue;
 
 
-            if (theLoan.liquidationPriceInUsd <= currentCollateralPriceInUsd) {
-              //end the loan plan and send the user and tinqfi an email notification
-              console.log(
-                "end the loan plan and send the user and tinqfi an email notification"
-              );
-            }
-            if (theLoan.marginCallPriceInUsd <= currentCollateralPriceInUsd) {
-              console.log("Topup the loan");
-              //add a new amount to the topup array
-            }
-            if (
-              currentCollateralPriceInUsd >= theLoan.collateralTokenAmountInUsd
-            ) {
-              console.log("no need to topup");
-              //add a new amount to the topup array
-            }
-          } else {
-            res
-              .status(400)
-              .send({ success: false, msg: "Failed market data response" });
-          }
-          //determine how many more collateral to take
-          //collect the collateral and add to the topup
-        });
+        if (theLoan.liquidationPriceInUsd <= currentCollateralPriceInUsd) {
+          //end the loan plan and send the user and tinqfi an email notification
+          console.log(
+            "end the loan plan and send the user and tinqfi an email notification"
+          );
+        }
+        if (theLoan.marginCallPriceInUsd <= currentCollateralPriceInUsd) {
+          console.log("Topup the loan");
+          //add a new amount to the topup array
+        }
+        if (
+          currentCollateralPriceInUsd >= theLoan.collateralTokenAmountInUsd
+        ) {
+          console.log("no need to topup");
+          //add a new amount to the topup array
+        }
+
+        //determine how many more collateral to take
+        //collect the collateral and add to the topup
       }
     } catch (e) {
       res.status(500).send({
@@ -450,7 +378,7 @@ var functions = {
     }
   },
 
-  //repay a loan complete this
+  //repay a loan 
   repayLoan: async function (req, res) {
     try {
       //get the loan data from db
@@ -473,7 +401,8 @@ var functions = {
         for (var i in topupArray) {
           topupSum += topupArray[i];
         }
-        // console.log(topupSum);
+        //GETTING DATA FROM COINGECKO
+        const priceData = await getCurrentTokenPrice()
 
         //get the daily interest rate and calculate the interest rate for the loan
         const aDayInMilliseconds = 86400000; //24 * 60 * 60 * 1000
@@ -487,7 +416,10 @@ var functions = {
         //THE AMOUNT + THE PROFIT
         const borrowedTokenAndProfit =
           totalInterest + theLoan.borrowedAmountInValue;
-        // console.log(borrowedTokenAndProfit);
+        //THE AMOUNT + THE PROFIT IN USD
+        const borrowedTokenAndProfitInUsd = Number(borrowedTokenAndProfit) * Number(priceData[theLoan.borrowedToken]);
+        const collateralTokenInUsd = Number(topupSum) * Number(priceData[theLoan.collateralToken]);
+
         //COLLECT THE LOAN BORROWED TOKEN TO THE USER
         const borrowedTokenData = {
           recipientAccountId:
@@ -518,6 +450,24 @@ var functions = {
                 //the response from Tatum
                 const borrowedTokenRefId = await serverUserResponse.data
                   .reference;
+                //POST BORROWED TOKEN TRANSACTIONS TO USER
+                const newTinqfiTrxn = {
+                  userEmail: req.user.email,
+                  userTaTumId: req.user.ourCustomerTatumId,
+                  transactionAmount: formatAmount(borrowedTokenAndProfit),
+                  transactionAmountInUsd: formatAmountInUsd(borrowedTokenAndProfitInUsd),
+                  transactionState: "Successful",
+                  transactionDetails: `Repayed -${borrowedTokenAndProfit} as loan + Profit with loan Id ${theLoan._id}`,
+                  transactionToken: theLoan.borrowedToken,
+                  transactionType: "Loan",
+                  tenure: `${Math.ceil(days)} days`,
+                  from: theLoan.borrowedTokenAccount,
+                  to: "Tinqfi",
+                  debit: true,
+                  trxnRefId: borrowedTokenRefId,
+                };
+                new TinqfiTrxn(newTinqfiTrxn).save()
+
                 //COLLECT THE COLLATERAL FROM TINQFI
                 const collateralTokenData = {
                   recipientAccountId: theLoan.collateralTokenAccount,
@@ -567,15 +517,18 @@ var functions = {
                         const newTinqfiTrxn = {
                           userEmail: req.user.email,
                           userTaTumId: req.user.ourCustomerTatumId,
-                          transactionAmount: borrowedTokenAndProfit,
-                          transactionToken: `Repayed -${borrowedTokenAndProfit} as loan + Profit with loan Id ${theLoan._id} and collected Collateral`,
+                          transactionAmount: formatAmount(topupSum),
+                          transactionAmountInUsd: formatAmountInUsd(collateralTokenInUsd),
+                          transactionState: "Successful",
+                          transactionDetails: `Sent -${topupSum} as collateral back to user ${theLoan._id}`,
+                          transactionToken: theLoan.collateralToken,
                           transactionType: "Loan",
                           tenure: `${Math.ceil(days)} days`,
-                          from: "From TinqFI + User",
+                          from: "From TinqFI",
                           to: theLoan.collateralTokenAccount,
-                          debit: true,
+                          debit: false,
                           trxnRefId:
-                            collateralTokenRefId + " - " + borrowedTokenRefId,
+                            collateralTokenRefId,
                         };
                         new TinqfiTrxn(newTinqfiTrxn).save().then(() => {
                           res.json({

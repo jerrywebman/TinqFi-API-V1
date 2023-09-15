@@ -5,6 +5,8 @@ var bcrypt = require("bcrypt");
 var User = require("../../models/user");
 const generateOTP = require("../../middleware/generateOTP");
 const emailTemplate = require("../../middleware/emailTemplate");
+const formatAmount = require("../../utils/index")
+const formatAmountInUsd = require("../../utils/formatUsd")
 
 var functions = {
   //BITCOIN WITHDRAWAL

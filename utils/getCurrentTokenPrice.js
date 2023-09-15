@@ -1,0 +1,46 @@
+const axios = require("axios");
+const redisClient = require("../middleware/init_redis");
+
+const getCurrentTokenPrice = async () => {
+    try {
+        //CHECK IF REDIS DATA IS AVAILABLE AND WILL NOT EXPIRE IN 20 SEC
+        const redisTtl = await redisClient.ttl("priceData");
+        if (!redisTtl || redisTtl < 20) {
+            const res = await axios
+                .get(process.env.PRICE_API, {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                .then(async function (response) {
+                    const responseFromGecko = await response.data;
+                    //rearrange the response object
+                    const priceData = {
+                        BTC: responseFromGecko.bitcoin.usd,
+                        ETH: responseFromGecko.ethereum.usd,
+                        BSC: responseFromGecko.binancecoin.usd,
+                        DOGE: responseFromGecko.dogecoin.usd,
+                    }
+                    //Save data to Redis
+                    redisClient.set("priceData", JSON.stringify(priceData));
+                    redisClient.expire("priceData", 300);
+                    return priceData;
+                })
+                .catch(function (error) {
+                    return error.response.data;
+                });
+            return res;
+        }
+        else {
+            const data = await redisClient.get("priceData");
+            return JSON.parse(data);
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: "Price Data Network failed",
+        };
+    }
+}
+
+module.exports = getCurrentTokenPrice;
