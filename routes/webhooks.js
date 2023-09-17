@@ -11,7 +11,6 @@ const router = express.Router();
 //GET ALL ACCOUNTS
 router.post(
   "/api/v1/webhooks/get",
-  verify,
   webhooksActions.getWebhooks
 );
 

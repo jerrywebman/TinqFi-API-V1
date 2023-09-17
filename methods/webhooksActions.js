@@ -16,13 +16,14 @@ var functions = {
   },
   //SET WEBHOOKS NOTIFICATIONS
   setWebhooks: function (req, res) {
+    //once a user account is created, set a webhook subscription.
     try {
       if (req.user.email !== "tinqlabtech@gmail.com") {
         res.send("not you")
       } else {
         const formUserData = {
           attr: {
-            id: "632cec963c281051123c8d95",//customer token account id
+            id: "632cfc5a664a0e32e3d4e1ef",//customer token account id
             // address: "0xdb2c0e4166316a3daf8e280787091dda2d89ff9a",
             // chain: "BSC",
             url: "https://tinqfi.cyclic.app/api/v1/webhooks/get",
@@ -41,7 +42,7 @@ var functions = {
         };
         //DONE
         axios(options).then((response) => {
-          console.log(response);
+          res.send(response.data);
         }).catch((err) => { console.log(err); });
       }
 
