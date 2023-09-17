@@ -105,6 +105,7 @@ const convert = require("./routes/convert");
 const biometrics = require("./routes/biometrics");
 const adverts = require("./routes/adverts");
 const referral = require("./routes/referral");
+const webhooks = require("./routes/webhooks");
 
 app.use(routes);
 app.use(wallet);
@@ -122,6 +123,7 @@ app.use(convert);
 app.use(biometrics);
 app.use(adverts);
 app.use(referral);
+app.use(webhooks);
 
 const PORT = process.env.PORT || 4000;
 

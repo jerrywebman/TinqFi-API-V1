@@ -10,7 +10,7 @@ const formatAmountInUsd = require("../../utils/formatUsd")
 
 var functions = {
   //BITCOIN WITHDRAWAL
-  withdrawBtc: function (req, res) {
+  withdrawBtc: async function (req, res) {
     try {
       //get the currency
       const currency = req.body.currency;
@@ -45,7 +45,6 @@ var functions = {
           senderNote,
           xpub: process.env.BTC_XPUB,
         };
-        console.log(formData);
         try {
           const options = {
             method: "POST",
@@ -57,7 +56,7 @@ var functions = {
           };
           //try sending to the kms
           axios(options)
-            .then((ServerResponse) => {
+            .then(async (ServerResponse) => {
               if (ServerResponse.data.errorCode === "balance.insufficient") {
                 res.status(400).send({
                   success: false,
@@ -65,19 +64,23 @@ var functions = {
                 });
               }
               const response = ServerResponse.data.signatureId;
-              // console.log(ServerResponse);
+              const priceData = await getCurrentTokenPrice();
+              //DO THE DOLLAR CALCULATIONS HERE
+              const valueInDollar =
+                Number(priceData[currency]) * Number(amount);
 
-              //post a transaction and tell the user it is successful
-              // if (response != undefined || response != null) {
               //POST TRX HISTORY WITH THE USER DATA IN DB
               const newTinqfiTrxn = {
                 userEmail: req.user.email,
                 userTaTumId: req.user.ourCustomerTatumId,
-                transactionAmount: amount,
+                transactionAmount: formatAmount(amount),
                 transactionToken: currency,
+                transactionState: "Pending",
+                transactionAmountInUsd: formatAmountInUsd(valueInDollar),
+                transactionDetails: `Sent ${amount} worth of ${currency} at ${valueInDollar}in USD to ${address}`,
                 transactionType: "Withdrawal",
-                tenure: "Instant",
-                from: "wallet",
+                tenure: "",
+                from: "Wallet",
                 to: address,
                 debit: true,
                 trxnRefId: response,
@@ -115,7 +118,7 @@ var functions = {
     }
   },
   //ETHEREUM WITHDRAWAL
-  withdrawEth: function (req, res) {
+  withdrawEth: async function (req, res) {
     try {
       //get the currency
       const currency = req.body.currency;
@@ -161,7 +164,7 @@ var functions = {
           };
           //try sending to the kms
           axios(options)
-            .then((ServerResponse) => {
+            .then(async (ServerResponse) => {
               if (ServerResponse.data.errorCode === "balance.insufficient") {
                 res.status(400).send({
                   success: false,
@@ -171,21 +174,28 @@ var functions = {
               const response = ServerResponse.data.signatureId;
               // console.log(ServerResponse);
 
-              //post a transaction and tell the user it is successful
-              // if (response != undefined || response != null) {
+              const priceData = await getCurrentTokenPrice()
+              //DO THE DOLLAR CALCULATIONS HERE
+              const valueInDollar =
+                Number(priceData[currency]) * Number(amount);
+
               //POST TRX HISTORY WITH THE USER DATA IN DB
               const newTinqfiTrxn = {
                 userEmail: req.user.email,
                 userTaTumId: req.user.ourCustomerTatumId,
-                transactionAmount: amount,
+                transactionAmount: formatAmount(amount),
                 transactionToken: currency,
+                transactionState: "Pending",
+                transactionAmountInUsd: formatAmountInUsd(valueInDollar),
+                transactionDetails: `Sent ${amount} worth of ${currency} at ${valueInDollar}in USD to ${address}`,
                 transactionType: "Withdrawal",
-                tenure: "Instant",
-                from: "wallet",
+                tenure: "",
+                from: "Wallet",
                 to: address,
                 debit: true,
                 trxnRefId: response,
               };
+
               new TinqfiTrxn(newTinqfiTrxn).save();
               res.json({
                 success: true,
@@ -219,7 +229,7 @@ var functions = {
     }
   },
   //BINANCE WITHDRAWAL
-  withdrawBsc: function (req, res) {
+  withdrawBsc: async function (req, res) {
     try {
       //get the currency
       const currency = req.body.currency;
@@ -265,7 +275,7 @@ var functions = {
           };
           //try sending to the kms
           axios(options)
-            .then((ServerResponse) => {
+            .then(async (ServerResponse) => {
               if (ServerResponse.data.errorCode === "balance.insufficient") {
                 res.status(400).send({
                   success: false,
@@ -273,19 +283,23 @@ var functions = {
                 });
               }
               const response = ServerResponse.data.signatureId;
-              // console.log(ServerResponse);
+              const priceData = await getCurrentTokenPrice()
+              //DO THE DOLLAR CALCULATIONS HERE
+              const valueInDollar =
+                Number(priceData[currency]) * Number(amount);
 
-              //post a transaction and tell the user it is successful
-              // if (response != undefined || response != null) {
               //POST TRX HISTORY WITH THE USER DATA IN DB
               const newTinqfiTrxn = {
                 userEmail: req.user.email,
                 userTaTumId: req.user.ourCustomerTatumId,
-                transactionAmount: amount,
+                transactionAmount: formatAmount(amount),
                 transactionToken: currency,
+                transactionState: "Pending",
+                transactionAmountInUsd: formatAmountInUsd(valueInDollar),
+                transactionDetails: `Sent ${amount} worth of ${currency} at ${valueInDollar}in USD to ${address}`,
                 transactionType: "Withdrawal",
-                tenure: "Instant",
-                from: "wallet",
+                tenure: "",
+                from: "Wallet",
                 to: address,
                 debit: true,
                 trxnRefId: response,
@@ -323,7 +337,7 @@ var functions = {
     }
   },
   //DOGECOIN WITHDRAWAL
-  withdrawDoge: function (req, res) {
+  withdrawDoge: async function (req, res) {
     try {
       //get the currency
       const currency = req.body.currency;
@@ -370,7 +384,7 @@ var functions = {
           };
           //try sending to the kms
           axios(options)
-            .then((ServerResponse) => {
+            .then(async (ServerResponse) => {
               if (ServerResponse.data.errorCode === "balance.insufficient") {
                 res.status(400).send({
                   success: false,
@@ -378,19 +392,23 @@ var functions = {
                 });
               }
               const response = ServerResponse.data.signatureId;
-              // console.log(ServerResponse);
+              const priceData = await getCurrentTokenPrice()
+              //DO THE DOLLAR CALCULATIONS HERE
+              const valueInDollar =
+                Number(priceData[currency]) * Number(amount);
 
-              //post a transaction and tell the user it is successful
-              // if (response != undefined || response != null) {
               //POST TRX HISTORY WITH THE USER DATA IN DB
               const newTinqfiTrxn = {
                 userEmail: req.user.email,
                 userTaTumId: req.user.ourCustomerTatumId,
-                transactionAmount: amount,
+                transactionAmount: formatAmount(amount),
                 transactionToken: currency,
+                transactionState: "Pending",
+                transactionAmountInUsd: formatAmountInUsd(valueInDollar),
+                transactionDetails: `Sent ${amount} worth of ${currency} at ${valueInDollar}in USD to ${address}`,
                 transactionType: "Withdrawal",
-                tenure: "Instant",
-                from: "wallet",
+                tenure: "",
+                from: "Wallet",
                 to: address,
                 debit: true,
                 trxnRefId: response,
@@ -427,7 +445,6 @@ var functions = {
       });
     }
   },
-
   //SEND OTP
   sendOtp: async function (req, res) {
     try {
@@ -492,7 +509,6 @@ var functions = {
       })
     }
   },
-
   //COMPLETE WITHDRAWAL
   completeWithdrawal: async function (req, res) {
     try {
