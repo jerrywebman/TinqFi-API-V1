@@ -4,10 +4,9 @@ var functions = {
   //GET ALL WEBHOOKS NOTIFICATIONS
   getWebhooks: function (req, res) {
     try {
-      return res.status(200).json({
-        data: content,
-      });
+      console.log(res);
     } catch (err) {
+      console.log(err);
       return res.status(503).send({
         success: false,
         msg: "Server unavailable",
