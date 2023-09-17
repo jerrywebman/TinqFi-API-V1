@@ -4,7 +4,7 @@ var functions = {
   //GET ALL WEBHOOKS NOTIFICATIONS
   getWebhooks: function (req, res) {
     try {
-      console.log(res);
+      console.log(req.body);
     } catch (err) {
       console.log(err);
       return res.status(503).send({
