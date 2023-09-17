@@ -5,6 +5,7 @@ var functions = {
   getWebhooks: function (req, res) {
     try {
       console.log(req.body);
+      res.status(200).end()
     } catch (err) {
       console.log(err);
       return res.status(503).send({
