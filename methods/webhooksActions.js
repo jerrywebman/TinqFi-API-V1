@@ -1,14 +1,50 @@
 const axios = require("axios");
+var User = require("../models/user");
+const formatAmount = require("../utils/index")
+const formatAmountInUsd = require("../utils/formatUsd")
+var TinqfiTrxn = require("../models/Transaction");
+const getCurrentTokenPrice = require("../utils/getCurrentTokenPrice")
 
 var functions = {
   //GET ALL WEBHOOKS NOTIFICATIONS
-  getWebhooks: function (req, res) {
+  getWebhooks: async function (req, res) {
     try {
-      console.log(req.body);
-      res.status(200).end()
+      const { accountId, amount, reference, currency, txId, from, to, date } = req.body.data;
+      //find the user
+      let user = await User.findOne({ onRegistrationLedgerAccnts: { $all: [{ "$elemMatch": { tokenAccountId: accountId } }] } });
+      //get token price in dollar
+      const priceData = await getCurrentTokenPrice();
+      //DO THE DOLLAR CALCULATIONS HERE
+      const valueInDollar =
+        Number(priceData[currency]) * Number(amount);
+
+      if (user) {
+        //post deposit trannsaction
+        //find the user and get their email and tatum id
+        const newTinqfiTrxn = {
+          userEmail: user.email,
+          userTaTumId: user.ourCustomerTatumId,
+          transactionAmount: formatAmount(amount),
+          transactionToken: currency,
+          transactionAmountInUsd: formatAmountInUsd(valueInDollar),
+          transactionState: "Successful",
+          transactionDetails: `Deposited - ${amount + " of " + currency
+            } at ${valueInDollar}`,
+          transactionType: "Deposit",
+          tenure: "Instant",
+          from: from,
+          to: to,
+          debit: false,
+          trxnRefId: txId,
+        };
+        new TinqfiTrxn(newTinqfiTrxn).save();
+        res.status(200).send({
+          success: true,
+          msg: "Ok",
+        });
+      }
     } catch (err) {
-      console.log(err);
-      return res.status(503).send({
+      res.status(503).send({
         success: false,
         msg: "Server unavailable",
       });
