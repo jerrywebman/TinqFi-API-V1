@@ -35,7 +35,7 @@ var functions = {
           from: from,
           to: to,
           debit: false,
-          trxnRefId: txId,
+          trxnRefId: txId,//add the network url here
         };
         new TinqfiTrxn(newTinqfiTrxn).save();
         res.status(200).send({

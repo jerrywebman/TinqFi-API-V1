@@ -23,7 +23,7 @@ router.post("/api/v1/loan/apply", verify, loanActions.applyForLoan);
 //GET ALL A USER LOAN
 router.get("/api/v1/loan/get_loans", verify, loanActions.getAllUserLoan);
 //TOPUP A LOAN
-router.get("/api/v1/loan/topup/:id", verify, loanActions.topupCollateral);
+router.put("/api/v1/loan/topup/:id", verify, loanActions.topupCollateral);
 //REPAY A LOAN
 router.get("/api/v1/loan/repay/:id", verify, loanActions.repayLoan);
 

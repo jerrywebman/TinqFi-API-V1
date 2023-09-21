@@ -349,26 +349,90 @@ var functions = {
           priceData[theLoan.collateralToken] *
           theLoan.collateralAmountInValue;
 
-
-        if (theLoan.liquidationPriceInUsd <= currentCollateralPriceInUsd) {
-          //end the loan plan and send the user and tinqfi an email notification
-          console.log(
-            "end the loan plan and send the user and tinqfi an email notification"
-          );
+        if (theLoan.marginCallPriceInUsd > currentCollateralPriceInUsd) {
+          //get the topup value in usd
+          const amountDiffInUsd = currentCollateralPriceInUsd - theLoan.collateralTokenAmountInUsd;
+          //get the value to deduct and add to topup
+          const valueOfTopup = amountDiffInUsd / priceData[theLoan.collateralToken]
+          // check if the amount diff in usd is not a negative number, if yes, take the value to topup from the
+          //user account and add it to the topup array
+          if (Math.sign(amountDiffInUsd) === -1) {
+            //checking if its a negative of positive value
+            //withdraw add to the topup array        
+            //add a new amount to the topup array
+            const toTinqfiMoneyData = {
+              recipientAccountId: process.env["TINQFI_LOAN_ACCOUNT_" + theLoan.collateralToken],
+              senderAccountId: theLoan.collateralTokenAccount,
+              amount: String(valueOfTopup),
+              anonymous: false,
+              compliant: false,
+              transactionCode: req.user.email,
+              paymentId: req.user.ourCustomerTatumId,
+              recipientNote: "topup token to Tinqfi",
+            };
+            const options = {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": process.env.TATUM_API_KEY,
+              },
+              url: `${process.env.TATUM_BASE_URL}/ledger/transaction`,
+              data: toTinqfiMoneyData,
+            };
+            //DONE
+            axios(options).then((response) => {
+              if (response.data.reference) {
+                const referenceId =
+                  response.data.reference;
+                //UPDATE THE LOAN DATA.
+                const loanData = Loan.updateOne(
+                  { _id: req.params.id, },
+                  {
+                    $set: {
+                      collateralTatumRefID: theLoan.collateralTatumRefID + " ," + referenceId,//adding the new refID to the existing one
+                    },
+                    $push: {
+                      topupLoan: valueOfTopup,//add to the topup array
+                    },
+                  }
+                ).then(async () => {
+                  const newTinqfiTrxn = {
+                    userEmail: req.user.email,
+                    userTaTumId: req.user.ourCustomerTatumId,
+                    transactionAmount: formatAmount(valueOfTopup),
+                    transactionAmountInUsd: formatAmountInUsd(amountDiffInUsd),
+                    transactionState: "Successful",
+                    transactionDetails: `Topup -${theLoan.collateralToken} at ${priceData[theLoan.collateralToken]} collateral`,
+                    transactionToken: theLoan.collateralToken,
+                    transactionType: "Loan",
+                    tenure: `${theLoan.loanTenure} days`,
+                    from: "Wallet",
+                    to: "TinqFi",
+                    debit: true,
+                    trxnRefId: referenceId,
+                  };
+                  await new TinqfiTrxn(newTinqfiTrxn).save();
+                  res.status(200).send({
+                    success: true,
+                    message: "Topup Successfull"
+                  })
+                });
+                //POST TRX HISTORY WITH THE USER DATA IN DB
+              }
+            }).catch((error) => {
+              res.status(400).send({
+                success: false,
+                message: "an error occurred, please try again later"
+              })
+            });
+          }
+          else {
+            res.status(400).send({
+              success: false,
+              message: "Topup not required"
+            })
+          }
         }
-        if (theLoan.marginCallPriceInUsd <= currentCollateralPriceInUsd) {
-          console.log("Topup the loan");
-          //add a new amount to the topup array
-        }
-        if (
-          currentCollateralPriceInUsd >= theLoan.collateralTokenAmountInUsd
-        ) {
-          console.log("no need to topup");
-          //add a new amount to the topup array
-        }
-
-        //determine how many more collateral to take
-        //collect the collateral and add to the topup
       }
     } catch (e) {
       res.status(500).send({
