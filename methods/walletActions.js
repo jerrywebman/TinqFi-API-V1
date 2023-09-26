@@ -196,7 +196,7 @@ var functions = {
           //GET THE TOKEN BALANCE IN USD
           let accountBalance = 0;
           finalResponse.map((single) => {
-            const price = Number(single.current_price);
+            const price = single.current_price !== undefined ? Number(single.current_price) : 1.00;
             const availableBalance = Number(
               single.balance.availableBalance
             );
