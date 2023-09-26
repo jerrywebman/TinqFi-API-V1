@@ -74,7 +74,6 @@ var functions = {
           });
         })
         .catch((e) => {
-
           res.status(500).send({
             success: false,
             msg: "Error occured while updating market data",
