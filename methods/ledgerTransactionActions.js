@@ -1,5 +1,7 @@
 var TinqfiTrxn = require("../models/Transaction");
+var User = require("../models/user");
 const axios = require("axios");
+const getCurrentTokenPrice = require("../utils/getCurrentTokenPrice")
 
 var functions = {
   //MAKE INTERNAL TRANSFER
@@ -7,12 +9,12 @@ var functions = {
     //security checks: min withdrawal, max transfer, check amount,
     // res.send({ success: true, msg: "Internal transfer route" });
     //CHECK THE ADDRESS, IF IN TATUM
-
     try {
       const currency = req.body.currency;
       const address = req.body.address;
       const tokenAccountId = req.body.tokenAccountId;
       const amount = req.body.amount;
+      const amountNumber = Number(amount);
       // console.log(currency, address, amount, tokenAccountId);
       //Check whether a blockchain address is assigned to a user
       const url = `${process.env.TATUM_BASE_URL}/offchain/account/address/${address}/${currency}`;
@@ -31,15 +33,15 @@ var functions = {
             //the response from Tatum
             // console.log(serverResponse.data);
             const recieverTokenAccountId = await serverResponse.data.id;
+            const recieverTatumId = await serverResponse.data.customerId;
             //NOW MAKE THE TRANSFER
-            // const userArray = req.user.onRegistrationLedgerAccnts;
-            // const searchIndex = userArray.find(
-            //   (user) => user.tokenAccountcurrency === currency
-            // );
+            const reciever = await User.findOne({ ourCustomerTatumId: recieverTatumId });
+            //GET THE EARN TOKEN VALUE IN DOLLAR
+            const priceData = await getCurrentTokenPrice();
+            const valueInDollar =
+              Number(priceData[currency]) * amountNumber;
 
             const senderTokenAccountId = tokenAccountId;
-            // console.log("SenderID", senderTokenAccountId);
-            // console.log("RecieverID", recieverTokenAccountId);
             const formData = {
               senderAccountId: senderTokenAccountId,
               recipientAccountId: recieverTokenAccountId,
@@ -68,26 +70,48 @@ var functions = {
                   if (serverResponse.data !== null) {
                     //the response from Tatum
                     const referenceId = serverResponse.data.reference;
-                    //DONE
-                    //POST TRX HISTORY WITH THE USER DATA IN DB
+                    //POST TRANSACTION FOR THE RECIEVER
+                    //GET THE USER EMAIL FROM THE DB USING THE RECIEVER TOKEN ID
+                    const recieverTrxn = {
+                      userEmail: reciever.email,
+                      userTaTumId: recieverTatumId,
+                      transactionAmount: formatAmount(amount),
+                      transactionToken: currency,
+                      transactionState: "Successful",
+                      transactionAmountInUsd: formatAmountInUsd(valueInDollar),
+                      transactionType: "Transfer",
+                      from: senderTokenAccountId,
+                      transactionDetails: `Transfer ${amountNumber} at ${valueInDollar} from ${recieverTokenAccountId}`,
+                      tenure: `Internal Transfer `,
+                      to: "Wallet",
+                      debit: false,
+                      trxnRefId: referenceId,
+                    };
+                    new TinqfiTrxn(recieverTrxn).save();
+                    //POST TRX HISTORY WITH THE USER DATA FOR THE SENDER
                     const newTinqfiTrxn = {
                       userEmail: req.user.email,
                       userTaTumId: req.user.ourCustomerTatumId,
-                      transactionAmount: req.body.amount,
+                      transactionAmount: formatAmount(amount),
                       transactionToken: currency,
+                      transactionState: "Successful",
+                      transactionAmountInUsd: formatAmountInUsd(valueInDollar),
                       transactionType: "Transfer",
                       from: senderTokenAccountId,
+                      transactionDetails: `Transfer ${amountNumber} at ${valueInDollar} to ${senderTokenAccountId}`,
+                      tenure: `Internal Transfer `,
                       to: recieverTokenAccountId,
-                      trxnRefId: referenceId,
                       debit: true,
+                      trxnRefId: referenceId,
                     };
                     new TinqfiTrxn(newTinqfiTrxn).save().then(() =>
                       res.json({
                         success: true,
-                        msg: "Transaction Successful",
-                        // trxnRefId: referenceId,
+                        msg: "Transfer Successful",
+
                       })
                     );
+
                   } else
                     res.status(403).send({
                       success: false,
