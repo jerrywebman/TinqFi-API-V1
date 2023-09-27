@@ -23,7 +23,7 @@ const getCurrentTokenPrice = async () => {
                     }
                     //Save data to Redis
                     redisClient.set("priceData", JSON.stringify(priceData));
-                    redisClient.expire("priceData", 300);
+                    redisClient.expire("priceData", 900);
                     return priceData;
                 })
                 .catch(function (error) {

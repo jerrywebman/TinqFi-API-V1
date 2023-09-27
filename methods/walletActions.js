@@ -30,7 +30,8 @@ var functions = {
           });
 
           //GETTING DATA FROM COINGECKO
-          const priceData = await getAllCurrentTokenPrice();
+          let priceData = [];
+          priceData = await getAllCurrentTokenPrice();
           const newresponseFromGecko = [];
           //do the heavy data processing  by slicing the data and editing it
           priceData.map(function (single) {
@@ -159,7 +160,8 @@ var functions = {
           });
 
           //GETTING DATA FROM COINGECKO
-          const priceData = await getAllCurrentTokenPrice();
+          let priceData = [];
+          priceData = await getAllCurrentTokenPrice();
           const newresponseFromGecko = [];
           //do the heavy data processing  by slicing the data and editing it
           priceData.map(function (single) {
