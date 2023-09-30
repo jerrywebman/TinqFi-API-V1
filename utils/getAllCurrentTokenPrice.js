@@ -16,10 +16,11 @@ const getAllCurrentTokenPrice = async () => {
                     const responseFromGecko = await response.data;
                     //Save data to Redis
                     redisClient.set("allPriceData", JSON.stringify(responseFromGecko));
-                    redisClient.expire("allPriceData", 900);
+                    redisClient.expire("allPriceData", 6000);
                     return priceData;
                 })
                 .catch(function (error) {
+                    console.log(error);
                     return error.response.data;
                 });
             return res;

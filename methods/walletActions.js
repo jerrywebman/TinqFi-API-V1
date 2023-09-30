@@ -32,6 +32,7 @@ var functions = {
           //GETTING DATA FROM COINGECKO
           let priceData = [];
           priceData = await getAllCurrentTokenPrice();
+          console.log(priceData);
           const newresponseFromGecko = [];
           //do the heavy data processing  by slicing the data and editing it
           priceData.map(function (single) {
@@ -75,10 +76,11 @@ var functions = {
           });
         })
         .catch((e) => {
-          res.status(500).send({
-            success: false,
-            msg: "Error occured while updating market data",
-          });
+          res.end();
+          // res.status(500).send({
+          //   success: false,
+          //   msg: "Error occured while updating market data",
+          // });
         });
 
     } catch (err) {
@@ -162,6 +164,7 @@ var functions = {
           //GETTING DATA FROM COINGECKO
           let priceData = [];
           priceData = await getAllCurrentTokenPrice();
+          console.log(priceData);
           const newresponseFromGecko = [];
           //do the heavy data processing  by slicing the data and editing it
           priceData.map(function (single) {
@@ -275,10 +278,11 @@ var functions = {
         })
         .catch((err) => {
           console.log(err);
-          res.status(404).send({
-            success: false,
-            msg: "Error occured while updating market data",
-          });
+          res.end();
+          // res.status(404).send({
+          //   success: false,
+          //   msg: "Error occured while updating market data",
+          // });
         });
 
 
