@@ -164,7 +164,6 @@ var functions = {
           //GETTING DATA FROM COINGECKO
           let priceData = [];
           priceData = await getAllCurrentTokenPrice();
-          console.log(priceData);
           const newresponseFromGecko = [];
           //do the heavy data processing  by slicing the data and editing it
           priceData.map(function (single) {

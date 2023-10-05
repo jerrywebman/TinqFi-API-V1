@@ -63,7 +63,7 @@ var functions = {
           msg: "amount is below minimum amount for this plan",
         });
       } else {
-        const planTenure = req.body.planTenure;
+        const planTenure = Number(req.body.planTenure);
         //get the monthly profit percentage
         const monthlyProfitPercent = Number(thePlan.apy) / 12;
         //GET the daily profit percantage
