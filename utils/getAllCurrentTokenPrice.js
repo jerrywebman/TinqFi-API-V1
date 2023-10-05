@@ -17,10 +17,9 @@ const getAllCurrentTokenPrice = async () => {
                     //Save data to Redis
                     redisClient.set("allPriceData", JSON.stringify(responseFromGecko));
                     redisClient.expire("allPriceData", 6000);
-                    return priceData;
+                    return responseFromGecko;
                 })
                 .catch(function (error) {
-                    console.log(error);
                     return error.response.data;
                 });
             return res;
@@ -30,7 +29,6 @@ const getAllCurrentTokenPrice = async () => {
             return JSON.parse(data);
         }
     } catch (error) {
-        console.log(error);
         return {
             success: false,
             message: "Price Data Network failed",
