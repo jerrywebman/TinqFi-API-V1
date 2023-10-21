@@ -1,6 +1,7 @@
 var functions = {
     getAvailableTokens: function (req, res) {
         try {
+            const availableTokenList = [];
             const tokens = [
                 {
                     name: "Bitcoin",
@@ -14,7 +15,7 @@ var functions = {
                 },
                 {
                     name: "Dogecoin",
-                    symbol: "Doge",
+                    symbol: "DOGE",
                     image: "https://cryptologos.cc/logos/thumbs/dogecoin.png?v=025"
                 },
                 {
@@ -58,16 +59,36 @@ var functions = {
                 //     image: "https://cryptologos.cc/logos/thumbs/litecoin.png?v=025"
                 // },
             ]
+            //get the customer token accounts
+            //check if he has that token account and add is available
+            const customerTokenAccounts = req.user.onRegistrationLedgerAccnts;
+            for (const token of tokens) {
+                let tok = customerTokenAccounts.find((toks) => toks.tokenAccountcurrency === token.symbol);
+                if (tok) {
+                    availableTokenList.push({
+                        name: token.name,
+                        symbol: token.symbol,
+                        image: token.image,
+                        isAvailable: true,
+                    })
+                } else {
+                    availableTokenList.push({
+                        name: token.name,
+                        symbol: token.symbol,
+                        image: token.image,
+                        isAvailable: false,
+                    })
+                }
+            }
             res.status(200).send({
                 success: true,
-                data: tokens
+                data: availableTokenList,
             });
-
         } catch (e) {
             return res.status(503).send({
                 success: false,
                 error: e.message,
-                msg: "Server unavailable",
+                message: "Server unavailable",
             });
         }
     },
