@@ -106,6 +106,7 @@ const biometrics = require("./routes/biometrics");
 const adverts = require("./routes/adverts");
 const referral = require("./routes/referral");
 const webhooks = require("./routes/webhooks");
+const tokens = require("./routes/tokens");
 
 app.use(routes);
 app.use(wallet);
@@ -124,6 +125,7 @@ app.use(biometrics);
 app.use(adverts);
 app.use(referral);
 app.use(webhooks);
+app.use(tokens);
 
 const PORT = process.env.PORT || 4000;
 

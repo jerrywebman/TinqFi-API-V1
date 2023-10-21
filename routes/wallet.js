@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const walletActions = require("../methods/walletActions");
+const initWalletActions = require("../methods/specialMethods/createWalletActions");
 
 const verify = require("../middleware/verifyToken");
 
@@ -24,5 +25,10 @@ router.get(
 
 //GET ALL THE BALANCES
 router.get("/api/v1/portfolio/balance", verify, walletActions.getAllBalances);
+// router.get("/api/v1/initwallets", initWalletActions.initWallets);
+router.post("/api/v1/wallet/:currency", verify, initWalletActions.createWallet);
+
+//wallets
+
 
 module.exports = router;

@@ -284,167 +284,102 @@ var functions = {
             });
           } else {
             //hashing the password
-            try {
-              bcrypt.genSalt(10, function (err, salt) {
-                if (err) {
-                  return next(err);
-                }
-                bcrypt.hash(
-                  req.body.password,
-                  salt,
-                  async function (err, hash) {
-                    if (err) {
-                      return next(err);
-                    }
-                    try {
-                      const user = User.updateOne(
-                        { email: lowerCaseEmail },
-                        {
-                          $set: {
-                            nickname,
-                            referredBy,
-                            password: hash,
-                            accountSetup: true,
-                          },
-                        }
-                      ).then(async (user) => {
-                        //CREATING A NEW USER MONEY DATABASE
-
-                        const userMoney = await Money.findOne({
-                          userEmail: lowerCaseEmail,
-                        });
-                        if (!userMoney) {
-                          try {
-                            const newMoney = {
-                              _id: lowerCaseEmail,
-                              userEmail: lowerCaseEmail,
-                              referredBy,
-                              nickname,
-                              investmentBalance: 0,
-                              loanBalance: 0,
-                              savingsBalance: 0,
-                              referralBonusBalance: 0,
-                            };
-                            new Money(newMoney).save();
-                            //creating the address db
-                            const newAddress = {
-                              userEmail: lowerCaseEmail,
-                              nickname,
-                              ourCustomerTatumId: lowerCaseEmail,
-                              onRegistration: [],
-                              onP2P: [],
-                              lastUpdated: Date.now(),
-                            };
-                            new AddressStore(newAddress).save();
-                            const clientEmail = lowerCaseEmail;
-                            //CREATE TATUM ACCOUNT_SETUP AND RECIEVE ADDRESSES HERE and delay the response by some seconds
-                            async function btc() {
-                              try {
-                                await new Promise((resolve) =>
-                                  setTimeout(resolve, 500)
-                                );
-                                createWalletActions.createBtcWallet(
-                                  clientEmail
-                                );
-                              } catch (e) {
-                                console.log(e);
-                              }
-                            }
-                            btc();
-                            async function eth() {
-                              try {
-                                await new Promise((resolve) =>
-                                  setTimeout(resolve, 1000)
-                                );
-                                createWalletActions.createETHWallet(
-                                  clientEmail
-                                );
-                              } catch (e) {
-                                console.log(e);
-                              }
-                            }
-                            eth();
-                            async function bsc() {
-                              try {
-                                await new Promise((resolve) =>
-                                  setTimeout(resolve, 1500)
-                                );
-                                createWalletActions.createBSCWallet(
-                                  clientEmail
-                                );
-                              } catch (e) {
-                                console.log(e);
-                              }
-                            }
-                            bsc();
-                            async function doge() {
-                              try {
-                                await new Promise((resolve) =>
-                                  setTimeout(resolve, 2000)
-                                );
-                                createWalletActions.createDOGEWallet(
-                                  clientEmail
-                                );
-                              } catch (e) {
-                                console.log(e);
-                              }
-                            }
-                            doge();
-                          } catch (err) {
-                            console.log(err);
-                          }
-                        } else {
-                          console.log("User already exists in money db");
-                        }
-                      });
-                    } catch (err) {
-                      res.json(err);
-                    }
+            bcrypt.genSalt(10, function (err, salt) {
+              if (err) {
+                return next(err);
+              }
+              bcrypt.hash(
+                req.body.password,
+                salt,
+                async function (err, hash) {
+                  if (err) {
+                    return next(err);
                   }
-                );
-              });
 
-              //SEND EMAIL
-              emailTemplate.completeRegistration(lowerCaseEmail, nickname);
-
-              // res.json({
-              //   success: true,
-              //   msg: "User Account successfully created, Please Login ",
-              // });
-              //PASS THE USER TOKEN TO
-              const theFunction = async () => {
-                const theuser = await User.findOne({ email: lowerCaseEmail });
-                if (!theuser) {
-                  res.json({
-                    success: false,
-                    user: "error occured while creating user account. Please Login",
-                  });
-                } else {
-                  const payload = {
-                    sub: theuser._id,
-                    user: theuser,
-                    iat: Date.now(),
-                  };
-
-                  var token = jwt.sign(payload, process.env.TOKEN_SECRET, {
-                    expiresIn: "5d",
-                  });
-                  // Set data to Redis
-                  client.set(theuser.email, token);
-                  client.expire(theuser.email, 86400);
-                  //give the response
-                  res.json({
-                    success: true,
-                    user: theuser,
-                    token: "Bearer " + token,
+                  const user = User.updateOne(
+                    { email: lowerCaseEmail },
+                    {
+                      $set: {
+                        nickname,
+                        referredBy,
+                        password: hash,
+                        accountSetup: true,
+                      },
+                    }
+                  ).then(async (user) => {
+                    //CREATING A NEW USER MONEY DATABASE
+                    const userMoney = await Money.findOne({
+                      userEmail: lowerCaseEmail,
+                    });
+                    const newMoney = {
+                      _id: lowerCaseEmail,
+                      userEmail: lowerCaseEmail,
+                      referredBy,
+                      nickname,
+                      investmentBalance: 0,
+                      loanBalance: 0,
+                      savingsBalance: 0,
+                      referralBonusBalance: 0,
+                    };
+                    new Money(newMoney).save();
+                    //creating the address db
+                    const newAddress = {
+                      userEmail: lowerCaseEmail,
+                      nickname,
+                      ourCustomerTatumId: lowerCaseEmail,
+                      onRegistration: [],
+                      onP2P: [],
+                      lastUpdated: Date.now(),
+                    };
+                    new AddressStore(newAddress).save();
+                    const clientEmail = lowerCaseEmail;
+                    //CREATE TATUM ACCOUNT_SETUP AND RECIEVE ADDRESSES HERE and delay the response by some seconds
+                    await createWalletActions.initWallets(
+                      clientEmail
+                    );
                   });
                 }
-              };
+              );
+            });
 
-              setTimeout(() => theFunction(), 6000);
-            } catch (err) {
-              res.json({ message: err });
-            }
+            //SEND EMAIL
+            emailTemplate.completeRegistration(lowerCaseEmail, nickname);
+
+            // res.json({
+            //   success: true,
+            //   msg: "User Account successfully created, Please Login ",
+            // });
+            //PASS THE USER TOKEN TO
+            const theFunction = async () => {
+              const theuser = await User.findOne({ email: lowerCaseEmail });
+              if (!theuser) {
+                res.json({
+                  success: false,
+                  user: "error occured while creating user account. Please Login",
+                });
+              } else {
+                const payload = {
+                  sub: theuser._id,
+                  user: theuser,
+                  iat: Date.now(),
+                };
+
+                var token = jwt.sign(payload, process.env.TOKEN_SECRET, {
+                  expiresIn: "5d",
+                });
+                // Set data to Redis
+                client.set(theuser.email, token);
+                client.expire(theuser.email, 86400);
+                //give the response
+                res.json({
+                  success: true,
+                  user: theuser,
+                  token: "Bearer " + token,
+                });
+              }
+            };
+            //DELAY 6 SECONDS BEFORE ACCOUNT IS COMPLETED
+            setTimeout(() => theFunction(), 6000);
           }
         }
       );
@@ -500,7 +435,8 @@ var functions = {
                       user: user,
                       token: "Bearer " + token,
                     });
-
+                    //SEND EMAIL
+                    // emailTemplate.completeRegistration("jerrycifeanyi@gmail.com", "jerry");
                     // Set data to Redis
                     await client.set(user.email, token);
                     await client.expire(user.email, 86400);

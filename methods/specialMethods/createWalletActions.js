@@ -2,6 +2,48 @@ const axios = require("axios");
 const tatumcalls = require("../../config/tatumcalls");
 
 var functions = {
+  //CREATE ALL INITIALIZATION WALLETS
+  //BTC,ETH,BSC,DOGE,SOL,CELO,TRX,USDT,POLY,LTC
+  initWallets: async function (clientEmail) {
+    try {
+      const externalId = clientEmail;
+      const tokens = ["BTC", "ETH", "BSC", "DOGE"];
+      // const tokens = ["BTC", "ETH", "BSC", "DOGE", "SOL", "CELO", "TRX", "LTC", "MATIC"];
+      tokens.map(async (token, index) => {
+        const xpub = process.env[token + "_XPUB"];
+        await tatumcalls.createLedgerAccount(token, xpub, externalId);
+      })
+    } catch (e) {
+      console.log(e);
+    }
+  },
+  //CREATE WALLETS
+  createWallet: async function (req, res) {
+    //step 1
+    try {
+      //if successful create btc ledger account
+      const currency = req.params.currency;
+      const xpub = process.env[currency + "_XPUB"];
+      const externalId = req.user.email;
+      if (xpub === undefined || externalId === undefined || currency === undefined)
+        return res.status(500).json({
+          success: false,
+          message: 'Service unavailable, Please try again'
+        })
+      const response = await tatumcalls.createLedgerAccount(currency, xpub, externalId);
+      res.json({
+        success: response.success,
+        message: response.message
+      })
+
+    } catch (e) {
+      console.log(e);
+      res.status(500).json({
+        success: false,
+        message: 'Service unavailable, Please try again'
+      })
+    }
+  },
   //BITCOIN XPUB
   createBtcWallet: async function (clientEmail) {
     //step 1
