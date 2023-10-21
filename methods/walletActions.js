@@ -7,11 +7,8 @@ var functions = {
   //GET ALL THE TOKEN ACCOUNT
   getAllTokenAccounts: function (req, res) {
     try {
-      const query = new URLSearchParams({
-        pageSize: "10",
-      }).toString();
       const id = req.user.ourCustomerTatumId;
-      const url = `${process.env.TATUM_BASE_URL}/ledger/account/customer/${id}?${query}`;
+      const url = `${process.env.TATUM_BASE_URL}/ledger/account/customer/${id}?pageSize=40`;
 
       const options = {
         method: "GET",
@@ -25,6 +22,7 @@ var functions = {
         .then(async (ServerResponse) => {
           const response = ServerResponse.data;
           //remove the xpub from the server response
+          console.log(response)
           response.forEach((object) => {
             delete object["xpub"];
           });
@@ -156,6 +154,7 @@ var functions = {
         .then(async (ServerResponse) => {
           const response = ServerResponse.data;
           //remove the xpub from the server response
+
           response.forEach((object) => {
             delete object["xpub"];
           });
