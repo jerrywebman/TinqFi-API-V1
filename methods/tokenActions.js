@@ -27,11 +27,11 @@ var functions = {
                     symbol: "XRP",
                     image: "https://cryptologos.cc/logos/thumbs/xrp.png?v=025"
                 },
-                {
-                    name: "Tether USDt",
-                    symbol: "USDT",
-                    image: "https://cryptologos.cc/logos/thumbs/tether.png?v=025"
-                },
+                // {
+                //     name: "Tether USDt",
+                //     symbol: "USDT",
+                //     image: "https://cryptologos.cc/logos/thumbs/tether.png?v=025"
+                // },
                 {
                     name: "Solana",
                     symbol: "SOL",
@@ -42,21 +42,21 @@ var functions = {
                     symbol: "TRX",
                     image: "https://cryptologos.cc/logos/thumbs/tron.png?v=025"
                 },
-                {
-                    name: "Polygon",
-                    symbol: "MATIC",
-                    image: "https://cryptologos.cc/logos/thumbs/polygon.png?v=025"
-                },
-                {
-                    name: "Polkadot",
-                    symbol: "DOT",
-                    image: "https://cryptologos.cc/logos/thumbs/polkadot-new.png?v=025"
-                },
-                {
-                    name: "Litecoin",
-                    symbol: "LTC",
-                    image: "https://cryptologos.cc/logos/thumbs/litecoin.png?v=025"
-                },
+                // {
+                //     name: "Polygon",
+                //     symbol: "MATIC",
+                //     image: "https://cryptologos.cc/logos/thumbs/polygon.png?v=025"
+                // },
+                // {
+                //     name: "Polkadot",
+                //     symbol: "DOT",
+                //     image: "https://cryptologos.cc/logos/thumbs/polkadot-new.png?v=025"
+                // },
+                // {
+                //     name: "Litecoin",
+                //     symbol: "LTC",
+                //     image: "https://cryptologos.cc/logos/thumbs/litecoin.png?v=025"
+                // },
             ]
             res.status(200).send({
                 success: true,

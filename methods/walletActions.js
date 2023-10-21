@@ -139,7 +139,7 @@ var functions = {
   getAllBalances: async function (req, res) {
     try {
       const query = new URLSearchParams({
-        pageSize: "10",
+        pageSize: "20",
       }).toString();
       const id = req.user.ourCustomerTatumId;
       const url = `${process.env.TATUM_BASE_URL}/ledger/account/customer/${id}?${query}`;
