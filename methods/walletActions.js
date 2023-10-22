@@ -109,7 +109,6 @@ var functions = {
         axios(options)
           .then((ServerResponse) => {
             const response = ServerResponse.data;
-            console.log(response);
             //remove the xpub from the server response
             response.forEach((object) => {
               delete object["xpub"];
