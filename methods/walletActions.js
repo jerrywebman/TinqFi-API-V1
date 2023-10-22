@@ -109,15 +109,25 @@ var functions = {
         axios(options)
           .then((ServerResponse) => {
             const response = ServerResponse.data;
+            console.log(response);
             //remove the xpub from the server response
             response.forEach((object) => {
               delete object["xpub"];
             });
-            res.status(200).send({
-              success: true,
-              msg: "Address found",
-              data: response[0],
-            });
+            if (response[0]) {
+              res.status(200).send({
+                success: true,
+                msg: "Address found",
+                data: response[0],
+              });
+            } else {
+              res.status(404).send({
+                success: false,
+                msg: "No Address found",
+                data: {},
+              });
+            }
+
           })
           .catch(() =>
             res

@@ -140,7 +140,8 @@ exports.createLedgerAccountWithoutXpub = async function (currency, wallet, exter
       customer: {
         externalId,
         accountingCurrency: "USD",
-
+        customerCountry: "NG",
+        providerCountry: "NG",
       },
       accountingCurrency: "USD",
     };
@@ -162,6 +163,7 @@ exports.createLedgerAccountWithoutXpub = async function (currency, wallet, exter
 
           // console.log("Customer acount details", serverResponse.data);
           const ledgerAccountDetails = serverResponse.data;
+          console.log(serverResponse.data);
           const callthis = async (id) => {
             const url = `${process.env.TATUM_BASE_URL}/offchain/account/${id}/address/${wallet}`;
             const options = {
@@ -176,9 +178,6 @@ exports.createLedgerAccountWithoutXpub = async function (currency, wallet, exter
             const accntresponse = await axios(options)
               .then((offchainServerResponse) => {
                 if (offchainServerResponse.data !== null) {
-
-
-
                   //UPDATE THE CUSTOMER ADDRESS DB
                   const addAddress = AddressStore.updateOne(
                     { userEmail: externalId },
