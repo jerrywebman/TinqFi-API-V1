@@ -25,17 +25,32 @@ var functions = {
       const currency = req.params.currency;
       const xpub = process.env[currency + "_XPUB"];
       const externalId = req.user.email;
-      if (xpub === undefined || externalId === undefined || currency === undefined)
-        return res.status(500).json({
-          success: false,
-          message: 'Service unavailable, Please try again'
+      //check the currency to know the blockchain
+      if (currency === "TRX") {
+        const wallet = process.env.TRX_WALLET_FOR_ACCOUNT_CREATION;
+        if (wallet === undefined || externalId === undefined || currency === undefined)
+          return res.status(500).json({
+            success: false,
+            message: 'Service unavailable, Please try again'
+          })
+        const response = await tatumcalls.createLedgerAccountWithoutXpub(currency, wallet, externalId);
+        res.json({
+          success: response.success,
+          message: response.message
         })
-      const response = await tatumcalls.createLedgerAccount(currency, xpub, externalId);
-      res.json({
-        success: response.success,
-        message: response.message
-      })
-
+      } else {
+        //do this for any account that requires xpub
+        if (xpub === undefined || externalId === undefined || currency === undefined)
+          return res.status(500).json({
+            success: false,
+            message: 'Service unavailable, Please try again'
+          })
+        const response = await tatumcalls.createLedgerAccount(currency, xpub, externalId);
+        res.json({
+          success: response.success,
+          message: response.message
+        })
+      }
     } catch (e) {
       console.log(e);
       res.status(500).json({
