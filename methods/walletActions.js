@@ -22,7 +22,6 @@ var functions = {
         .then(async (ServerResponse) => {
           const response = ServerResponse.data;
           //remove the xpub from the server response
-          console.log(response)
           response.forEach((object) => {
             delete object["xpub"];
           });
@@ -34,11 +33,15 @@ var functions = {
           //do the heavy data processing  by slicing the data and editing it
           priceData.map(function (single) {
             if (single.name === "BNB") {
-              single.name = "Smart Chain";
+              single.name = "Binance Smart Chain";
               single.symbol = "BSC";
             }
             else if (single.symbol === "btc") single.symbol = "BTC";
             else if (single.symbol === "eth") single.symbol = "ETH";
+            else if (single.symbol === "xrp") single.symbol = "XRP";
+            else if (single.symbol === "sol") single.symbol = "SOL";
+            else if (single.symbol === "trx") single.symbol = "TRX";
+            else if (single.symbol === "doge") single.symbol = "DOGE";
             else single.symbol = "DOGE";
 
             var currency = single.symbol;
