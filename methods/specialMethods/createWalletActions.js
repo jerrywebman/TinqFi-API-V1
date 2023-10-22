@@ -26,7 +26,7 @@ var functions = {
       const xpub = process.env[currency + "_XPUB"];
       const externalId = req.user.email;
       //check the currency to know the blockchain
-      if (currency === "TRX") {
+      if (currency === "XRP") {
         const wallet = process.env.TRX_WALLET_FOR_ACCOUNT_CREATION;
         if (wallet === undefined || externalId === undefined || currency === undefined)
           return res.status(500).json({
