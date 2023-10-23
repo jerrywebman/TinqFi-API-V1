@@ -163,7 +163,6 @@ exports.createLedgerAccountWithoutXpub = async function (currency, wallet, exter
 
           // console.log("Customer acount details", serverResponse.data);
           const ledgerAccountDetails = serverResponse.data;
-          console.log(serverResponse.data);
           const callthis = async (id) => {
             const url = `${process.env.TATUM_BASE_URL}/offchain/account/${id}/address/${wallet}`;
             const options = {

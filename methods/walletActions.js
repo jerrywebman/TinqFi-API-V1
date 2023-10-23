@@ -42,6 +42,8 @@ var functions = {
             else if (single.symbol === "sol") single.symbol = "SOL";
             else if (single.symbol === "trx") single.symbol = "TRX";
             else if (single.symbol === "doge") single.symbol = "DOGE";
+            else if (single.symbol === "ltc") single.symbol = "LTC";
+            else if (single.symbol === "matic") single.symbol = "MATIC";
             else single.symbol = "DOGE";
 
             var currency = single.symbol;

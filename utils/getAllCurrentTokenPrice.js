@@ -7,7 +7,7 @@ const getAllCurrentTokenPrice = async () => {
         const redisTtl = await redisClient.ttl("allPriceData");
         if (!redisTtl || redisTtl < 20) {
             const res = await axios
-                .get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin%2Cripple%2Csolana%2Ctron&page=1", {
+                .get(process.env.PRICE_IMAGE_API, {
                     headers: {
                         "Content-Type": "application/json",
                     },

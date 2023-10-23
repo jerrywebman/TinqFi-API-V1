@@ -23,41 +23,41 @@ var functions = {
                     symbol: "BSC",
                     image: "https://cryptologos.cc/logos/thumbs/bnb.png?v=025"
                 },
-                {
-                    name: "Ripple",
-                    symbol: "XRP",
-                    image: "https://cryptologos.cc/logos/thumbs/xrp.png?v=025"
-                },
+                // {
+                //     name: "Ripple",
+                //     symbol: "XRP",
+                //     image: "https://cryptologos.cc/logos/thumbs/xrp.png?v=025"
+                // },
                 // {
                 //     name: "Tether USDt",
                 //     symbol: "USDT",
                 //     image: "https://cryptologos.cc/logos/thumbs/tether.png?v=025"
                 // },
-                {
-                    name: "Solana",
-                    symbol: "SOL",
-                    image: "https://cryptologos.cc/logos/thumbs/solana.png?v=025"
-                },
+                // {
+                //     name: "Solana",
+                //     symbol: "SOL",
+                //     image: "https://cryptologos.cc/logos/thumbs/solana.png?v=025"
+                // },
                 {
                     name: "TRON",
                     symbol: "TRX",
                     image: "https://cryptologos.cc/logos/thumbs/tron.png?v=025"
                 },
-                // {
-                //     name: "Polygon",
-                //     symbol: "MATIC",
-                //     image: "https://cryptologos.cc/logos/thumbs/polygon.png?v=025"
-                // },
+                {
+                    name: "Polygon",
+                    symbol: "MATIC",
+                    image: "https://cryptologos.cc/logos/thumbs/polygon.png?v=025"
+                },
                 // {
                 //     name: "Polkadot",
                 //     symbol: "DOT",
                 //     image: "https://cryptologos.cc/logos/thumbs/polkadot-new.png?v=025"
                 // },
-                // {
-                //     name: "Litecoin",
-                //     symbol: "LTC",
-                //     image: "https://cryptologos.cc/logos/thumbs/litecoin.png?v=025"
-                // },
+                {
+                    name: "Litecoin",
+                    symbol: "LTC",
+                    image: "https://cryptologos.cc/logos/thumbs/litecoin.png?v=025"
+                },
             ]
             //get the customer token accounts
             //check if he has that token account and add is available
