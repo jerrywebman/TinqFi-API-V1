@@ -88,12 +88,20 @@ exports.createLedgerAccount = async function (currency, xpub, externalId) {
           message: err.response.data.message
         };
       });
+    console.log(ledgerresponse);
+    if (ledgerresponse.success === false) {
+      return {
+        success: ledgerresponse.success,
+        message: `An error occurred`
+      };
+    }
     return {
-      success: ledgerresponse.data.active,
+      success: ledgerresponse.success,
       message: `${currency} wallet created successfully`
     };
 
   } catch (error) {
+    console.log(error);
     return {
       success: false,
       // statusCode: 500,
