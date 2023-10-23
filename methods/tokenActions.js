@@ -61,28 +61,28 @@ var functions = {
             ]
             //get the customer token accounts
             //check if he has that token account and add is available
-            const customerTokenAccounts = req.user.onRegistrationLedgerAccnts;
-            for (const token of tokens) {
-                let tok = customerTokenAccounts.find((toks) => toks.tokenAccountcurrency === token.symbol);
-                if (tok) {
-                    availableTokenList.push({
-                        name: token.name,
-                        symbol: token.symbol,
-                        image: token.image,
-                        isAvailable: true,
-                    })
-                } else {
-                    availableTokenList.push({
-                        name: token.name,
-                        symbol: token.symbol,
-                        image: token.image,
-                        isAvailable: false,
-                    })
-                }
-            }
+            // const customerTokenAccounts = req.user.onRegistrationLedgerAccnts;
+            // for (const token of tokens) {
+            //     let tok = customerTokenAccounts.find((toks) => toks.tokenAccountcurrency === token.symbol);
+            //     if (tok) {
+            //         availableTokenList.push({
+            //             name: token.name,
+            //             symbol: token.symbol,
+            //             image: token.image,
+            //             isAvailable: true,
+            //         })
+            //     } else {
+            //         availableTokenList.push({
+            //             name: token.name,
+            //             symbol: token.symbol,
+            //             image: token.image,
+            //             isAvailable: false,
+            //         })
+            //     }
+            // }
             res.status(200).send({
                 success: true,
-                data: availableTokenList,
+                data: tokens,
             });
         } catch (e) {
             return res.status(503).send({

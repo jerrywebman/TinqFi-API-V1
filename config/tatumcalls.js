@@ -46,56 +46,26 @@ exports.createLedgerAccount = async function (currency, xpub, externalId) {
             };
             //try creating the token offchain address
             const accntresponse = await axios(options)
-              .then((offchainServerResponse) => {
+              .then(async (offchainServerResponse) => {
                 if (offchainServerResponse.data !== null) {
                   //store the addresses in the database
-                  // console.log(
-                  //   "Customer offchainServerResponse",
-                  //   offchainServerResponse.data
-                  // );
-
-
-                  //UPDATE THE CUSTOMER ADDRESS DB
-                  const addAddress = AddressStore.updateOne(
-                    { userEmail: externalId },
+                  const addTatumUserID = await User.updateOne(
+                    { email: externalId },
                     {
                       $set: {
                         ourCustomerTatumId:
                           ledgerAccountDetails.customerId,
                       },
                       $push: {
-                        onRegistration: {
+                        onRegistrationLedgerAccnts: {
                           tokenAccountId: ledgerAccountDetails.id,
-                          derivationKey:
-                            offchainServerResponse.data.derivationKey,
-                          currency:
-                            offchainServerResponse.data.currency,
-                          address: offchainServerResponse.data.address,
+                          tokenAccountcurrency:
+                            ledgerAccountDetails.currency,
+                          createdAt: Date.now(),
                         },
                       },
                     }
-                  ).then(async () => {
-                    //UPDATE THE CUSTOMER USER PROFILE DB
-
-                    const addTatumUserID = await User.updateOne(
-                      { email: externalId },
-                      {
-                        $set: {
-                          ourCustomerTatumId:
-                            ledgerAccountDetails.customerId,
-                        },
-                        $push: {
-                          onRegistrationLedgerAccnts: {
-                            tokenAccountId: ledgerAccountDetails.id,
-                            tokenAccountcurrency:
-                              ledgerAccountDetails.currency,
-                            createdAt: Date.now(),
-                          },
-                        },
-                      }
-                    );
-
-                  });
+                  );
 
                 }
 
