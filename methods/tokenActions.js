@@ -40,7 +40,7 @@ var functions = {
                 // },
                 {
                     name: "TRON",
-                    symbol: "TRX",
+                    symbol: "TRON",
                     image: "https://cryptologos.cc/logos/thumbs/tron.png?v=025"
                 },
                 {
