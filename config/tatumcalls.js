@@ -96,7 +96,7 @@ exports.createLedgerAccount = async function (currency, xpub, externalId) {
       };
     }
     return {
-      success: ledgerresponse.success,
+      success: ledgerresponse.data.active,
       message: `${currency} wallet created successfully`
     };
 
