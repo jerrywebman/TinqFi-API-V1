@@ -56,7 +56,7 @@ var functions = {
           const response = await tatumcalls.createLedgerAccount(currency, xpub, externalId);
           res.json({
             success: response.success,
-            message: response.message
+            message: `${response.message}, Please refresh your wallets`
           })
         }
       } else {
