@@ -1,5 +1,6 @@
 const axios = require("axios");
 const tatumcalls = require("../../config/tatumcalls");
+const walletActions = require("../walletActions");
 
 var functions = {
   //CREATE ALL INITIALIZATION WALLETS
@@ -8,10 +9,13 @@ var functions = {
     try {
       const externalId = clientEmail;
       const tokens = ["BTC", "ETH", "BSC", "DOGE"];
-      // const tokens = ["BTC", "ETH", "BSC", "DOGE", "SOL", "CELO", "TRX", "LTC", "MATIC"];
       tokens.map(async (token, index) => {
-        const xpub = process.env[token + "_XPUB"];
-        await tatumcalls.createLedgerAccount(token, xpub, externalId);
+        //delay by two seconds
+        setTimeout(() => {
+          const xpub = process.env[token + "_XPUB"];
+          tatumcalls.createLedgerAccount(token, xpub, externalId);
+        }, 2000);
+
       })
     } catch (e) {
       console.log(e);
@@ -22,35 +26,46 @@ var functions = {
     //step 1
     try {
       //if successful create btc ledger account
-      const currency = req.params.currency;
+      const currency = req.params.currency.toUpperCase();
       const xpub = process.env[currency + "_XPUB"];
       const externalId = req.user.email;
-      //check the currency to know the blockchain
-      if (currency === "XRP") {
-        const wallet = process.env.TRX_WALLET_FOR_ACCOUNT_CREATION;
-        if (wallet === undefined || externalId === undefined || currency === undefined)
-          return res.status(500).json({
-            success: false,
-            message: 'Service unavailable, Please try again'
+      //search if the user already owns this ledger account.
+      const isWalletAvailable = await tatumcalls.createWalletChecker(req.user.ourCustomerTatumId);
+      const checker = isWalletAvailable.filter((item) => item.currency === currency)
+      //check if the user owns this wallet.
+      if (checker.length === 0) {
+        if (currency === "XRP") {
+          const wallet = process.env.TRX_WALLET_FOR_ACCOUNT_CREATION;
+          if (wallet === undefined || externalId === undefined || currency === undefined)
+            return res.status(500).json({
+              success: false,
+              message: 'Service unavailable, Please try again'
+            })
+          const response = await tatumcalls.createLedgerAccountWithoutXpub(currency, wallet, externalId);
+          res.json({
+            success: response.success,
+            message: response.message
           })
-        const response = await tatumcalls.createLedgerAccountWithoutXpub(currency, wallet, externalId);
-        res.json({
-          success: response.success,
-          message: response.message
-        })
+        } else {
+          //do this for any account that requires xpub
+          if (xpub === undefined || externalId === undefined || currency === undefined)
+            return res.status(500).json({
+              success: false,
+              message: 'Service unavailable, Please try again'
+            })
+          const response = await tatumcalls.createLedgerAccount(currency, xpub, externalId);
+          res.json({
+            success: response.success,
+            message: response.message
+          })
+        }
       } else {
-        //do this for any account that requires xpub
-        if (xpub === undefined || externalId === undefined || currency === undefined)
-          return res.status(500).json({
-            success: false,
-            message: 'Service unavailable, Please try again'
-          })
-        const response = await tatumcalls.createLedgerAccount(currency, xpub, externalId);
-        res.json({
-          success: response.success,
-          message: response.message
+        res.status(400).json({
+          success: false,
+          message: 'wallet exist, please refresh your account'
         })
       }
+
     } catch (e) {
       console.log(e);
       res.status(500).json({

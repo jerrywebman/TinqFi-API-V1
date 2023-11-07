@@ -88,7 +88,6 @@ exports.createLedgerAccount = async function (currency, xpub, externalId) {
           message: err.response.data.message
         };
       });
-    console.log(ledgerresponse);
     if (ledgerresponse.success === false) {
       return {
         success: ledgerresponse.success,
@@ -101,7 +100,6 @@ exports.createLedgerAccount = async function (currency, xpub, externalId) {
     };
 
   } catch (error) {
-    console.log(error);
     return {
       success: false,
       // statusCode: 500,
@@ -232,3 +230,34 @@ exports.createLedgerAccountWithoutXpub = async function (currency, wallet, exter
   }
 };
 
+exports.createWalletChecker = async function (externalId) {
+  try {
+    const id = externalId;
+    const url = `${process.env.TATUM_BASE_URL}/ledger/account/customer/${id}?pageSize=40`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        "x-api-key": process.env.TATUM_API_KEY,
+      },
+      url,
+    };
+    const data = await axios(options)
+      .then(async (ServerResponse) => {
+        const response = ServerResponse.data;
+        //remove the xpub from the server response
+        response.forEach((object) => {
+          delete object["xpub"];
+        });
+        return response;
+      })
+      .catch((e) => {
+        return null;
+
+      });
+    return data;
+
+  } catch (err) {
+    return null;
+  }
+};
