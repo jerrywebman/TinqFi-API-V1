@@ -32,6 +32,7 @@ var functions = {
       //search if the user already owns this ledger account.
       const isWalletAvailable = await tatumcalls.createWalletChecker(req.user.ourCustomerTatumId);
       const checker = isWalletAvailable.filter((item) => item.currency === currency)
+      console.log(checker);
       //check if the user owns this wallet.
       if (checker.length === 0) {
         if (currency === "XRP") {
