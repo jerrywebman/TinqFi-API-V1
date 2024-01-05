@@ -12,7 +12,7 @@ var functions = {
   signup: function (generatedOTP, lowerCaseEmail) {
     const sender = {
       name: "TinqFi",
-      email: "jerrycifeanyi@gmail.com",
+      email: "info@tinqfi.com",
     };
 
     const recievers = [{ email: lowerCaseEmail }];
@@ -411,7 +411,7 @@ var functions = {
   completeRegistration: function (lowerCaseEmail, nickname) {
     const sender = {
       name: "TinqFi",
-      email: "jerrycifeanyi@gmail.com",
+      email: "info@tinqfi.com",
     };
 
     const recievers = [{ email: lowerCaseEmail }];
@@ -985,7 +985,7 @@ var functions = {
   recover: function (generatedOTP, lowerCaseEmail) {
     const sender = {
       name: "TinqFi",
-      email: "jerrycifeanyi@gmail.com",
+      email: "info@tinqfi.com",
     };
 
     const recievers = [{ email: lowerCaseEmail }];
@@ -1021,7 +1021,7 @@ var functions = {
   verifyWithdrawal: function (generatedOTP, lowerCaseEmail) {
     const sender = {
       name: "TinqFi",
-      email: "jerrycifeanyi@gmail.com",
+      email: "info@tinqfi.com",
     };
 
     const recievers = [{ email: lowerCaseEmail }];
