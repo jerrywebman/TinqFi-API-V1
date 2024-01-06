@@ -2,6 +2,8 @@ const axios = require("axios");
 var Loan = require("../models/Loan");
 var Earn = require("../models/earn");
 const getAllCurrentTokenPrice = require("../utils/getAllCurrentTokenPrice")
+const getCurrentTokenPrice = require("../utils/getCurrentTokenPrice")
+const redisClient = require("../middleware/init_redis");
 
 var functions = {
   //GET ALL THE TOKEN ACCOUNT
@@ -185,6 +187,12 @@ var functions = {
             }
             else if (single.symbol === "btc") single.symbol = "BTC";
             else if (single.symbol === "eth") single.symbol = "ETH";
+            else if (single.symbol === "xrp") single.symbol = "XRP";
+            else if (single.symbol === "sol") single.symbol = "SOL";
+            else if (single.symbol === "trx") single.symbol = "TRX";
+            else if (single.symbol === "doge") single.symbol = "DOGE";
+            else if (single.symbol === "ltc") single.symbol = "LTC";
+            else if (single.symbol === "matic") single.symbol = "MATIC";
             else single.symbol = "DOGE";
 
             var currency = single.symbol;
@@ -304,6 +312,12 @@ var functions = {
       });
     }
   },
+
+  // testAllBalances: async function (req, res) {
+  //   const data = await getCurrentTokenPrice()
+  //   return res.send(data)
+
+  // },
 };
 
 module.exports = functions;

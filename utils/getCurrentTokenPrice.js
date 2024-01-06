@@ -20,6 +20,10 @@ const getCurrentTokenPrice = async () => {
                         ETH: responseFromGecko.ethereum.usd,
                         BSC: responseFromGecko.binancecoin.usd,
                         DOGE: responseFromGecko.dogecoin.usd,
+                        SOL: responseFromGecko.solana.usd,
+                        LTC: responseFromGecko.litecoin.usd,
+                        TRON: responseFromGecko.tron.usd,
+                        MATIC: responseFromGecko["matic-network"].usd,
                     }
                     //Save data to Redis
                     redisClient.set("priceData", JSON.stringify(priceData));
