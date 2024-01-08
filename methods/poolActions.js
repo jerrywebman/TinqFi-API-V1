@@ -91,7 +91,7 @@ var functions = {
       //GET THE CURRENT PRICE OF THE TOKENS
       const options = {
         method: "GET",
-        url: process.env.PRICE_API,
+        url: "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Cdogecoin%2Cbinancecoin%2Cbinancecoin%2Cripple%2Csolana%2Ctron%2Clitecoin%2Cmatic-network&vs_currencies=usd",
       };
       //do something with the response object from coinGecko
       axios(options)
