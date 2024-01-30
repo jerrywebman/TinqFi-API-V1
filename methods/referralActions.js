@@ -10,7 +10,7 @@ var functions = {
                     referralId: req.user.nickname,
                     referralLink: `https://tinqfi.com/referral/${req.user.nickname}`,
                     totalRewards: 0,
-                    totalReferral: 0,
+                    totalReferral: 1,
                     qualifiedReferral: 0,
                 }
             });
