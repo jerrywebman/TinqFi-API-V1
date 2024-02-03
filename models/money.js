@@ -14,12 +14,10 @@ var moneySchema = new mongoose.Schema({
   },
   referredBy: {
     type: String,
-    min: 6,
-    max: 6,
   },
   nickname: {
     type: String,
-    require: true,
+    required: true,
   },
   investmentBalance: {
     type: Array,

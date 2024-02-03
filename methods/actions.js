@@ -241,7 +241,8 @@ var functions = {
       const userEmailAddress = req.body.email;
       const lowerCaseEmail = userEmailAddress.toLowerCase();
       let nickname = req.body.nickname;
-      let referredBy = req.body.referredBy || " ";
+      const ref = req.body.referredBy;
+      let referredBy = ref.toLowerCase();
       let password = req.body.password;
       let confirmPassword = req.body.confirmPassword;
       //CHECKING IF USER HAS AN ACCOUNT WITH US AND EMAIL VERIFIED

@@ -24,8 +24,7 @@ var userSchema = new mongoose.Schema({
   referredBy: {
     type: String,
     // require: true,
-    min: 6,
-    max: 6,
+    default: "",
   },
   fullname: {
     type: String,
@@ -74,11 +73,11 @@ var userSchema = new mongoose.Schema({
   },
   dateOfBirth: {
     type: String,
-    require: true,
+    required: true,
   },
   issuer: {
     type: String,
-    require: true,
+    required: true,
   },
   verifyCode: {
     type: String,
