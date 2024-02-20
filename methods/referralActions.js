@@ -7,9 +7,11 @@ var functions = {
     getReferrals: async function (req, res) {
         try {
             let totalQualifiedReferrals = 0;
+            let totalQualifiedReferralsCount = 0;
             const totalReferral = await User.find({ referredBy: req.user.nickname })
             if (totalReferral.length > 0) {
-                totalQualifiedReferrals = await totalReferral.filter((item) => item.accountSetup === true)
+                totalQualifiedReferrals = await totalReferral.filter((item) => item.accountSetup === true);
+                totalQualifiedReferralsCount = totalQualifiedReferrals.length;
             }
             const isRewardDocAvailable = await Reward.findOne({ email: req.user.email });
             if (isRewardDocAvailable === null) {
@@ -27,7 +29,8 @@ var functions = {
                     isAvailable: true,
                     earnedStatus: isRewardDocAvailable.referTen,
                     points: 100,
-                    category: "Referral"
+                    category: "Referral",
+                    progressLevel: Number((totalQualifiedReferralsCount / 10) * 100),
                 },
                 {
                     id: "referFifty",
@@ -35,7 +38,8 @@ var functions = {
                     isAvailable: true,
                     earnedStatus: isRewardDocAvailable.referFifty,
                     points: 800,
-                    category: "Referral"
+                    category: "Referral",
+                    progressLevel: Number((totalQualifiedReferralsCount / 50) * 100)
                 },
                 {
                     id: "referHundred",
@@ -43,7 +47,8 @@ var functions = {
                     isAvailable: true,
                     earnedStatus: isRewardDocAvailable.referHundred,
                     points: 2000,
-                    category: "Referral"
+                    category: "Referral",
+                    progressLevel: Number((totalQualifiedReferralsCount / 100) * 100)
                 },
                 {
                     id: "referOneThousand",
@@ -51,7 +56,8 @@ var functions = {
                     isAvailable: true,
                     earnedStatus: isRewardDocAvailable.referOneThousand,
                     points: 12000,
-                    category: "Referral"
+                    category: "Referral",
+                    progressLevel: Number((totalQualifiedReferralsCount / 1000) * 100)
                 },
                 {
                     id: "earnBonus",
@@ -59,7 +65,8 @@ var functions = {
                     isAvailable: true,
                     earnedStatus: isRewardDocAvailable.earnBonus,
                     points: 200,
-                    category: "Earn"
+                    category: "Earn",
+                    progressLevel: 0,
                 },
                 {
                     id: "convertBonus",
@@ -67,7 +74,8 @@ var functions = {
                     isAvailable: true,
                     earnedStatus: isRewardDocAvailable.convertBonus,
                     points: 400,
-                    category: "Convert"
+                    category: "Convert",
+                    progressLevel: 0,
                 },
             ];
             const RewardData = await Reward.findOne({ email: req.user.email })
@@ -100,7 +108,7 @@ var functions = {
             const lastCheckedIn = new Date(checkedData.lastCheckedIn);
             const dateDiff = today - lastCheckedIn;
             const lastTime = dateDiff / aDayInMilliseconds;
-            if (lastTime < 1) {
+            if (lastTime > 1) {
                 //credit user and send response
                 const reward = await Reward.updateOne(
                     { email: req.user.email }, {
