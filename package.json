@@ -7,6 +7,9 @@
     "start": "cross-env NODE_ENV=production node server",
     "dev": "cross-env NODE_ENV=development nodemon server"
   },
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "keywords": [],
   "author": "jerrywebman",
   "license": "MIT",
