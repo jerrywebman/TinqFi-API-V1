@@ -6,7 +6,7 @@ var contactUsSchema = new mongoose.Schema({
     type: String,
     required: true,
     match: /.+\@.+\..+/,
-    unique: true,
+    // unique: true,
   },
   name: {
     type: String,

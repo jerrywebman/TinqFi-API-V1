@@ -1,17 +1,13 @@
-// const nodemailer = require("nodemailer");
-const Sib = require("sib-api-v3-sdk");
+const { TransactionalEmailsApi, SendSmtpEmail } = require("@getbrevo/brevo");
 
-const client = Sib.ApiClient.instance;
-var apiKey = client.authentications["api-key"];
-apiKey.apiKey = process.env.SEND_IN_BLUE;
-
-const tranEmailApi = new Sib.TransactionalEmailsApi();
+let transactionalEmailApi = new TransactionalEmailsApi();
+transactionalEmailApi.authentications.apiKey.apiKey = process.env.BREVO;
 
 var functions = {
   //Contact Us Email
   contactUs: function (name, email) {
     const sender = {
-      name: "Tinqlab Technologies contact form",
+      name: "Tinqlab Technologies",
       email: "info@tinqlab.com",
     };
 
@@ -67,20 +63,13 @@ var functions = {
             bgcolor="#ffffff"
             style="margin: 0 auto"
           >
-            <!-- Header -->
-            <tr>
-              <td style="padding: 35px 55px; text-align: center">
-                <p style="font-size: 22px; font-family: Cabin, sans-serif;">
-                  <strong>Thanks for contacting Tinqlab</strong>
-                </p>
-              </td>
-            </tr>
+           
 
             <!-- Logo -->
             <tr>
               <td align="center" style="padding: 0 55px 20px">
                 <img
-                  src="https://www.tinqfi.com/images/logo-01.png"
+                  src="https://i.imgur.com/jkzc1u2.png"
                   alt="Tinqlab Logo"
                   style="width: 100%; max-width: 260px; height: auto"
                 />
@@ -152,7 +141,7 @@ var functions = {
                   "
                 >
                   Warm regards,<br />
-                  <strong>The Tinqlab Support Team</strong>
+                  <strong>Tinqlab Support Team</strong>
                 </p>
               </td>
             </tr>
@@ -171,7 +160,7 @@ var functions = {
 </html>
 `;
 
-    tranEmailApi
+    transactionalEmailApi
       .sendTransacEmail({
         sender,
         to: recievers,
@@ -246,19 +235,13 @@ var functions = {
             style="margin: 0 auto"
           >
             <!-- Header -->
-            <tr>
-              <td style="padding: 35px 55px; text-align: center">
-                <p style="font-size: 22px; font-family: Cabin, sans-serif;">
-                  <strong>Thanks for contacting Tinqlab</strong>
-                </p>
-              </td>
-            </tr>
+           
 
             <!-- Logo -->
             <tr>
               <td align="center" style="padding: 0 55px 20px">
                 <img
-                  src="https://www.tinqfi.com/images/logo-01.png"
+                  src="https://i.imgur.com/jkzc1u2.png"
                   alt="Tinqlab Logo"
                   style="width: 100%; max-width: 260px; height: auto"
                 />
@@ -376,7 +359,7 @@ var functions = {
                   "
                 >
                   Warm regards,<br />
-                  <strong>The Tinqlab Support Team</strong>
+                  <strong>Tinqlab Support Team</strong>
                 </p>
               </td>
             </tr>
@@ -395,7 +378,7 @@ var functions = {
 </html>
 `;
 
-    tranEmailApi
+    transactionalEmailApi
       .sendTransacEmail({
         sender,
         to: recievers,

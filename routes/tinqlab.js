@@ -4,9 +4,15 @@ const router = express.Router();
 
 router.get("/api/tinqlab/wake", function (req, res) {
   try {
-    res.status(200).send(`Hello Dev, Am up now`);
+    res.status(200).json({
+      success: false,
+      msg: "Hello Dev, Am up now`",
+    });
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).json({
+      success: false,
+      msg: "Strugling`",
+    });
   }
 });
 
