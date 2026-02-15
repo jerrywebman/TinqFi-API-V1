@@ -17,7 +17,11 @@ if (process.env.NODE_ENV === "development") {
 
 //routes
 //cors allows us to call data/api from cross domains
-app.use(cors({ origin: "*" }));
+app.use(
+  cors({
+    origin: ["https://tinqlab.com", "https://www.tinqlab.com"],
+  }),
+);
 // Add headers
 app.use(function (req, res, next) {
   // Website you wish to allow to connect
