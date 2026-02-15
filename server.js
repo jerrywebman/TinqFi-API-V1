@@ -2,74 +2,79 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const connectDB = require("./config/db");
-const dbConfig = require("./config/dbconfig");
 const passport = require("passport");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 
+// Connect to database
 connectDB();
 
 const app = express();
 
+// Logging in development
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-//routes
-//cors allows us to call data/api from cross domains
+// Body parser
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
+
+// CORS configuration
+const allowedOrigins = [
+  "https://tinqlab.com",
+  "https://www.tinqlab.com",
+  "http://tinqlab.com",
+  "http://www.tinqlab.com",
+];
+
 app.use(
   cors({
-    origin: ["https://tinqlab.com", "https://www.tinqlab.com"],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like Postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Allow cookies / auth headers
   }),
 );
-// Add headers
-app.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  // res.setHeader(
-  //   "Access-Control-Allow-Origin",
-  //   "http://localhost:5000,http://localhost:2 000 "
-  // );
 
-  // Request methods you wish to allow
+// Optional: set headers for additional safety
+app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, OPTIONS, PUT, PATCH, DELETE",
   );
-
-  // Request headers you wish to allow
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type",
+    "X-Requested-With, Content-Type, Authorization",
   );
-
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader("Access-Control-Allow-Credentials", true);
-
-  // Pass to next layer of middleware
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
 
-//creating the session store
-// const sessionStore = new MongoStore.create({
-//   mongoUrl: dbConfig.database,
-//   collection: "sessions",
-// });
+// Passport initialization (if used)
+app.use(passport.initialize());
 
-// app.use(cors({ origin: "https://localhost:3000", credentials: true }));
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+// Routes
+const tinqlabRoutes = require("./routes/tinqlab");
+app.use("/api/tinqlab", tinqlabRoutes);
 
-app.use(cookieParser());
+// Catch-all route for invalid paths
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
 
-//get routes
-const tinqlab = require("./routes/tinqlab");
-
-app.use(tinqlab);
-
-const PORT = 4001;
-
-app.listen(
-  PORT,
-  console.log(`Server running on ${process.env.NODE_ENV} mode on port ${PORT}`),
+// Start server
+const PORT = process.env.PORT || 4001;
+app.listen(PORT, () =>
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`),
 );
