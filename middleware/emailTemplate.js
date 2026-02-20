@@ -1,6 +1,6 @@
-const { TransactionalEmailsApi, SendSmtpEmail } = require("@getbrevo/brevo");
+const brevo = require("@getbrevo/brevo");
 
-let transactionalEmailApi = new TransactionalEmailsApi();
+let transactionalEmailApi = new brevo.TransactionalEmailsApi();
 transactionalEmailApi.authentications.apiKey.apiKey = process.env.BREVO;
 
 var functions = {

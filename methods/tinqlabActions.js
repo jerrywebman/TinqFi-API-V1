@@ -5,7 +5,6 @@ var functions = {
   // ** Contact US ROUTE **//
   contactUs: function (req, res) {
     try {
-      console.log(req.body);
       const { name, email, phoneNumber, industry, budget, message } = req.body;
       if (!name || !email || !phoneNumber || !industry || !budget || !message) {
         res.status(200).json({
