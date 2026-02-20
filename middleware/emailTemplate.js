@@ -1,4 +1,3 @@
-const brevo = require("@getbrevo/brevo");
 const { transactionalEmailApi, brevo } = require("../utils/brevoConfig");
 
 var functions = {
