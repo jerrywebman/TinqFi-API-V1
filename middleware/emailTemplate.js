@@ -1,20 +1,28 @@
 const brevo = require("@getbrevo/brevo");
-
-let transactionalEmailApi = new brevo.TransactionalEmailsApi();
-transactionalEmailApi.authentications.apiKey.apiKey = process.env.BREVO;
+const { transactionalEmailApi, brevo } = require("../utils/brevoConfig");
 
 var functions = {
   //Contact Us Email
-  contactUs: function (name, email) {
-    const sender = {
+  contactUs: async function (name, email) {
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+
+    sendSmtpEmail.sender = {
       name: "Tinqlab Technologies",
       email: "info@tinqlab.com",
     };
 
+    sendSmtpEmail.to = [
+      {
+        email: email,
+        name: name,
+      },
+    ];
+
+    sendSmtpEmail.subject = "Welcome to Tinqlab 🎉";
+
     //done
 
-    const recievers = [{ email: email }];
-    let htmlWelcomeTemplate = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    sendSmtpEmail.htmlContent = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html
   xmlns="http://www.w3.org/1999/xhtml"
@@ -160,18 +168,16 @@ var functions = {
 </html>
 `;
 
-    transactionalEmailApi
-      .sendTransacEmail({
-        sender,
-        to: recievers,
-        subject: "Thank you for reaching out - Tinqlab Technologies",
-        htmlContent: htmlWelcomeTemplate,
-      })
-      .then(console.log("email sent successfully"))
-      .catch((e) => console.log("error occured", e));
+    try {
+      const response =
+        await transactionalEmailApi.sendTransacEmail(sendSmtpEmail);
+      console.log("Email sent:", response);
+    } catch (error) {
+      console.error("Brevo error:", error.response?.body || error);
+    }
   },
 
-  adminContactUs: function (
+  adminContactUs: async function (
     name,
     email,
     phoneNumber,
@@ -179,13 +185,20 @@ var functions = {
     budget,
     message,
   ) {
-    const sender = {
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+
+    sendSmtpEmail.sender = {
       name: "Tinqlab Technologies",
       email: "info@tinqlab.com",
     };
 
-    const recievers = [{ email: "info@tinqlab.com" }];
-    let htmlWelcomeTemplate = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    sendSmtpEmail.to = [
+      { email: "info@tinqlab.com", name: "Tinqlab Technologies" },
+    ];
+
+    sendSmtpEmail.subject = "We have a lead - Tinqlab Technologies";
+
+    sendSmtpEmail.htmlContent = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html
   xmlns="http://www.w3.org/1999/xhtml"
@@ -378,15 +391,13 @@ var functions = {
 </html>
 `;
 
-    transactionalEmailApi
-      .sendTransacEmail({
-        sender,
-        to: recievers,
-        subject: "We have a lead - Tinqlab Technologies",
-        htmlContent: htmlWelcomeTemplate,
-      })
-      .then(console.log("email sent successfully"))
-      .catch((e) => console.log("error occured", e));
+    try {
+      const response =
+        await transactionalEmailApi.sendTransacEmail(sendSmtpEmail);
+      console.log("Email sent:", response);
+    } catch (error) {
+      console.error("Brevo error:", error.response?.body || error);
+    }
   },
 };
 
