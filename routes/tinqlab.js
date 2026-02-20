@@ -2,7 +2,7 @@ const express = require("express");
 const tinqlabActions = require("../methods/tinqlabActions");
 const router = express.Router();
 
-router.get("/api/tinqlab/wake", function (req, res) {
+router.get("/wake", function (req, res) {
   try {
     res.status(200).json({
       success: false,
@@ -17,6 +17,6 @@ router.get("/api/tinqlab/wake", function (req, res) {
 });
 
 //** @desc ADD A NEW USER **
-router.post("/api/tinqlab/contact-us", tinqlabActions.contactUs);
+router.post("/contact-us", tinqlabActions.contactUs);
 
 module.exports = router;

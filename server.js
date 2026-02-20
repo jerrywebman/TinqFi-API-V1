@@ -29,6 +29,7 @@ const allowedOrigins = [
   "https://www.tinqlab.com",
   "http://tinqlab.com",
   "http://www.tinqlab.com",
+  // "http://localhost:3000",
 ];
 
 app.use(
@@ -67,11 +68,6 @@ app.use(passport.initialize());
 // Routes
 const tinqlabRoutes = require("./routes/tinqlab");
 app.use("/api/tinqlab", tinqlabRoutes);
-
-// Catch-all route for invalid paths
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
 
 // Start server
 const PORT = process.env.PORT || 4001;

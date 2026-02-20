@@ -5,6 +5,7 @@ var functions = {
   // ** Contact US ROUTE **//
   contactUs: function (req, res) {
     try {
+      console.log(req.body);
       const { name, email, phoneNumber, industry, budget, message } = req.body;
       if (!name || !email || !phoneNumber || !industry || !budget || !message) {
         res.status(200).json({
@@ -20,26 +21,17 @@ var functions = {
           budget,
           message,
         });
-        contactData.save(function (err, newData) {
-          if (err) {
-            res.status(500).send({
-              success: false,
-              msg: "An error occurred",
-              err,
-            });
-          } else {
-            contactUs(name, email);
-            adminContactUs(name, email, phoneNumber, industry, budget, message);
-            return res.status(200).json({
-              success: true,
-              msg: "Thank you for contacting us. We’ll get back to you shortly.",
-            });
-          }
+        contactData.save().then((savedDoc) => {
+          contactUs(name, email);
+          adminContactUs(name, email, phoneNumber, industry, budget, message);
+          return res.status(200).json({
+            success: true,
+            msg: "Thank you for contacting us. We’ll get back to you shortly.",
+          });
         });
       }
     } catch (e) {
-      console.error("Contact Us Error:", e);
-      res.send({
+      res.status(500).json({
         success: false,
         msg: "Something went wrong.",
       });

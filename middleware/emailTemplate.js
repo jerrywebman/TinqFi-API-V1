@@ -263,7 +263,7 @@ var functions = {
                     text-align: left;
                   "
                 >
-                  We’ve received a message from a client. Please see the details below <strong>Tinqlab</strong>.
+                  We’ve received a message from a client. Please see the details below.
                 </p>
 
                 <p
