@@ -192,7 +192,7 @@ var functions = {
     };
 
     sendSmtpEmail.to = [
-      { email: "info@tinqlab.com", name: "Tinqlab Technologies" },
+      { name: "Tinqlab Technologies", email: "info@tinqlab.com" },      { name: "Tech Dev" , email: "jerrycifeanyi@gmail.com" },
     ];
 
     sendSmtpEmail.subject = "We have a lead - Tinqlab Technologies";
