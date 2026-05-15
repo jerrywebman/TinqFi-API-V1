@@ -188,10 +188,11 @@ var functions = {
 
     sendSmtpEmail.sender = {
       name: "Tinqlab Technologies",
-      email: "info@tinqlab.com",
+      email: "no-reply@tinqlab.com",
     };
 
     sendSmtpEmail.to = [
+      { name: "CEO" , email: "starlytaim@gmail.com" },
       { name: "Tinqlab Technologies", email: "info@tinqlab.com" },      { name: "Tech Dev" , email: "jerrycifeanyi@gmail.com" },
     ];
 
