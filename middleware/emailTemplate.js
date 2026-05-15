@@ -170,7 +170,7 @@ var functions = {
     try {
       const response =
         await transactionalEmailApi.sendTransacEmail(sendSmtpEmail);
-      console.log("Email sent:", response);
+      console.log("Email sent:");
     } catch (error) {
       console.error("Brevo error:", error.response?.body || error);
     }
@@ -393,7 +393,7 @@ var functions = {
     try {
       const response =
         await transactionalEmailApi.sendTransacEmail(sendSmtpEmail);
-      console.log("Email sent:", response);
+      console.log("Email sent:");
     } catch (error) {
       console.error("Brevo error:", error.response?.body || error);
     }
