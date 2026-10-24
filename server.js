@@ -29,6 +29,10 @@ const allowedOrigins = [
   "https://www.tinqlab.com",
   "http://tinqlab.com",
   "http://www.tinqlab.com",
+  "https://zamafit.co.uk",
+  "https://www.zamafit.co.uk",
+  "http://zamafit.co.uk",
+  "http://www.zamafit.co.uk",
   // "http://localhost:3000",
 ];
 

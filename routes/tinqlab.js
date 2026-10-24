@@ -18,5 +18,6 @@ router.get("/wake", function (req, res) {
 
 //** @desc ADD A NEW USER **
 router.post("/contact-us", tinqlabActions.contactUs);
+router.post("/contact-us/zamafit", tinqlabActions.contactUsZamafit);
 
 module.exports = router;
