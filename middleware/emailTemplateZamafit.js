@@ -34,7 +34,7 @@ var functions = {
 
     sendSmtpEmail.sender = {
       name: "Zamafit Rehab Centre",
-      email: "jerrycifeanyi@gmail.com",
+      email: "admin@zamafit.co.uk",
     };
 
     sendSmtpEmail.to = [
@@ -45,7 +45,7 @@ var functions = {
     ];
 
     sendSmtpEmail.replyTo = {
-      email: "jerrycifeanyi@gmail.com",
+      email: "admin@zamafit.co.uk",
       name: "Zamafit Rehab Centre",
     };
 
@@ -186,12 +186,12 @@ var functions = {
 
     sendSmtpEmail.sender = {
       name: "Zamafit Rehab Centre",
-      email: "jerrycifeanyi@gmail.com",
+      email: "admin@zamafit.co.uk",
     };
 
     sendSmtpEmail.to = [
       {
-        email: "jerrycifeanyi@gmail.com",
+        email: "admin@zamafit.co.uk",
         name: "Zamafit Rehab Centre",
       },
     ];
