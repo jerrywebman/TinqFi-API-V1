@@ -10,6 +10,14 @@ var functions = {
   contactUs: function (req, res) {
     try {
       const { name, email, phoneNumber, industry, budget, message } = req.body;
+      const { website } = req.body;
+
+      if (typeof website === "string" && website.trim() !== "") {
+        return res.status(200).json({
+          success: true,
+          msg: "Thank you for contacting us.",
+        });
+      }
       if (!name || !email || !phoneNumber || !industry || !budget || !message) {
         res.status(200).json({
           success: false,
