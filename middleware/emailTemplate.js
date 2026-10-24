@@ -170,7 +170,7 @@ var functions = {
     try {
       const response =
         await transactionalEmailApi.sendTransacEmail(sendSmtpEmail);
-      console.log("Email sent:", response);
+      console.log("Email sent:");
     } catch (error) {
       console.error("Brevo error:", error.response?.body || error);
     }
@@ -188,11 +188,13 @@ var functions = {
 
     sendSmtpEmail.sender = {
       name: "Tinqlab Technologies",
-      email: "info@tinqlab.com",
+      email: "no-reply@tinqlab.com",
     };
 
     sendSmtpEmail.to = [
-      { email: "info@tinqlab.com", name: "Tinqlab Technologies" },
+      { name: "CEO", email: "starlytaim@gmail.com" },
+      { name: "Tinqlab Technologies", email: "info@tinqlab.com" },
+      { name: "Tech Dev", email: "jerrycifeanyi@gmail.com" },
     ];
 
     sendSmtpEmail.subject = "We have a lead - Tinqlab Technologies";
@@ -393,7 +395,7 @@ var functions = {
     try {
       const response =
         await transactionalEmailApi.sendTransacEmail(sendSmtpEmail);
-      console.log("Email sent:", response);
+      console.log("Email sent:");
     } catch (error) {
       console.error("Brevo error:", error.response?.body || error);
     }
